@@ -20,7 +20,6 @@ public:
 	static const int Black = 32;
 	static const int White = 0;
 
-
 	static uint8_t colour(uint8_t piece) { return (piece & colourMask); }
 	static uint8_t height(uint8_t piece) { return (piece & heightMask); }
 	static uint8_t addOn(uint8_t piece) { return (piece & addOnMask); }

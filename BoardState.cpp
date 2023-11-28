@@ -4,6 +4,9 @@
 #include "Piece.h"
 #include <cstdint>
 
+#include <Windows.h>
+#include <WinUser.h>
+
 #define BACKGROUND "\x1b[43m\x1b[38;5;52m"
 #define RESET "\x1b[m"
 #define BLACK "\x1b[38;5;0m"
@@ -95,24 +98,25 @@ void BoardState::rst(std::bitset<3>& tps)
 		}
 	}
 
-	pieces[5][0] |= 3;
-	pieces[7][0] |= 3;
+	/*pieces[5][0] |= 3 | Piece::Blue;
+	pieces[7][0] |= 3 | Piece::Red;
 	pieces[5][2] |= 3;
-	pieces[7][2] |= 3;
+	pieces[7][2] |= 3;*/
+	pieces[2][2] |= 3;
 
-	pieces[5][10] |= 3 | Piece::Black;
-	pieces[7][10] |= 3 | Piece::Black;
-	pieces[5][12] |= 3 | Piece::Black;
-	pieces[7][12] |= 3 | Piece::Black;
+	pieces[5][10] |= 3 | Piece::Black | Piece::Blue;
+	pieces[7][10] |= 3 | Piece::Black | Piece::Red;
+	pieces[5][12] |= 5 | Piece::Black;
+	pieces[7][12] |= 1 | Piece::Black;
 
-	pieces[0][0] |= Piece::Blue;
-	pieces[12][0] |= Piece::Blue;
-	pieces[0][12] |= Piece::Blue;
-	pieces[12][12] |= Piece::Blue;
-	pieces[6][6] |= Piece::Blue;
+	pieces[0][0] |= Piece::Blue | 1;
+	pieces[12][0] |= Piece::Blue | 1;
+	pieces[0][12] |= Piece::Blue | 1;
+	pieces[12][12] |= Piece::Blue | 1;
+	pieces[6][6] |= Piece::Blue | 1;
 
-	pieces[0][6] |= Piece::Red;
-	pieces[12][6] |= Piece::Red;
+	pieces[0][6] |= Piece::Red | 1;
+	pieces[12][6] |= Piece::Red | 1;
 }
 
 std::string center(uint8_t piece) {
@@ -193,9 +197,116 @@ void BoardState::print()
 
 void BoardState::copyBoard(uint8_t(*dest)[13][13])
 {
+	std::memcpy(dest, &pieces, sizeof(pieces));
+}
+
+struct BoardState::xMove {
+	int i;
+	int j;
+	uint8_t delta;
+	xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
+};
+
+void debugPrint(std::string str) {
+	std::wstring temp = std::wstring(str.begin(), str.end());
+	LPCWSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
+std::vector<std::vector<BoardState::xMove>>* BoardState::getMoves(bool isWhite)
+{
+	std::vector<std::vector<xMove>>* moves = new std::vector<std::vector<xMove>>;		//HEAP ALLOCATED!!! HAS TO BE DECONSTRUCTED OR MEMORY WILL BE FILLED UP
+
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
-			(*dest)[i][j] = pieces[i][j];
+			uint8_t piece = pieces[i][j];
+			if (Piece::height(piece) == 0 || Piece::isAddOn(piece)) continue;
+			if (Piece::isWhiteTower(piece) == isWhite) continue;
+
+			uint8_t boardCopy[13][13];
+			copyBoard(&boardCopy);
+			bool visited[13][13];
+			memset(visited, false, sizeof(visited));
+			visited[i][j] = true;
+			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false);
 		}
+	}
+
+	return moves;
+}
+
+void BoardState::basicGenerator(std::vector<std::vector<xMove>>* moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned)
+{
+	std::vector<BoardState::xMove>* move = new std::vector<BoardState::xMove>;
+	for (int i = 0; i < 13; i++) {
+		for (int j = 0; j < 13; j++) {
+			if (pieces[i][j] == (*state)[i][j]) continue;
+			move->emplace_back(xMove{ i, j, ((uint8_t)((pieces[i][j]) ^ ((*state)[i][j]))) });		//Creation of xor lists for moves
+		}
+	}
+	moves->emplace_back(*move);
+
+	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, state, sizeof(boardCopy));
+		boardCopy[x][y] ^= setTurnPiece;
+		bool visitedCopy[13][13];
+		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+		basicGenerator(moves, &boardCopy, x, y, &visitedCopy, remainingSteps, true);
+	}
+
+	if (remainingSteps == 0) return;
+
+
+	/*
+		0
+	   3 1
+		2
+	*/
+	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
+		if ((((*state)[x][y]) & turnPiece) != 0) {		//Obey turn pieces
+			if (((((*state)[x][y]) & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
+		}
+		int i = x;
+		int j = y;
+		switch (d)
+		{
+		case 0:
+			j--;
+			break;
+		case 1:
+			i++;
+			break;
+		case 2:
+			j++;
+			break;
+		case 3:
+			i--;
+			break;
+		}
+		if (i < 0 || i > 12 || j < 0 || j > 12) continue;
+		if (i % 2 == 1 && j % 2 == 1) continue;
+		if ((*visited)[i][j]) continue;		//Bounds and revisiting check
+		if ((((*state)[i][j]) & turnPiece) != 0 && (((((*state)[i][j]) & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
+
+		if (((*state)[i][j] & 0b00111111) == 0) {		//Most basic case : empty target square
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+			boardCopy[x][y] &= 0b11000000;
+			boardCopy[i][j] |= (uint8_t)(((*state)[x][y]) & 0b00111111);
+			bool visitedCopy[13][13];
+			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+			visitedCopy[i][j] = true;
+			debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false);
+		}
+	}
+}
+
+void BoardState::unsafeMakeMove(std::vector<xMove>* move)
+{
+	for (int i = 0; i < move->size(); i++) {
+		pieces[(*move)[i].i][(*move)[i].j] ^= (*move)[i].delta;
 	}
 }
