@@ -13,7 +13,6 @@ class BoardState
 public:
 	BoardState();
 	void rst(std::bitset<3>& tps);
-	void print();
 
 	void copyBoard(uint8_t(*dest)[13][13]);
 

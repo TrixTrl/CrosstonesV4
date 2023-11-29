@@ -137,64 +137,6 @@ std::string center(uint8_t piece) {
 	return out;
 };
 
-void BoardState::print()
-{
-	auto s = [](int i)->std::string {
-		return std::string(1, (unsigned char)i);
-	};
-
-	std::string basicTop = BACKGROUND + s(218) + s(196) + s(196) + s(196) + s(196) + s(191) + RESET;
-	std::string basicBottom = BACKGROUND + s(192) + s(196) + s(196) + s(196) + s(196) + s(217) + RESET;
-	std::string basicSide = BACKGROUND + s(179) + RESET;
-	std::string turnTop = BACKGROUND + s(201) + s(205) + s(205) + s(205) + s(205) + s(187) + RESET;
-	std::string turnBottom = BACKGROUND + s(200) + s(205) + s(205) + s(205) + s(205) + s(188) + RESET;
-	std::string turnSide = BACKGROUND + s(186) + RESET;
-
-	std::cout << "    1     2     3     4     5     6     7     8     9    10    11    12    13  \n";
-
-	for (int i = 0; i < 13; i++) {
-		for (int l = 0; l < 3; l++) {
-			if (l == 1) {
-				std::cout << s(77 - i);
-			}
-			else {
-				std::cout << " ";
-			}
-			for (int j = 0; j < 13; j++) {
-				uint8_t piece = pieces[j][i];
-				if (i % 2 == 1 && j % 2 == 1) {
-					std::cout << "      ";
-				}
-				else {
-					switch (l) {
-					case 0:
-						if ((piece & turnPiece) != 0) {
-							std::cout << turnTop;
-						}
-						else std::cout << basicTop;
-						break;
-					case 1:
-						if ((piece & turnPiece) != 0) {
-							std::cout << turnSide << center(piece) << turnSide;
-						}
-						else std::cout << basicSide << center(piece) << basicSide;
-						break;
-					case 2:
-						if ((piece & turnPiece) != 0) {
-							std::cout << turnBottom;
-						}
-						else std::cout << basicBottom;
-						break;
-					}
-				}
-			}
-			if (l == 1) std::cout << s(77 - i);
-			std::cout << "\n";
-		}
-	}
-	std::cout << "    1     2     3     4     5     6     7     8     9    10    11    12    13  \n";
-}
-
 void BoardState::copyBoard(uint8_t(*dest)[13][13])
 {
 	std::memcpy(dest, &pieces, sizeof(pieces));
