@@ -32,8 +32,9 @@ int main() {
 
 	InvalidateRect(globalHwnd, NULL, NULL);
 
-
-	std::vector<std::vector<BoardState::xMove>>* moves = bs.getMoves(false);
+	bool isWhite = false;
+	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	moves = bs.getMoves(isWhite);
 
 	std::string str = std::to_string(moves->size());
 	str += "\n";
@@ -43,7 +44,7 @@ int main() {
 
 	int i = 0;
 	while (true) {
-		bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
+		bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
 		bs.copyBoard(&(displayBoard[0]));
 		bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
 

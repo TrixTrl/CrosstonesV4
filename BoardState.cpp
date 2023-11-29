@@ -213,9 +213,8 @@ void debugPrint(std::string str) {
 	OutputDebugString(wideString);
 }
 
-std::vector<std::vector<BoardState::xMove>>* BoardState::getMoves(bool isWhite)
-{
-	std::vector<std::vector<xMove>>* moves = new std::vector<std::vector<xMove>>;		//HEAP ALLOCATED!!! HAS TO BE DECONSTRUCTED OR MEMORY WILL BE FILLED UP
+std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) {
+	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
 
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
@@ -236,16 +235,16 @@ std::vector<std::vector<BoardState::xMove>>* BoardState::getMoves(bool isWhite)
 	return moves;
 }
 
-void BoardState::basicGenerator(std::vector<std::vector<xMove>>* moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned)
+void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned)
 {
-	std::vector<BoardState::xMove>* move = new std::vector<BoardState::xMove>;
+	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
 			if (pieces[i][j] == (*state)[i][j]) continue;
-			move->emplace_back(xMove{ i, j, ((uint8_t)((pieces[i][j]) ^ ((*state)[i][j]))) });		//Creation of xor lists for moves
+			move.emplace_back(xMove{ i, j, ((uint8_t)((pieces[i][j]) ^ ((*state)[i][j]))) });		//Creation of xor lists for moves
 		}
 	}
-	moves->emplace_back(*move);
+	moves->emplace_back(move);
 
 	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
 		uint8_t boardCopy[13][13];
@@ -308,5 +307,27 @@ void BoardState::unsafeMakeMove(std::vector<xMove>* move)
 {
 	for (int i = 0; i < move->size(); i++) {
 		pieces[(*move)[i].i][(*move)[i].j] ^= (*move)[i].delta;
+	}
+}
+
+void BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
+{
+	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	moves = getMoves(isWhiteTurn);
+	uint8_t boardCopy1[13][13];
+	uint8_t boardCopy2[13][13];
+	std::memcpy(&boardCopy1, pieces, sizeof(boardCopy1));
+	for (int i = 0; i < move->size(); i++) {
+		boardCopy1[(*move)[i].i][(*move)[i].j] ^= (*move)[i].delta;
+	}
+	for (int i = 0; i < moves->size(); i++) {
+		std::memcpy(&boardCopy2, pieces, sizeof(boardCopy2));
+		for (int j = 0; j < (*moves)[i].size(); j++) {
+			boardCopy2[(*moves)[i][j].i][(*moves)[i][j].j] ^= (*moves)[i][j].delta;
+		}
+		if (memcmp(&boardCopy1, &boardCopy2, sizeof(boardCopy1)) == 0) {
+			std::memcpy(&pieces, boardCopy1, sizeof(pieces));
+			return;
+		}
 	}
 }

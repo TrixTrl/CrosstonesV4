@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <bitset>
 #include <vector>
+#include <memory>
 
 class BoardState
 {
@@ -18,10 +19,11 @@ public:
 
 	struct xMove;
 
-	std::vector<std::vector<xMove>>* getMoves(bool isWhite);
-	void basicGenerator(std::vector<std::vector<xMove>>* moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned);
+	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite);
+	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned);
 
 	void unsafeMakeMove(std::vector<xMove>* move);
+	void makeMove(std::vector<xMove>* move, bool isWhiteTurn);
 
 	static const uint8_t turnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
