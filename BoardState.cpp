@@ -106,6 +106,7 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[7][2] |= 3;*/
 	pieces[2][4] |= 2 | Piece::Blue;
 	pieces[4][4] |= 1;
+	pieces[6][4] |= 2;
 	pieces[2][5] |= 1 | Piece::Black;
 	pieces[2][3] |= 1 | Piece::Red;
 
@@ -214,7 +215,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
 		uint8_t piece = ((*state)[x][y]);
 		if ((piece & turnPiece) != 0) {		//Obey turn pieces
-			if (((((*state)[x][y]) & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
+			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
 		}
 		int i = x;
 		int j = y;
@@ -265,7 +266,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 		}
 		else if (Piece::height(dest) > 0 && (Piece::isAddOn(dest) ? true : (Piece::colour(dest) == Piece::colour(piece)))) {		//merging
 			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++) {
-				if (splitOff == Piece::height(piece) && Piece::hasAddOn(dest) && Piece::hasAddOn(piece)) continue;
+				if (splitOff == Piece::height(piece) &&  Piece::hasAddOn(piece)) continue;
 				uint8_t boardCopy[13][13];
 				std::memcpy(&boardCopy, state, sizeof(boardCopy));
 				if (splitOff == Piece::height(piece)) {
@@ -285,9 +286,80 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+				debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
 			}
+		}
+
+		if (Piece::height(dest) > 0 && Piece::height(dest) <= Piece::height(piece) && (Piece::isAddOn(dest) ? false : (Piece::colour(dest) == Piece::colour(piece)))) {		//pushing (smaller than the pushing piece, not an addon and the same color)
+			int offset = 2;
+			bool pushValid = false;
+			int pushHeight = Piece::height(dest);
+
+			int xDir = 0;
+			int yDir = 0;
+			switch (d)
+			{
+			case 0:
+				yDir = -1;
+				break;
+			case 1:
+				xDir = 1;
+				break;
+			case 2:
+				yDir = 1;
+				break;
+			case 3:
+				xDir = -1;
+				break;
+			}
+
+			/*
+				Continue checking in the direction of movement until pushing is either posible or it isn't
+				Offset is the offset from the original piece
+				We loop until we hit a wall or something we can't push (hopefully)
+			*/
+
+			while (true) {
+				int pushX = x + xDir * offset;
+				int pushY = y + yDir * offset;
+
+				if (pushX < 0 || pushX > 12 || pushY < 0 || pushY > 12) break;
+
+				uint8_t pushPiece = ((*state)[pushX][pushY]);
+
+				if ((pushPiece & turnPiece) != 0) {		//Obey turn pieces
+					if (((pushPiece & setTurnPiece)) == (d % 2) * setTurnPiece) break;		//This feels deeply cursed
+				}
+				if (Piece::height(pushPiece) == 0) {
+					pushValid = true;
+					break;
+				}
+				if (Piece::height(pushPiece) <= pushHeight && (Piece::isAddOn(pushPiece) ? false : (Piece::colour(pushPiece) == Piece::colour(piece)))) {
+					offset++;
+					pushHeight = Piece::height(pushPiece);
+				}
+				else { break; }
+			}
+			if (!pushValid) continue;
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+
+			for (int o = offset; o > 0; o--) {	//loop backwards from the end of the push chain and copy the pieces over
+				int destX = x + xDir * o;
+				int destY = y + yDir * o;
+				int sourceX = x + xDir * (o - 1);
+				int sourceY = y + yDir * (o - 1);
+
+				boardCopy[destX][destY] |= boardCopy[sourceX][sourceY] & 0b00111111;
+				boardCopy[sourceX][sourceY] &= 0b11000000;
+			}
+
+			bool visitedCopy[13][13];
+			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+			visitedCopy[i][j] = true;
+			debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
 }
