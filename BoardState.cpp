@@ -14,6 +14,8 @@
 #define RED "\x1b[38;5;9mR"
 #define BLUE "\x1b[38;5;12mB"
 
+#define DEBUG_PRINTING false
+
 BoardState::BoardState() {
 	for (int i = 0; i < 13; i++) { for (int j = 0; j < 13; j++) { pieces[i][j] = 0; } }
 
@@ -102,7 +104,10 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[7][0] |= 3 | Piece::Red;
 	pieces[5][2] |= 3;
 	pieces[7][2] |= 3;*/
-	pieces[2][2] |= 3;
+	pieces[2][4] |= 2 | Piece::Blue;
+	pieces[4][4] |= 1;
+	pieces[2][5] |= 1 | Piece::Black;
+	pieces[2][3] |= 1 | Piece::Red;
 
 	pieces[5][10] |= 3 | Piece::Black | Piece::Blue;
 	pieces[7][10] |= 3 | Piece::Black | Piece::Red;
@@ -150,6 +155,7 @@ struct BoardState::xMove {
 };
 
 void debugPrint(std::string str) {
+	if (!DEBUG_PRINTING) return;
 	std::wstring temp = std::wstring(str.begin(), str.end());
 	LPCWSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
@@ -170,14 +176,14 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 			memset(visited, false, sizeof(visited));
 			visited[i][j] = true;
 			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
-			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false);
+			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false, isWhite);
 		}
 	}
 
 	return moves;
 }
 
-void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned)
+void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite)
 {
 	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
 	for (int i = 0; i < 13; i++) {
@@ -194,7 +200,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 		boardCopy[x][y] ^= setTurnPiece;
 		bool visitedCopy[13][13];
 		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-		basicGenerator(moves, &boardCopy, x, y, &visitedCopy, remainingSteps, true);
+		basicGenerator(moves, &boardCopy, x, y, &visitedCopy, remainingSteps, true, isWhite);
 	}
 
 	if (remainingSteps == 0) return;
@@ -206,7 +212,8 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 		2
 	*/
 	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
-		if ((((*state)[x][y]) & turnPiece) != 0) {		//Obey turn pieces
+		uint8_t piece = ((*state)[x][y]);
+		if ((piece & turnPiece) != 0) {		//Obey turn pieces
 			if (((((*state)[x][y]) & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
 		}
 		int i = x;
@@ -226,21 +233,61 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			i--;
 			break;
 		}
+		uint8_t dest = (*state)[i][j];
 		if (i < 0 || i > 12 || j < 0 || j > 12) continue;
 		if (i % 2 == 1 && j % 2 == 1) continue;
 		if ((*visited)[i][j]) continue;		//Bounds and revisiting check
-		if ((((*state)[i][j]) & turnPiece) != 0 && (((((*state)[i][j]) & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
+		if ((dest & turnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
 
-		if (((*state)[i][j] & 0b00111111) == 0) {		//Most basic case : empty target square
-			uint8_t boardCopy[13][13];
-			std::memcpy(&boardCopy, state, sizeof(boardCopy));
-			boardCopy[x][y] &= 0b11000000;
-			boardCopy[i][j] |= (uint8_t)(((*state)[x][y]) & 0b00111111);
-			bool visitedCopy[13][13];
-			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-			visitedCopy[i][j] = true;
-			debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
-			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false);
+		if ((dest & 0b00111111) == 0) {		//Most basic case : empty target square
+			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++) {
+				uint8_t boardCopy[13][13];
+				std::memcpy(&boardCopy, state, sizeof(boardCopy));
+				if (splitOff == Piece::height(piece)) {
+					boardCopy[x][y] &= 0b11000000;
+				}
+				else {
+					boardCopy[x][y] -= splitOff;
+					if (splitOff == Piece::height(piece) - 1) {
+						boardCopy[x][y] &= 0b11011111;		//erase trailing color
+					}
+				}
+				boardCopy[i][j] |= (uint8_t)((piece) & 0b00100000 | splitOff);
+				if (splitOff == Piece::height(piece)) {
+					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000);		//addons, only if  we're moving the whole tower
+				}
+				bool visitedCopy[13][13];
+				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+				visitedCopy[i][j] = true;
+				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
+			}
+		}
+		else if (Piece::height(dest) > 0 && (Piece::isAddOn(dest) ? true : (Piece::colour(dest) == Piece::colour(piece)))) {		//merging
+			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++) {
+				if (splitOff == Piece::height(piece) && Piece::hasAddOn(dest) && Piece::hasAddOn(piece)) continue;
+				uint8_t boardCopy[13][13];
+				std::memcpy(&boardCopy, state, sizeof(boardCopy));
+				if (splitOff == Piece::height(piece)) {
+					boardCopy[x][y] &= 0b11000000;
+				}
+				else {
+					boardCopy[x][y] -= splitOff;
+					if (splitOff == Piece::height(piece) - 1) {
+						boardCopy[x][y] &= 0b11011111;		//erase trailing color
+					}
+				}
+				boardCopy[i][j] |= (uint8_t)((piece) & 0b00100000);		//color info
+				boardCopy[i][j] += splitOff;
+				if (splitOff == Piece::height(piece)) {
+					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000);		//addons, only if  we're moving the whole tower
+				}
+				bool visitedCopy[13][13];
+				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+				visitedCopy[i][j] = true;
+				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
+			}
 		}
 	}
 }

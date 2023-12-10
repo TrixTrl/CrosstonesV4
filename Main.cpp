@@ -42,7 +42,7 @@ int main() {
 	LPCWSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 
-	int i = 0;
+	int i = 0;			//--------------------------------------------------------------
 	while (true) {
 		bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
 		bs.copyBoard(&(displayBoard[0]));
@@ -56,7 +56,7 @@ int main() {
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 		i++;
-		std::this_thread::sleep_for(std::chrono::milliseconds(300));
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 
 	return 0;
