@@ -20,6 +20,7 @@ public:
 
 	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite);
 	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite);
+	void captureGenerator(uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool blue, bool isWhite);
 
 	void unsafeMakeMove(std::vector<xMove>* move);
 	void makeMove(std::vector<xMove>* move, bool isWhiteTurn);

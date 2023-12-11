@@ -23,8 +23,6 @@ HWND globalHwnd = NULL;
 bool firstDraw = true;
 
 int main() {
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-
 	BoardState bs;
 	std::bitset<3> set(5);
 	bs.rst(set);
@@ -32,7 +30,7 @@ int main() {
 
 	InvalidateRect(globalHwnd, NULL, NULL);
 
-	bool isWhite = false;
+	bool isWhite = true;
 	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
 	moves = bs.getMoves(isWhite);
 
@@ -56,7 +54,7 @@ int main() {
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 		i++;
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 	}
 
 	return 0;
@@ -305,6 +303,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		swprintf_s(msg, L"WM_KEYDOWN: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
+		if ((wchar_t)wParam == 0x20) firstDraw = true;
 		break;
 
 	case WM_KEYUP:

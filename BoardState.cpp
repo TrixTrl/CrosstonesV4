@@ -104,7 +104,9 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[7][0] |= 3 | Piece::Red;
 	pieces[5][2] |= 3;
 	pieces[7][2] |= 3;*/
-	pieces[2][4] |= 2 | Piece::Blue;
+
+
+	/*pieces[2][4] |= 2 | Piece::Blue;
 	pieces[4][4] |= 1;
 	pieces[6][4] |= 2;
 	pieces[2][5] |= 1 | Piece::Black;
@@ -122,7 +124,19 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[6][6] |= Piece::Blue | 1;
 
 	pieces[0][6] |= Piece::Red | 1;
-	pieces[12][6] |= Piece::Red | 1;
+	pieces[12][6] |= Piece::Red | 1;*/
+
+	pieces[5][10] = Piece::White | 1;
+	pieces[6][9] = Piece::White | 5;
+	pieces[2][8] = Piece::White | 1;
+	pieces[5][4] = Piece::White | 2 | Piece::Blue;
+	pieces[8][4] = Piece::White | 1;
+	pieces[6][3] = Piece::White | 1;
+	pieces[8][3] = Piece::White | 3 | Piece::Red;
+	pieces[6][8] = Piece::Black | 2 | Piece::Blue;
+	pieces[6][6] = Piece::Black | 4 | Piece::Red;
+	pieces[3][2] = Piece::Black | 2 | Piece::Blue;
+	pieces[6][2] = Piece::Black | 3;
 }
 
 std::string center(uint8_t piece) {
@@ -169,7 +183,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = pieces[i][j];
 			if (Piece::height(piece) == 0 || Piece::isAddOn(piece)) continue;
-			if (Piece::isWhiteTower(piece) == isWhite) continue;
+			if (Piece::isWhiteTower(piece) == !isWhite) continue;
 
 			uint8_t boardCopy[13][13];
 			copyBoard(&boardCopy);
@@ -265,8 +279,8 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			}
 		}
 		else if (Piece::height(dest) > 0 && (Piece::isAddOn(dest) ? true : (Piece::colour(dest) == Piece::colour(piece)))) {		//merging
-			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++) {
-				if (splitOff == Piece::height(piece) &&  Piece::hasAddOn(piece)) continue;
+			for (int splitOff = 1; (splitOff <= Piece::height(piece)) && (splitOff <= 5 - Piece::height(dest)); splitOff++) {
+				if (splitOff == Piece::height(piece) && Piece::hasAddOn(piece)) continue;
 				uint8_t boardCopy[13][13];
 				std::memcpy(&boardCopy, state, sizeof(boardCopy));
 				if (splitOff == Piece::height(piece)) {
@@ -362,6 +376,11 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
+}
+
+void BoardState::captureGenerator(uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool blue, bool isWhite)
+{
+
 }
 
 void BoardState::unsafeMakeMove(std::vector<xMove>* move)
