@@ -126,7 +126,8 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[0][6] |= Piece::Red | 1;
 	pieces[12][6] |= Piece::Red | 1;*/
 
-	pieces[5][10] = Piece::White | 1;
+	
+	/*pieces[5][10] = Piece::White | 1;
 	pieces[6][9] = Piece::White | 5;
 	pieces[2][8] = Piece::White | 1;
 	pieces[5][4] = Piece::White | 2 | Piece::Blue;
@@ -136,7 +137,11 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[6][8] = Piece::Black | 2 | Piece::Blue;
 	pieces[6][6] = Piece::Black | 4 | Piece::Red;
 	pieces[3][2] = Piece::Black | 2 | Piece::Blue;
-	pieces[6][2] = Piece::Black | 3;
+	pieces[6][2] = Piece::Black | 3;*/
+
+	pieces[5][4] |= 3 | Piece::Black;
+	pieces[4][4] |= 2 | Piece::Black;
+	pieces[3][4] |= 2 | Piece::Blue | Piece::White;
 }
 
 std::string center(uint8_t piece) {
@@ -176,8 +181,15 @@ void debugPrint(std::string str) {
 	OutputDebugString(wideString);
 }
 
+void forceDebugPrint(std::string str) {
+	std::wstring temp = std::wstring(str.begin(), str.end());
+	LPCWSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
 std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) {
 	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
+	moves->reserve(400);
 
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
@@ -190,7 +202,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 			bool visited[13][13];
 			memset(visited, false, sizeof(visited));
 			visited[i][j] = true;
-			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false, isWhite);
 		}
 	}
@@ -201,6 +213,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite)
 {
 	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
+	move.reserve(10);
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
 			if (pieces[i][j] == (*state)[i][j]) continue;
@@ -263,7 +276,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				}
 				else {
 					boardCopy[x][y] -= splitOff;
-					if (splitOff == Piece::height(piece) - 1) {
+					if (Piece::hasAddOn(piece) && splitOff == Piece::height(piece) - 1) {
 						boardCopy[x][y] &= 0b11011111;		//erase trailing color
 					}
 				}
@@ -274,7 +287,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 			}
 		}
@@ -288,7 +301,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				}
 				else {
 					boardCopy[x][y] -= splitOff;
-					if (splitOff == Piece::height(piece) - 1) {
+					if (Piece::hasAddOn(piece) && splitOff == Piece::height(piece) - 1) {
 						boardCopy[x][y] &= 0b11011111;		//erase trailing color
 					}
 				}
@@ -300,7 +313,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+				debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
 			}
 		}
@@ -372,15 +385,112 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j) + "\n");
+			debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
+		}
+
+		if (remainingSteps >= 2 && Piece::isTower(dest) && Piece::colour(dest) != Piece::colour(piece)) {		//capturing
+																												//making sure we have enough moves left to be able to capture
+			if (!Piece::isBlue(piece) && Piece::height(dest) > Piece::height(piece)) continue;		//capturing height check
+
+			//Logic: figure out all ways to capture and then generate all splitting options at the enmd to not redo the work over and over again (this might be something good to cache when trying to optimize)
+
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+			boardCopy[i][j] &= 0b11000000; //remove piece we're capturing
+			bool visitedCopy[13][13];
+			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+			visitedCopy[i][j] = true;
+			debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, isWhite);
 		}
 	}
 }
 
-void BoardState::captureGenerator(uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool blue, bool isWhite)
-{
 
+void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool isWhite)
+{
+	/*
+		0
+	   3 1
+		2
+	*/
+	uint8_t origin = ((*state)[originX][originY]);
+	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
+		uint8_t piece = ((*state)[x][y]);
+		if ((piece & turnPiece) != 0) {		//Obey turn pieces
+			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
+		}
+		int i = x;
+		int j = y;
+		switch (d)
+		{
+		case 0:
+			j--;
+			break;
+		case 1:
+			i++;
+			break;
+		case 2:
+			j++;
+			break;
+		case 3:
+			i--;
+			break;
+		}
+		uint8_t dest = (*state)[i][j];
+		if (i < 0 || i > 12 || j < 0 || j > 12) continue;
+		if (i % 2 == 1 && j % 2 == 1) continue;
+		if ((*visited)[i][j]) continue;		//Bounds and revisiting check
+		if ((dest & turnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
+
+		//piece is the position where an enemy piece used to be that we are currently taking, this value has already been wiped
+		//dest is the piece we are now looking to move to, either to complete the capture or to continue the chain
+		//the original piece doing the capturing still exists at originX, originY in the state array
+		//splitting will be done once the end of a capture chain has been found
+
+
+		//ending the chain on an empty square or a friendly tower or a single addon to merge onto
+		if (Piece::height(dest) == 0 || (Piece::isTower(dest) && Piece::colour(dest) == Piece::colour(origin)) || Piece::isAddOn(dest)) {
+
+			//We have to split less than the full tower, except if the height is 1 and we can't go over the merge limit
+			//forceDebugPrint(std::to_string(Piece::height(origin)));
+			for (int splitOff = 1; (Piece::height(origin) == 1 ? splitOff <= 1 : (splitOff < Piece::height(origin))) && (splitOff <= 5 - Piece::height(dest)); splitOff++) {
+
+				uint8_t boardCopy[13][13];
+				std::memcpy(&boardCopy, state, sizeof(boardCopy));
+				if (Piece::height(origin) == 1) {
+					boardCopy[originX][originY] &= 0b11000000;		//wipe the orign only if the height is one
+				}
+				else {
+					boardCopy[originX][originY] -= splitOff;
+					if (Piece::isAddOn(boardCopy[originX][originY])) boardCopy[originX][originY] &= 0b11011111;		//if we left a single addon, remove the color
+				}
+
+				boardCopy[i][j] += splitOff;
+				boardCopy[i][j] |= Piece::colour(origin);		//always copy color and add height as that should be allowed based on the only way this can be called
+
+				bool visitedCopy[13][13];
+				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+				visitedCopy[i][j] = true;
+				debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);		//if dest is empty, continue the move if possible
+			}
+		}
+		else if (remainingSteps + Piece::isBlue(origin) > 1 && Piece::isTower(dest) && Piece::colour(origin) != Piece::colour(dest)) {
+			//forceDebugPrint("Is this being reached?\n");
+			if (!Piece::isBlue(origin) && Piece::height(dest) > Piece::height(origin)) continue;		//capturing height check
+			//forceDebugPrint("Is this being reached??\n");
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+			boardCopy[i][j] &= 0b11000000; //remove piece we're capturing
+			bool visitedCopy[13][13];
+			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+			visitedCopy[i][j] = true;
+			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), isWhite);		//only decrement moves if the capturing piece doesn't have a blue addon
+		}
+	}
 }
 
 void BoardState::unsafeMakeMove(std::vector<xMove>* move)

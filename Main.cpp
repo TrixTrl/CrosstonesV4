@@ -14,6 +14,7 @@
 #include <string>
 #include <chrono>
 
+#define KEYBOARDCONTROLL 1
 
 int screenWidth = 750;//1200;
 int screenHeight = 750;
@@ -21,6 +22,7 @@ int screenHeight = 750;
 uint8_t displayBoard[3][13][13];
 HWND globalHwnd = NULL;
 bool firstDraw = true;
+int switchMove = 0;
 
 int main() {
 	BoardState bs;
@@ -40,8 +42,33 @@ int main() {
 	LPCWSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 
+
+	//Timing testing code
+
+	/*std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < 100000; i++) {
+		bs.getMoves(i%2);
+	}
+	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+	std::string strT = std::to_string(time_span.count());
+	strT += "\n";
+	std::wstring tempT = std::wstring(strT.begin(), strT.end());
+	LPCWSTR wideStringT = tempT.c_str();
+	OutputDebugString(wideStringT);
+
+	return 0;*/
+
+
+	//Cycle through moves with left and right arrow keys
+	//Up and down arrows incrent and decrement the counter by 10 respectively
+	//The delete key (entf) resets back to 0
+
 	int i = 0;			//--------------------------------------------------------------
 	while (true) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
 		bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
 		bs.copyBoard(&(displayBoard[0]));
 		bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
@@ -53,8 +80,21 @@ int main() {
 		OutputDebugString(wideString2);
 
 		InvalidateRect(globalHwnd, NULL, NULL);
-		i++;
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		if (!KEYBOARDCONTROLL) {
+			i++;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+		else {
+			while (switchMove == 0) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			if (switchMove != -99999) {
+				i += moves->size() * 3 + switchMove;
+				i %= moves->size();
+			}
+			else {
+				i = 0;
+			}
+			switchMove = 0;
+		}
 	}
 
 	return 0;
@@ -129,17 +169,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_PAINT:
 	{
-		OutputDebugString(L"Painting\n");
+		//OutputDebugString(L"Painting\n");
 
 		memcpy(displayBoard[2], displayBoard[1], sizeof(displayBoard[0]));
 		memcpy(displayBoard[1], displayBoard[0], sizeof(displayBoard[0]));
 
 
-		std::string str = std::to_string((int)displayBoard[1][6][0]);
+		/*std::string str = std::to_string((int)displayBoard[1][6][0]);
 		str += "\n";
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		LPCWSTR wideString = temp.c_str();
-		OutputDebugString(wideString);
+		OutputDebugString(wideString);*/
 
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hwnd, &ps);
@@ -286,32 +326,47 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 
 	case WM_SYSKEYDOWN:
+		break;
 		swprintf_s(msg, L"WM_SYSKEYDOWN: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
 
 	case WM_SYSCHAR:
+		break;
 		swprintf_s(msg, L"WM_SYSCHAR: %c\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
 
 	case WM_SYSKEYUP:
+		break;
 		swprintf_s(msg, L"WM_SYSKEYUP: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
 
 	case WM_KEYDOWN:
-		swprintf_s(msg, L"WM_KEYDOWN: 0x%x\n", (wchar_t)wParam);
-		OutputDebugString(msg);
-		if ((wchar_t)wParam == 0x20) firstDraw = true;
+		//swprintf_s(msg, L"WM_KEYDOWN: 0x%x\n", (wchar_t)wParam);
+		//outputDebugString(msg);
+		if ((wchar_t)wParam == 0x20) {
+			firstDraw = true;
+			InvalidateRect(globalHwnd, NULL, NULL);
+		}
+		if (KEYBOARDCONTROLL) {
+			if ((wchar_t)wParam == 0x27) { switchMove = 1; }
+			if ((wchar_t)wParam == 0x25) { switchMove = -1; }
+			if ((wchar_t)wParam == 0x26) { switchMove = 10; }
+			if ((wchar_t)wParam == 0x28) { switchMove = -10; }
+			if ((wchar_t)wParam == 0x2E) { switchMove = -99999; }
+		}
 		break;
 
 	case WM_KEYUP:
+		break;
 		swprintf_s(msg, L"WM_KEYUP: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
 
 	case WM_CHAR:
+		break;
 		swprintf_s(msg, L"WM_CHAR: %c\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
