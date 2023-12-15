@@ -144,24 +144,6 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[3][4] |= 2 | Piece::Blue | Piece::White;
 }
 
-std::string center(uint8_t piece) {
-	std::string out = BACKGROUND;
-	if ((piece & BoardState::turnPiece) != 0) { out += (((piece & BoardState::setTurnPiece) == 0) ? std::string(1, (unsigned char)205) : std::string(1, (unsigned char)186)); }
-	else { out += " "; }
-
-	//if (Piece::isWhiteTower(piece)) { out += WHITE; }
-	if (Piece::height(piece) > 0) {
-		out += Piece::isWhite(piece) ? WHITE : BLACK;
-	}
-	out += Piece::height(piece) == 0 ? " " : std::to_string(Piece::height(piece));
-	out += (Piece::isBlue(piece) ? BLUE : Piece::isRed(piece) ? RED : " ");
-	out += BACKGROUND;
-
-	if ((piece & BoardState::turnPiece) != 0) { out += (((piece & BoardState::setTurnPiece) == 0) ? std::string(1, (unsigned char)205) : std::string(1, (unsigned char)186)); }
-	else { out += " "; }
-	return out;
-};
-
 void BoardState::copyBoard(uint8_t(*dest)[13][13])
 {
 	std::memcpy(dest, &pieces, sizeof(pieces));
@@ -402,13 +384,13 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
 			debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
-			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, isWhite);
+			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
 }
 
 
-void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool isWhite)
+void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite)
 {
 	/*
 		0
@@ -416,6 +398,16 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 		2
 	*/
 	uint8_t origin = ((*state)[originX][originY]);
+
+	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, state, sizeof(boardCopy));
+		boardCopy[x][y] ^= setTurnPiece;
+		bool visitedCopy[13][13];
+		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+		captureGenerator(moves, &boardCopy, originX, originY, x, y, &visitedCopy, remainingSteps, true, isWhite);
+	}
+
 	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
 		uint8_t piece = ((*state)[x][y]);
 		if ((piece & turnPiece) != 0) {		//Obey turn pieces
@@ -488,7 +480,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
 			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
-			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), isWhite);		//only decrement moves if the capturing piece doesn't have a blue addon
+			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite);		//only decrement moves if the capturing piece doesn't have a blue addon
 		}
 	}
 }
