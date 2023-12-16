@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrosstonesV4", "CrosstonesV4.vcxproj", "{DA6B60F4-04F3-410F-9460-2B367725B2FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test Suite", "..\Test Suite\Test Suite.vcxproj", "{5247DDD7-A5C2-40A4-9974-DB7893D14907}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test Suite", "Test Suite\Test Suite.vcxproj", "{5247DDD7-A5C2-40A4-9974-DB7893D14907}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

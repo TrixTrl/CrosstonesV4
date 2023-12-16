@@ -1,5 +1,5 @@
 #include "StateTester.h"
-#include "../CrosstonesV4/Piece.h"
+#include "../Piece.h"
 #include <iostream>
 
 #define PIECEREDUCTIONERROR 0
@@ -153,6 +153,7 @@ bool StateTester::checkAllMoves()
 			error += "addon number error : decrease in red addons from " + std::to_string(baseRedCount) + " to " + std::to_string(newRedCount) + " on black move " + std::to_string(i) + "\n";
 		}
 	}
+	return passing;
 }
 
 bool StateTester::fullTest() {

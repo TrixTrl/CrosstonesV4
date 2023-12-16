@@ -1,8 +1,8 @@
 #include <iostream>
-#include "../CrosstonesV4/BoardState.h"
-#include "../CrosstonesV4/BoardState.cpp"
-#include "../CrosstonesV4/Piece.h"
-#include "../CrosstonesV4/Piece.cpp"
+#include "../BoardState.h"
+#include "../BoardState.cpp"
+#include "../Piece.h"
+#include "../Piece.cpp"
 #include <bitset>
 #include "StateTester.h"
 

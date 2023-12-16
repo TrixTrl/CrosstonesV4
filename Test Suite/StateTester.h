@@ -1,5 +1,5 @@
 #pragma once
-#include "../CrosstonesV4/BoardState.h"
+#include "../BoardState.h"
 #include <string>
 
 class StateTester
