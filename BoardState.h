@@ -25,6 +25,15 @@ public:
 	void unsafeMakeMove(std::vector<xMove>* move);
 	void makeMove(std::vector<xMove>* move, bool isWhiteTurn);
 
+	enum class winValue {
+		none,
+		white,
+		black,
+		draw
+	};
+
+	winValue gameOver(bool isWhite);
+
 	static const uint8_t turnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
 private:

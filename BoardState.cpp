@@ -126,7 +126,7 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[0][6] |= Piece::Red | 1;
 	pieces[12][6] |= Piece::Red | 1;*/
 
-	
+
 	pieces[5][10] |= Piece::White | 1;
 	pieces[6][9] |= Piece::White | 5;
 	pieces[2][8] |= Piece::White | 1;
@@ -186,7 +186,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 			bool visited[13][13];
 			memset(visited, false, sizeof(visited));
 			visited[i][j] = true;
-			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+			debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false, isWhite);
 		}
 	}
@@ -272,7 +272,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+				debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 			}
 		}
@@ -298,7 +298,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+				debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
 			}
 		}
@@ -370,7 +370,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+			debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 
@@ -386,7 +386,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) +"\n");
+			debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
@@ -468,7 +468,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
-				debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+				debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);		//if dest is empty, continue the move if possible
 			}
 		}
@@ -480,7 +480,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j)+ " | " + std::to_string(moves->size()) + "\n");
+			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite);		//only decrement moves if the capturing piece doesn't have a blue addon
 		}
 	}
@@ -513,4 +513,98 @@ void BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
 			return;
 		}
 	}
+}
+
+BoardState::winValue BoardState::gameOver(bool isWhite) //last player to make a move
+{
+	//Check for full eliminations, if yes, that player wins
+	//Check for base wins
+	//Check for port wins
+	//Check to see if a player has one and make sure the right one wins, incuding the Bridge Rule
+
+	bool whiteNoPieces = true;
+	bool blackNoPieces = true;
+	for (int i = 0; i < 13 && (whiteNoPieces || blackNoPieces); i++) {
+		for (int j = 0; j < 13 && (whiteNoPieces || blackNoPieces); j++) {
+			if (Piece::isTower(pieces[i][j])) {
+				if (Piece::isWhite(pieces[i][j])) {
+					whiteNoPieces = false;
+				}
+				else {
+					blackNoPieces = false;
+				}
+			}
+		}
+	}
+	if (whiteNoPieces) return winValue::black;
+	if (whiteNoPieces) return winValue::white;
+	//There can be no draw if one side has no pieces left so we don't need any extra checks
+
+	bool bases[2][2] = { {false, false}, {false, false} }; //[0] white   [1] black   [x][0] white base   [x][1] black base
+	for (int i = 5; i < 8; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (Piece::isTower(pieces[i][j])) {
+				if (Piece::isWhite(pieces[i][j])) {
+					bases[0][1] = true;	//black base white piece
+				}
+				else {
+					bases[1][1] = true;	//black base black piece
+				}
+			}
+
+			if (Piece::isTower(pieces[i][12 - j])) {
+				if (Piece::isWhite(pieces[i][12 - j])) {
+					bases[0][0] = true;	//white base white piece
+				}
+				else {
+					bases[1][0] = true;	//white base black piece
+				}
+			}
+		}
+	}
+
+	bool whiteWin = false;
+	bool blackWin = false;
+	if (bases[0][1] && !bases[1][1]) whiteWin = true;
+	if (bases[1][0] && !bases[0][0]) blackWin = true;
+
+	bool portControll[4][2] = { false, false, false, false , false, false, false, false }; //[top left, top right, bottom left, bottom right],[white, black]
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			for (int corner = 0; corner < 4; corner++) {
+				uint8_t piece;
+				switch (corner) {
+				case 0:
+					piece = pieces[i][j];
+					break;
+				case 1:
+					piece = pieces[12 - i][j];
+					break;
+				case 2:
+					piece = pieces[i][12 - j];
+					break;
+				case 3:
+					piece = pieces[12 - i][12 - j];
+					break;
+				}
+				if (Piece::isTower(piece)) {
+					portControll[corner][1 - Piece::isWhiteTower(piece)] = true;
+				}
+			}
+
+		}
+	}
+	int portNumbers[2] = { 0, 0 };
+	for (int i = 0; i < 4; i++) {
+		portNumbers[0] += portControll[i][0];
+		portNumbers[1] += portControll[i][1];
+	}
+	if (portNumbers[0] == 4 && portNumbers[1] == 0) whiteWin = true;
+	if (portNumbers[1] == 4 && portNumbers[0] == 0) blackWin = true;
+	if (!(whiteWin || blackWin)) {
+		return winValue::none;
+	}
+	if (whiteWin && !blackWin) return winValue::white;
+	if (!whiteWin && blackWin) return winValue::black;
+	return isWhite ? winValue::white : winValue::black;
 }
