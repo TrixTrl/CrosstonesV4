@@ -1,8 +1,8 @@
 #include <iostream>
 #include "../BoardState.h"
 #include "../BoardState.cpp"
-#include "../Piece.h"
-#include "../Piece.cpp"
+#include "../Globals/Piece.h"
+#include "../Globals/Piece.cpp"
 #include <bitset>
 #include "StateTester.h"
 

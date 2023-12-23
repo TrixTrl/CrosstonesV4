@@ -1,5 +1,5 @@
 #include "StateTester.h"
-#include "../Piece.h"
+#include "../Globals/Piece.h"
 #include <iostream>
 
 #define PIECEREDUCTIONERROR 0
