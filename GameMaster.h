@@ -4,6 +4,8 @@
 #include <bitset>
 #include <chrono>
 #include "Globals/Player.h"
+#include <Windows.h>
+#include <WinUser.h>
 
 
 class GameMaster {
@@ -17,7 +19,7 @@ private:
 
 public:
 	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, uint8_t (*displayBoard)[13][13]);
-	void play();
+	void play(HWND globalHwnd);
 };
 
 class Time {

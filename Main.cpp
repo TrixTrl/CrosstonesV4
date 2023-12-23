@@ -8,6 +8,8 @@
 
 #include "BoardState.h"
 #include "Globals/Piece.h"
+#include "GameMaster.h"
+#include "Test Bots/TestBotRnd.h"
 
 #include <bitset>
 #include <thread>
@@ -15,6 +17,7 @@
 #include <chrono>
 
 #define KEYBOARDCONTROLL 1
+#define EXPLOREMOVEGENERATION 0
 
 int screenWidth = 750;//1200;
 int screenHeight = 750;
@@ -25,78 +28,91 @@ bool firstDraw = true;
 int switchMove = 0;
 
 int main() {
-	BoardState bs;
-	std::bitset<3> set(5);
-	bs.rst(set);
-	bs.copyBoard(&(displayBoard[0]));
+	srand(time(nullptr));
 
-	InvalidateRect(globalHwnd, NULL, NULL);
-
-	bool isWhite = true;
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
-	moves = bs.getMoves(isWhite);
-
-	std::string str = std::to_string(moves->size());
-	str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
-	OutputDebugString(wideString);
-
-
-	//Timing testing code
-
-	/*std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < 100000; i++) {
-		bs.getMoves(i%2);
-	}
-	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-
-	std::string strT = std::to_string(time_span.count());
-	strT += "\n";
-	std::wstring tempT = std::wstring(strT.begin(), strT.end());
-	LPCWSTR wideStringT = tempT.c_str();
-	OutputDebugString(wideStringT);
-
-	return 0;*/
-
-
-	//Cycle through moves with left and right arrow keys
-	//Up and down arrows incrent and decrement the counter by 10 respectively
-	//The delete key (entf) resets back to 0
-
-	int i = 0;			//--------------------------------------------------------------
-	while (true) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-		bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
+	if (EXPLOREMOVEGENERATION) {
+		BoardState bs;
+		std::bitset<3> set(5);
+		bs.rst(set);
 		bs.copyBoard(&(displayBoard[0]));
-		bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
-
-		std::string str2 = std::to_string(i);
-		str2 += "\n";
-		std::wstring temp2 = std::wstring(str2.begin(), str2.end());
-		LPCWSTR wideString2 = temp2.c_str();
-		OutputDebugString(wideString2);
 
 		InvalidateRect(globalHwnd, NULL, NULL);
-		if (!KEYBOARDCONTROLL) {
-			i++;
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+		bool isWhite = true;
+		std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+		moves = bs.getMoves(isWhite);
+
+		std::string str = std::to_string(moves->size());
+		str += "\n";
+		std::wstring temp = std::wstring(str.begin(), str.end());
+		LPCWSTR wideString = temp.c_str();
+		OutputDebugString(wideString);
+
+
+		//Timing testing code
+
+		/*std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < 100000; i++) {
+			bs.getMoves(i%2);
 		}
-		else {
-			while (switchMove == 0) std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			if (switchMove != -99999) {
-				i += moves->size() * 3 + switchMove;
-				i %= moves->size();
+		std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+		std::string strT = std::to_string(time_span.count());
+		strT += "\n";
+		std::wstring tempT = std::wstring(strT.begin(), strT.end());
+		LPCWSTR wideStringT = tempT.c_str();
+		OutputDebugString(wideStringT);
+
+		return 0;*/
+
+
+		//Cycle through moves with left and right arrow keys
+		//Up and down arrows incrent and decrement the counter by 10 respectively
+		//The delete key (entf) resets back to 0
+
+		int i = 0;			//--------------------------------------------------------------
+		while (true) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+			bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
+			bs.copyBoard(&(displayBoard[0]));
+			bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
+
+			std::string str2 = std::to_string(i);
+			str2 += "\n";
+			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
+			LPCWSTR wideString2 = temp2.c_str();
+			OutputDebugString(wideString2);
+
+			InvalidateRect(globalHwnd, NULL, NULL);
+			if (!KEYBOARDCONTROLL) {
+				i++;
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			}
 			else {
-				i = 0;
+				while (switchMove == 0) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				if (switchMove != -99999) {
+					i += moves->size() * 3 + switchMove;
+					i %= moves->size();
+				}
+				else {
+					i = 0;
+				}
+				switchMove = 0;
 			}
-			switchMove = 0;
 		}
-	}
 
+	}
+	else {
+		//TestBotRnd r1();
+		//TestBotRnd r2();
+		Player* p1 = new TestBotRnd();
+		Player* p2 = new TestBotRnd();
+		std::bitset<3> gamemode(5);
+		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
+		gameMaster.play(globalHwnd);
+	}
 	return 0;
 }
 

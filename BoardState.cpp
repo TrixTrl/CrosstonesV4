@@ -100,22 +100,15 @@ void BoardState::rst(std::bitset<3>& tps)
 		}
 	}
 
-	/*pieces[5][0] |= 3 | Piece::Blue;
-	pieces[7][0] |= 3 | Piece::Red;
-	pieces[5][2] |= 3;
-	pieces[7][2] |= 3;*/
+	pieces[5][0] |= 3 | Piece::Black;
+	pieces[7][0] |= 3 | Piece::Black;
+	pieces[5][2] |= 3 | Piece::Black;
+	pieces[7][2] |= 3 | Piece::Black;
 
-
-	/*pieces[2][4] |= 2 | Piece::Blue;
-	pieces[4][4] |= 1;
-	pieces[6][4] |= 2;
-	pieces[2][5] |= 1 | Piece::Black;
-	pieces[2][3] |= 1 | Piece::Red;
-
-	pieces[5][10] |= 3 | Piece::Black | Piece::Blue;
-	pieces[7][10] |= 3 | Piece::Black | Piece::Red;
-	pieces[5][12] |= 5 | Piece::Black;
-	pieces[7][12] |= 1 | Piece::Black;
+	pieces[5][10] |= 3 | Piece::White;
+	pieces[7][10] |= 3 | Piece::White;
+	pieces[5][12] |= 3 | Piece::White;
+	pieces[7][12] |= 3 | Piece::White;
 
 	pieces[0][0] |= Piece::Blue | 1;
 	pieces[12][0] |= Piece::Blue | 1;
@@ -124,10 +117,10 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[6][6] |= Piece::Blue | 1;
 
 	pieces[0][6] |= Piece::Red | 1;
-	pieces[12][6] |= Piece::Red | 1;*/
+	pieces[12][6] |= Piece::Red | 1;
 
 
-	pieces[5][10] |= Piece::White | 1;
+	/*pieces[5][10] |= Piece::White | 1;
 	pieces[6][9] |= Piece::White | 5;
 	pieces[2][8] |= Piece::White | 1;
 	pieces[5][4] |= Piece::White | 2 | Piece::Blue;
@@ -137,7 +130,7 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[6][8] |= Piece::Black | 2 | Piece::Blue;
 	pieces[6][6] |= Piece::Black | 4 | Piece::Red;
 	pieces[3][2] |= Piece::Black | 2 | Piece::Blue;
-	pieces[6][2] |= Piece::Black | 3;
+	pieces[6][2] |= Piece::Black | 3;*/
 
 
 	/*pieces[5][2] |= 4 | Piece::Blue | Piece::White;
@@ -510,7 +503,7 @@ int BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
 		}
 		if (memcmp(&boardCopy1, &boardCopy2, sizeof(boardCopy1)) == 0) {
 			std::memcpy(&pieces, boardCopy1, sizeof(pieces));
-			return (i > 0);
+			return i == 0 ? 0 : 1;
 		}
 	}
 	return -1;
@@ -526,9 +519,9 @@ int BoardState::makeMove(uint8_t(*newState)[13][13], bool isWhiteTurn)
 		for (int j = 0; j < (*moves)[i].size(); j++) {
 			boardCopy[(*moves)[i][j].i][(*moves)[i][j].j] ^= (*moves)[i][j].delta;
 		}
-		if (memcmp(newState, &boardCopy, sizeof(newState)) == 0) {
+		if (memcmp(newState, &boardCopy, sizeof(*newState)) == 0) {
 			std::memcpy(&pieces, newState, sizeof(pieces));
-			return (i > 0);
+			return i == 0 ? 0 : 1;
 		}
 	}
 	return -1;

@@ -18,7 +18,10 @@ GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player
 	displayBoardPointer = displayBoard;
 }
 
-void GameMaster::play() {
+void GameMaster::play(HWND globalHwnd) {
+	bs.copyBoard(displayBoardPointer);
+	InvalidateRect(globalHwnd, NULL, NULL);
+
 	bool ended = false;
 	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
 	while (bs.gameOver(!isWhiteTurn) == BoardState::winValue::none && !ended) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
@@ -35,6 +38,8 @@ void GameMaster::play() {
 		else {
 			int feedback;
 			feedback = bs.makeMove(&board, isWhiteTurn);
+			bs.copyBoard(displayBoardPointer);
+			InvalidateRect(globalHwnd, NULL, NULL);
 			if (feedback == -1) {
 				ended = true;
 				print("\n");
@@ -44,7 +49,7 @@ void GameMaster::play() {
 			else if (feedback == 0) {
 				if (passed[!isWhiteTurn]) {
 					ended = true;
-					print("\nDraw due to double passing");
+					print("\nDraw due to double passing\n");
 				}
 				else if (passed[isWhiteTurn]) {
 					ended = true;
