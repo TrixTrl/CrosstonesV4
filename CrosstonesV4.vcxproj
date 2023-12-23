@@ -22,12 +22,10 @@
     <ClCompile Include="BoardState.cpp" />
     <ClCompile Include="GameMaster.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Piece.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoardState.h" />
     <ClInclude Include="GameMaster.h" />
-    <ClInclude Include="Piece.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Globals\Globals.vcxproj">

@@ -1,7 +1,7 @@
 #include "BoardState.h"
 #include <iostream>
 #include <string>
-#include "Piece.h"
+#include "Globals/Piece.h"
 #include <cstdint>
 
 #include <Windows.h>

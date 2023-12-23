@@ -7,7 +7,7 @@
 #include <wchar.h>
 
 #include "BoardState.h"
-#include "Piece.h"
+#include "Globals/Piece.h"
 
 #include <bitset>
 #include <thread>
