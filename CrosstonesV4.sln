@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrosstonesV4", "CrosstonesV4.vcxproj", "{DA6B60F4-04F3-410F-9460-2B367725B2FA}"
 	ProjectSection(ProjectDependencies) = postProject
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215} = {D322921D-F9B1-479B-B7B8-25D7A3C47215}
 		{54930176-AE3E-44D4-B0E1-FBB059E2E789} = {54930176-AE3E-44D4-B0E1-FBB059E2E789}
 	EndProjectSection
 EndProject
@@ -14,6 +15,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Globals", "Globals\Globals.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test Bots", "Test Bots\Test Bots.vcxproj", "{54930176-AE3E-44D4-B0E1-FBB059E2E789}"
 	ProjectSection(ProjectDependencies) = postProject
+		{5024BAD8-24AC-4D6D-890A-6D99F42CC9D0} = {5024BAD8-24AC-4D6D-890A-6D99F42CC9D0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Felix Bots", "Felix Bots\Felix Bots.vcxproj", "{D322921D-F9B1-479B-B7B8-25D7A3C47215}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54930176-AE3E-44D4-B0E1-FBB059E2E789} = {54930176-AE3E-44D4-B0E1-FBB059E2E789}
 		{5024BAD8-24AC-4D6D-890A-6D99F42CC9D0} = {5024BAD8-24AC-4D6D-890A-6D99F42CC9D0}
 	EndProjectSection
 EndProject
@@ -57,6 +64,14 @@ Global
 		{54930176-AE3E-44D4-B0E1-FBB059E2E789}.Release|x64.Build.0 = Release|x64
 		{54930176-AE3E-44D4-B0E1-FBB059E2E789}.Release|x86.ActiveCfg = Release|Win32
 		{54930176-AE3E-44D4-B0E1-FBB059E2E789}.Release|x86.Build.0 = Release|Win32
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Debug|x64.ActiveCfg = Debug|x64
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Debug|x64.Build.0 = Debug|x64
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Debug|x86.ActiveCfg = Debug|Win32
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Debug|x86.Build.0 = Debug|Win32
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x64.ActiveCfg = Release|x64
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x64.Build.0 = Release|x64
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x86.ActiveCfg = Release|Win32
+		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

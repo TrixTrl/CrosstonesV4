@@ -12,5 +12,5 @@ void TestBotRnd::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTim
 	for (int i = 0; i < ((*moves)[random]).size(); i++) {
 		(*board)[((*moves)[random])[i].i][((*moves)[random])[i].j] ^= ((*moves)[random])[i].delta;
 	}
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
