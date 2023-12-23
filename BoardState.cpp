@@ -14,7 +14,7 @@
 #define RED "\x1b[38;5;9mR"
 #define BLUE "\x1b[38;5;12mB"
 
-#define DEBUG_PRINTING true
+#define DEBUG_PRINTING false
 
 BoardState::BoardState() {
 	for (int i = 0; i < 13; i++) { for (int j = 0; j < 13; j++) { pieces[i][j] = 0; } }
@@ -493,7 +493,7 @@ void BoardState::unsafeMakeMove(std::vector<xMove>* move)
 	}
 }
 
-void BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
+int BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
 {
 	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
 	moves = getMoves(isWhiteTurn);
@@ -510,11 +510,29 @@ void BoardState::makeMove(std::vector<xMove>* move, bool isWhiteTurn)
 		}
 		if (memcmp(&boardCopy1, &boardCopy2, sizeof(boardCopy1)) == 0) {
 			std::memcpy(&pieces, boardCopy1, sizeof(pieces));
-			return;
+			return (i > 0);
 		}
 	}
+	return -1;
 }
 
+int BoardState::makeMove(uint8_t(*newState)[13][13], bool isWhiteTurn)
+{
+	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	moves = getMoves(isWhiteTurn);
+	uint8_t boardCopy[13][13];
+	for (int i = 0; i < moves->size(); i++) {
+		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+		for (int j = 0; j < (*moves)[i].size(); j++) {
+			boardCopy[(*moves)[i][j].i][(*moves)[i][j].j] ^= (*moves)[i][j].delta;
+		}
+		if (memcmp(newState, &boardCopy, sizeof(newState)) == 0) {
+			std::memcpy(&pieces, newState, sizeof(pieces));
+			return (i > 0);
+		}
+	}
+	return -1;
+}
 BoardState::winValue BoardState::gameOver(bool isWhite) //last player to make a move
 {
 	//Check for full eliminations, if yes, that player wins

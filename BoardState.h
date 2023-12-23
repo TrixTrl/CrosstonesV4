@@ -23,7 +23,8 @@ public:
 	void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite);
 
 	void unsafeMakeMove(std::vector<xMove>* move);
-	void makeMove(std::vector<xMove>* move, bool isWhiteTurn);
+	int makeMove(std::vector<xMove>* move, bool isWhiteTurn);	//return -1 for invalid, 0 for passing, and 1 for any other valid move
+	int makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn);
 
 	enum class winValue {
 		none,
