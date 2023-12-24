@@ -148,8 +148,7 @@ float Utils::basicPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = (*pieces)[i][j];
 			if (!Piece::isTower(piece)) continue;
-			eval += (Piece::height(piece) + (Piece::height(piece)==1?-0.6:0) + 2 * (Piece::hasAddOn(piece)));
-			eval *= (Piece::isWhiteTower(piece) ? 1 : -1);
+			eval += (Piece::isWhiteTower(piece) ? 1 : -1)*((Piece::height(piece) + (Piece::height(piece)==1?-0.3:0) + 2 * (Piece::hasAddOn(piece))));
 		}
 	}
 	return eval;

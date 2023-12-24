@@ -23,7 +23,7 @@ void Deepchad::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
 		for (int i = 1; i < moves->size(); i++)
 		{
 			applyXMove(board, moves->at(i));
-			float eval = minimax(board, depth - 1, false);
+			float eval = minimax(board, depth - 1, true);
 			if (eval > value) {
 				value = eval;
 				bestMove = &(moves->at(i));
@@ -75,7 +75,7 @@ float Deepchad::minimax(uint8_t(*board)[13][13], uint8_t depth, bool isWhiteTurn
 		for (int i = 1; i < moves->size(); i++)
 		{
 			applyXMove(board, moves->at(i));
-			value = min(value, minimax(board, depth - 1, false));
+			value = min(value, minimax(board, depth - 1, true));
 			applyXMove(board, moves->at(i));
 		}
 		return value;
