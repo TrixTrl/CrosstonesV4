@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Felix Bots", "Felix Bots\Fe
 		{5024BAD8-24AC-4D6D-890A-6D99F42CC9D0} = {5024BAD8-24AC-4D6D-890A-6D99F42CC9D0}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Trix Bots", "Trix Bots\Trix Bots.vcxproj", "{DB1089E1-9915-4E58-8F85-F691DD9D2B92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -72,6 +74,14 @@ Global
 		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x64.Build.0 = Release|x64
 		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x86.ActiveCfg = Release|Win32
 		{D322921D-F9B1-479B-B7B8-25D7A3C47215}.Release|x86.Build.0 = Release|Win32
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Debug|x64.ActiveCfg = Debug|x64
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Debug|x64.Build.0 = Debug|x64
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Debug|x86.ActiveCfg = Debug|Win32
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Debug|x86.Build.0 = Debug|Win32
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Release|x64.ActiveCfg = Release|x64
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Release|x64.Build.0 = Release|x64
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Release|x86.ActiveCfg = Release|Win32
+		{DB1089E1-9915-4E58-8F85-F691DD9D2B92}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

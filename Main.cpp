@@ -10,6 +10,7 @@
 #include "Globals/Piece.h"
 #include "GameMaster.h"
 #include "Test Bots/TestBotRnd.h"
+#include "Trix Bots/TheFirst.h"
 
 #include <bitset>
 #include <thread>
@@ -105,10 +106,8 @@ int main() {
 
 	}
 	else {
-		//TestBotRnd r1();
-		//TestBotRnd r2();
-		Player* p1 = new TestBotRnd();
-		Player* p2 = new TestBotRnd();
+		Player* p1 = new TheFirst();
+		Player* p2 = new TheFirst();
 		std::bitset<3> gamemode(5);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 		gameMaster.play(globalHwnd);

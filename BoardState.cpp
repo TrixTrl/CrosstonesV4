@@ -197,7 +197,9 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			move.emplace_back(xMove{ i, j, ((uint8_t)((pieces[i][j]) ^ ((*state)[i][j]))) });		//Creation of xor lists for moves
 		}
 	}
-	moves->emplace_back(move);
+	if (moves->size() == 0 || move.size() > 0) {
+		moves->emplace_back(move);
+	}
 
 	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
 		uint8_t boardCopy[13][13];
