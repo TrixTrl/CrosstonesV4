@@ -10,6 +10,7 @@
 #include "Globals/Piece.h"
 #include "GameMaster.h"
 #include "Test Bots/TestBotRnd.h"
+#include "Felix Bots/Deepchad.h"
 #include "Trix Bots/TheFirst.h"
 
 #include <bitset>
@@ -107,7 +108,7 @@ int main() {
 	}
 	else {
 		Player* p1 = new TheFirst();
-		Player* p2 = new TheFirst();
+		Player* p2 = new Deepchad();
 		std::bitset<3> gamemode(5);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 		gameMaster.play(globalHwnd);
