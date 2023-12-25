@@ -12,6 +12,8 @@
 #include "../Globals/Piece.h"
 #include "../Test Bots/BasicGenerator.h"
 
+#define MAXEVAL 9999
+
 void Utils::print(std::string str, bool newLine = false) {
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -28,6 +30,14 @@ void Utils::print(float f, bool newLine = false) {
 }
 
 void Utils::print(int f, bool newLine = false) {
+	std::string str = std::to_string(f);
+	if (newLine) str += "\n";
+	std::wstring temp = std::wstring(str.begin(), str.end());
+	LPCWSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
+void Utils::print(size_t f, bool newLine = false) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -153,7 +163,7 @@ float Utils::basicPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = (*pieces)[i][j];
 			if (!Piece::isTower(piece)) continue;
-			float value = (Piece::height(piece) + (Piece::height(piece) == 1 ? -0.3 : 0) + 2.5 * (Piece::hasAddOn(piece)));
+			float value = (Piece::height(piece) + (Piece::height(piece) == 1 ? -0.1 : 0) + 2.5 * (Piece::hasAddOn(piece)));
 			value *= (Piece::isWhiteTower(piece) ? 1 : -1);
 			eval += value;
 		}
@@ -169,7 +179,7 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 	std::vector<int> bestMoves;
 	float bestEval = -99999;
 
-	int depth = 2;
+	int depth = 1;
 
 	debugContainer debug;
 
@@ -180,6 +190,8 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 		for (int i = 0; i < ((*moves)[j]).size(); i++) {
 			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
 		}
+
+		if (gameOver(isWhite, &boardCopy) == (isWhite?winValue::white:winValue::black)) return j;
 
 		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);//basicPosEval(isWhite, &boardCopy) * (isWhite ? 1 : -1);
 		//printU(std::to_string(bestEval));
@@ -202,6 +214,7 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 	print("getBestMoveBasic: ");
 	print(debug.n, true);
 	print(bestEval, true);
+	print(bestMoves.size(), true);
 
 	int random = rand() % bestMoves.size();
 	//print(bestMoves[random]);

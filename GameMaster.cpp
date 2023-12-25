@@ -74,3 +74,8 @@ void GameMaster::play(HWND globalHwnd) {
 		print(" has won\n");
 	}
 }
+
+void GameMaster::loadPos(std::string str)
+{
+	bs.loadPos(str);
+}

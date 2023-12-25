@@ -21,6 +21,7 @@ public:
 
 	static void print(std::string s, bool newLine);
 	static void print(int s, bool newLine);
+	static void print(size_t s, bool newLine);
 	static void print(float s, bool newLine);
 	static void print(BasicGenerator::xMove, bool newLine);
 

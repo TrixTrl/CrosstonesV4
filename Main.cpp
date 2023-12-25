@@ -21,6 +21,7 @@
 
 #define KEYBOARDCONTROLL 1
 #define EXPLOREMOVEGENERATION 0
+#define EVALUATIONTESTING 0
 
 int screenWidth = 750;//1200;
 int screenHeight = 750;
@@ -33,12 +34,12 @@ int switchMove = 0;
 int main() {
 	srand(time(nullptr));
 
-	if (EXPLOREMOVEGENERATION) {
+	if (EXPLOREMOVEGENERATION || EVALUATIONTESTING) {
 		BoardState bs;
 		std::bitset<3> set(5);
 		bs.rst(set);
 
-		//bs.loadPos("b-10000 r-10006 b-10012 -B30500 -B30502 -W30512 -B10602 b-10606 -W10610 -B30700 -B20702 -W50710 -W30712 b-11200 r-11206 b-11212 111111111101001111111111");
+		bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
 
 		bs.copyBoard(&(displayBoard[0]));
 
@@ -85,7 +86,7 @@ int main() {
 			bs.copyBoard(&(displayBoard[0]));
 			bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
 
-			std::string str2 = std::to_string(Utils::basicPosEval(isWhite, &(displayBoard[0])));//std::to_string(i);
+			std::string str2 = EVALUATIONTESTING?std::to_string(Utils::basicPosEval(isWhite, &(displayBoard[0]))):std::to_string(i);
 			str2 += "\n";
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
@@ -115,6 +116,9 @@ int main() {
 		Player* p2 = new TheFirst();
 		std::bitset<3> gamemode(5);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
+
+		//gameMaster.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
+
 		gameMaster.play(globalHwnd);
 	}
 	return 0;
