@@ -3,6 +3,8 @@
 #include <string>
 #include "Globals/Piece.h"
 #include <cstdint>
+#include <sstream>
+#include <iomanip>
 
 #include <Windows.h>
 #include <WinUser.h>
@@ -137,6 +139,15 @@ void BoardState::rst(std::bitset<3>& tps)
 	pieces[6][2] |= 3 | Piece::Black;
 	pieces[7][2] |= 2 | Piece::Black;
 	pieces[6][3] |= 3 | Piece::White;*/
+}
+
+void BoardState::wipe()
+{
+	for (int i = 0; i < 13; i++) {
+		for (int j = 0; j < 13; j++) {
+			pieces[i][j] &= 0b10000000;
+		}
+	}
 }
 
 void BoardState::copyBoard(uint8_t(*dest)[13][13])
@@ -523,6 +534,9 @@ int BoardState::makeMove(uint8_t(*newState)[13][13], bool isWhiteTurn)
 		}
 		if (memcmp(newState, &boardCopy, sizeof(*newState)) == 0) {
 			std::memcpy(&pieces, newState, sizeof(pieces));
+
+			forceDebugPrint(dumpPos());
+			forceDebugPrint("\n");
 			return i == 0 ? 0 : 1;
 		}
 	}
@@ -620,4 +634,72 @@ BoardState::winValue BoardState::gameOver(bool isWhite) //last player to make a 
 	if (whiteWin && !blackWin) return winValue::white;
 	if (!whiteWin && blackWin) return winValue::black;
 	return isWhite ? winValue::white : winValue::black;
+}
+
+std::string BoardState::dumpPos()
+{
+	std::string turnPieceStr = "";
+	std::string str = "";
+
+	for (int i = 0; i < 13; i++) {
+		for (int j = 0; j < 13; j++) {
+			uint8_t piece = pieces[i][j];
+
+			if (!((piece & turnPiece) == 0)) {
+				turnPieceStr += ((piece & setTurnPiece) == 0) ? "0" : "1";
+			}
+
+			if (Piece::height(piece) == 0) continue;
+			str += (Piece::hasAddOn(piece) ? (Piece::isRed(piece) ? "r" : "b") : "-");
+			str += Piece::isAddOn(piece) ? "-" : (Piece::isWhiteTower(piece) ? "W" : "B");
+			str += std::to_string(Piece::height(piece));
+
+			std::ostringstream ss1;
+			ss1 << std::setw(2) << std::setfill('0') << i;
+			std::ostringstream ss2;
+			ss2 << std::setw(2) << std::setfill('0') << j;
+
+			str += ss1.str();
+			str += ss2.str();
+
+			str += " ";
+		}
+	}
+	return str + turnPieceStr;
+}
+
+void BoardState::loadPos(std::string str)
+{
+	wipe();
+
+	std::string delimiter = " ";
+
+	size_t pos = 0;
+	std::string token;
+	while ((pos = str.find(delimiter)) != std::string::npos) {
+		token = str.substr(0, pos);
+
+		if (token.length() == 7) {
+			uint8_t piece = 0;
+			if (token[0] == 'b') piece |= Piece::Blue;
+			if (token[0] == 'r') piece |= Piece::Blue;
+			if (token[1] == 'B') piece |= Piece::Black;
+			piece += token[2] - '0';
+			int x = 10 * (token[3] - '0') + (token[4] - '0');
+			int y = 10 * (token[5] - '0') + (token[6] - '0');
+			pieces[x][y] |= piece;
+		}
+		else {
+			int n = 0;
+			for (int i = 0; i < 13; i++) {
+				for (int j = 0; j < 13; j++) {
+					if ((pieces[i][j] & turnPiece) == 0) continue;
+					pieces[i][j] |= token[n] == '1' ? setTurnPiece : 0;
+					n++;
+				}
+			}
+		}
+
+		str.erase(0, pos + delimiter.length());
+	}
 }

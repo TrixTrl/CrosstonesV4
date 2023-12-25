@@ -13,6 +13,7 @@ class BoardState
 public:
 	BoardState();
 	void rst(std::bitset<3>& tps);
+	void wipe();
 
 	void copyBoard(uint8_t(*dest)[13][13]);
 
@@ -37,6 +38,9 @@ public:
 
 	static const uint8_t turnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
+
+	std::string dumpPos();
+	void loadPos(std::string str);
 private:
 	uint8_t pieces[13][13];
 };

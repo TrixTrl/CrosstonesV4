@@ -37,6 +37,9 @@ int main() {
 		BoardState bs;
 		std::bitset<3> set(5);
 		bs.rst(set);
+
+		//bs.loadPos("b-10000 r-10006 b-10012 -B30500 -B30502 -W30512 -B10602 b-10606 -W10610 -B30700 -B20702 -W50710 -W30712 b-11200 r-11206 b-11212 111111111101001111111111");
+
 		bs.copyBoard(&(displayBoard[0]));
 
 		InvalidateRect(globalHwnd, NULL, NULL);
