@@ -70,7 +70,7 @@ Utils::winValue Utils::gameOver(bool isWhite, uint8_t(*pieces)[13][13]) //last p
 	for (int i = 0; i < 13 && (whiteNoPieces || blackNoPieces); i++) {
 		for (int j = 0; j < 13 && (whiteNoPieces || blackNoPieces); j++) {
 			if (Piece::isTower((*pieces)[i][j])) {
-				if (Piece::isWhite((*pieces)[i][j])) {
+				if (Piece::isWhiteTower((*pieces)[i][j])) {
 					whiteNoPieces = false;
 				}
 				else {
@@ -80,7 +80,7 @@ Utils::winValue Utils::gameOver(bool isWhite, uint8_t(*pieces)[13][13]) //last p
 		}
 	}
 	if (whiteNoPieces) return winValue::black;
-	if (whiteNoPieces) return winValue::white;
+	if (blackNoPieces) return winValue::white;
 	//There can be no draw if one side has no pieces left so we don't need any extra checks
 
 	bool bases[2][2] = { {false, false}, {false, false} }; //[0] white   [1] black   [x][0] white base   [x][1] black base
@@ -163,7 +163,8 @@ float Utils::basicPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = (*pieces)[i][j];
 			if (!Piece::isTower(piece)) continue;
-			float value = (Piece::height(piece) + (Piece::height(piece) == 1 ? -0.1 : 0) + 2.5 * (Piece::hasAddOn(piece)));
+			float value = Piece::height(piece);//(Piece::height(piece) + (Piece::height(piece) == 1 ? -0.1 : 0) + 2.5 * (Piece::hasAddOn(piece)));
+			value += (Piece::height(piece) == 1 ? -0.1 : 0);
 			value *= (Piece::isWhiteTower(piece) ? 1 : -1);
 			eval += value;
 		}
@@ -179,7 +180,7 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 	std::vector<int> bestMoves;
 	float bestEval = -99999;
 
-	int depth = 1;
+	int depth = 2;
 
 	debugContainer debug;
 
@@ -191,7 +192,7 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
 		}
 
-		if (gameOver(isWhite, &boardCopy) == (isWhite?winValue::white:winValue::black)) return j;
+		if (gameOver(isWhite, &boardCopy) == (isWhite ? winValue::white : winValue::black)) return j;
 
 		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);//basicPosEval(isWhite, &boardCopy) * (isWhite ? 1 : -1);
 		//printU(std::to_string(bestEval));
@@ -220,6 +221,48 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 	//print(bestMoves[random]);
 	//print("\n");
 	return bestMoves[random];
+}
+
+int Utils::trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13])
+{
+	std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
+	moves = BasicGenerator::getMoves(isWhite, pieces);
+
+	float bestEval = -99999;
+	int bestMove = 0;
+
+	int depth = 2;
+
+	debugContainer debug;
+
+	for (int j = 1; j < moves->size(); j++) {
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+		for (int i = 0; i < ((*moves)[j]).size(); i++) {
+			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
+		}
+
+		if (gameOver(isWhite, &boardCopy) == (isWhite ? winValue::white : winValue::black)) return j;
+
+		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), !isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);
+
+		//print(posEval, true);
+
+		if (posEval > bestEval) {
+			bestEval = posEval;
+			bestMove = j;
+		}
+		else if (posEval == bestEval && (rand() % 100 == 0)) {
+			bestMove = j;
+		}
+	}
+
+	print("\ntrivialMove: ");
+	print(debug.n, true);
+	print(bestEval, true);
+	print(bestMove, true);
+
+	return bestMove;
 }
 
 std::shared_ptr<std::vector<std::vector<Utils::xMove>>> Utils::getMoves_halfSplit_noPush(bool isWhite, uint8_t(*pieces)[13][13]) {
@@ -461,15 +504,21 @@ void Utils::captureGenerator_singleSplit(std::shared_ptr<std::vector<std::vector
 float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), debugContainer* debug = nullptr)
 {
 	if (debug != nullptr) debug->n++;
-	if (depth == 0 || Utils::gameOver(maximizing, pieces) != winValue::none) {
+	if (debug != nullptr) debug->depthCounts[depth]++;
+
+
+	if (depth == 0 || (Utils::gameOver(maximizing, pieces) != winValue::none)) {
 		return evalFunc(maximizing, pieces);
 	}
 
 	if (maximizing) {
-		float value = -std::numeric_limits<float>::infinity();
+		float value = -std::numeric_limits<float>::infinity();//-MAXEVAL;
 
-		std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
-		moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
+		//std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+		//moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
+
+		std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
+		moves = BasicGenerator::getMoves(maximizing, pieces);
 
 		for (int j = 1; j < moves->size(); j++) {
 			uint8_t boardCopy[13][13];
@@ -481,13 +530,13 @@ float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float b
 			float alphabeta = alphaBeta(&boardCopy, depth - 1, alpha, beta, false, evalFunc, debug);
 			value = max(value, alphabeta);
 
-			if (value > beta) break;
+			//if (value > beta) break;
 			alpha = max(alpha, value);
 		}
 		return value;
 	}
 	else {
-		float value = std::numeric_limits<float>::infinity();
+		float value = std::numeric_limits<float>::infinity();//MAXEVAL;
 
 		std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
 		moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
@@ -502,9 +551,10 @@ float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float b
 			float alphabeta = alphaBeta(&boardCopy, depth - 1, alpha, beta, true, evalFunc, debug);
 			value = min(value, alphabeta);
 
-			if (value < alpha) break;
+			//if (value < alpha) break;
 			beta = min(beta, value);
 		}
+
 		return value;
 	}
 }

@@ -18,6 +18,7 @@ public:
 	static winValue gameOver(bool isWhite, uint8_t (*pieces)[13][13]);
 	static float basicPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
 	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13]);
+	static int trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13]);
 
 	static void print(std::string s, bool newLine);
 	static void print(int s, bool newLine);
@@ -27,6 +28,7 @@ public:
 
 	struct debugContainer {
 		int n = 0;
+		int depthCounts[5] = {0, 0, 0, 0, 0};
 	};
 
 	struct xMove {

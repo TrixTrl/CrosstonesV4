@@ -21,23 +21,23 @@
 BoardState::BoardState() {
 	for (int i = 0; i < 13; i++) { for (int j = 0; j < 13; j++) { pieces[i][j] = 0; } }
 
-	pieces[0][0] = turnPiece;
+	//pieces[0][0] = turnPiece;
 	pieces[2][0] = turnPiece;
 	pieces[0][2] = turnPiece;
 	pieces[2][2] = turnPiece;
 
 	pieces[10][0] = turnPiece;
-	pieces[12][0] = turnPiece;
+	//pieces[12][0] = turnPiece;
 	pieces[10][2] = turnPiece;
 	pieces[12][2] = turnPiece;
 
-	pieces[0][12] = turnPiece;
+	//pieces[0][12] = turnPiece;
 	pieces[2][12] = turnPiece;
 	pieces[0][10] = turnPiece;
 	pieces[2][10] = turnPiece;
 
 	pieces[10][12] = turnPiece;
-	pieces[12][12] = turnPiece;
+	//pieces[12][12] = turnPiece;
 	pieces[10][10] = turnPiece;
 	pieces[12][10] = turnPiece;
 
@@ -564,7 +564,7 @@ BoardState::winValue BoardState::gameOver(bool isWhite) //last player to make a 
 		}
 	}
 	if (whiteNoPieces) return winValue::black;
-	if (whiteNoPieces) return winValue::white;
+	if (blackNoPieces) return winValue::white;
 	//There can be no draw if one side has no pieces left so we don't need any extra checks
 
 	bool bases[2][2] = { {false, false}, {false, false} }; //[0] white   [1] black   [x][0] white base   [x][1] black base
@@ -678,28 +678,24 @@ void BoardState::loadPos(std::string str)
 	std::string token;
 	while ((pos = str.find(delimiter)) != std::string::npos) {
 		token = str.substr(0, pos);
-
-		if (token.length() == 7) {
-			uint8_t piece = 0;
-			if (token[0] == 'b') piece |= Piece::Blue;
-			if (token[0] == 'r') piece |= Piece::Blue;
-			if (token[1] == 'B') piece |= Piece::Black;
-			piece += token[2] - '0';
-			int x = 10 * (token[3] - '0') + (token[4] - '0');
-			int y = 10 * (token[5] - '0') + (token[6] - '0');
-			pieces[x][y] |= piece;
-		}
-		else {
-			int n = 0;
-			for (int i = 0; i < 13; i++) {
-				for (int j = 0; j < 13; j++) {
-					if ((pieces[i][j] & turnPiece) == 0) continue;
-					pieces[i][j] |= token[n] == '1' ? setTurnPiece : 0;
-					n++;
-				}
-			}
-		}
+		uint8_t piece = 0;
+		if (token[0] == 'b') piece |= Piece::Blue;
+		if (token[0] == 'r') piece |= Piece::Blue;
+		if (token[1] == 'B') piece |= Piece::Black;
+		piece += token[2] - '0';
+		int x = 10 * (token[3] - '0') + (token[4] - '0');
+		int y = 10 * (token[5] - '0') + (token[6] - '0');
+		pieces[x][y] |= piece;
 
 		str.erase(0, pos + delimiter.length());
+	}
+	token = str;
+	int n = 0;
+	for (int i = 0; i < 13; i++) {
+		for (int j = 0; j < 13; j++) {
+			if ((pieces[i][j] & turnPiece) == 0) continue;
+			pieces[i][j] |= (token[n] == '1') ? setTurnPiece : 0;
+			n++;
+		}
 	}
 }

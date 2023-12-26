@@ -39,8 +39,9 @@ int main() {
 		std::bitset<3> set(5);
 		bs.rst(set);
 
-		bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
-
+		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
+		bs.loadPos("-B10700 -W10803 -W10602 00000000100000000000");
+		
 		bs.copyBoard(&(displayBoard[0]));
 
 		InvalidateRect(globalHwnd, NULL, NULL);
@@ -86,11 +87,22 @@ int main() {
 			bs.copyBoard(&(displayBoard[0]));
 			bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
 
+			Utils::print("--------", true);
+
 			std::string str2 = EVALUATIONTESTING?std::to_string(Utils::basicPosEval(isWhite, &(displayBoard[0]))):std::to_string(i);
 			str2 += "\n";
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
 			OutputDebugString(wideString2);
+
+			Utils::debugContainer debug;
+			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 4, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
+			Utils::print(debug.n, true);
+			Utils::print(debug.depthCounts[4], true);
+			Utils::print(debug.depthCounts[3], true);
+			Utils::print(debug.depthCounts[2], true);
+			Utils::print(debug.depthCounts[1], true);
+			Utils::print(debug.depthCounts[0], true);
 
 			InvalidateRect(globalHwnd, NULL, NULL);
 			if (!KEYBOARDCONTROLL) {
@@ -116,8 +128,6 @@ int main() {
 		Player* p2 = new TheFirst();
 		std::bitset<3> gamemode(5);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
-
-		//gameMaster.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
 
 		gameMaster.play(globalHwnd);
 	}
