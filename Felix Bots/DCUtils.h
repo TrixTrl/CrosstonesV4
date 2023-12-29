@@ -17,6 +17,7 @@ struct DCUtils
 
 	static inline void wrapWithXMove(uint8_t(*board)[13][13], std::vector<BasicGenerator::xMove>& move, std::function<void()> action);
 	static void applyXMove(uint8_t(*board)[13][13], std::vector<BasicGenerator::xMove>& move);
+
 	static WinValue calcWinValue(uint8_t(*board)[13][13], bool isWhite);
 	static bool gameOver(uint8_t(*board)[13][13]);
 

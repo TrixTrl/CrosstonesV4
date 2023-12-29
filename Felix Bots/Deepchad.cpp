@@ -15,8 +15,6 @@ using namespace std;
 
 void Deepchad::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
 {
-	DCUtils::print("this is windows test" , true);
-	cout << "this is cout test\n";
 	int maxDepth = 3,
 		color = (isWhite ? 1 : -1);
 
@@ -66,19 +64,41 @@ void Deepchad::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
 
 	// remove the passing move
 	moves->erase(moves->begin());
+	
+	//sortMoves(board, moves);
 
+	// only put best move in front
 	for (int depth = 1; depth <= maxDepth; depth++) {
+
 		int bestMoveIdx = negamaxAtRoot(board, moves, depth, alpha, beta, color);
+		if (bestMoveIdx < 0) 
+			return;
 		auto bestMove = moves->at(bestMoveIdx);
 
 		//move best move from iteration to front
 		moves->erase(moves->begin() + bestMoveIdx);
 		moves->insert(moves->begin(), bestMove);
 	}
+	//put n best moves in front
+	/*size_t bestMovesAmount = 50;
+	for (int depth = 1; depth <= maxDepth; depth++) {
+
+		queue<pair<int, int>> bestMoves = searchRootMultBestMoves(board, moves, depth, alpha, beta, color, bestMovesAmount);
+		while (!bestMoves.empty()) {
+			auto goodMoveIdx = bestMoves.front().first;
+			bestMoves.pop();
+			auto goodMove = moves->at(goodMoveIdx);
+			
+			//move best move from iteration to front
+			moves->erase(moves->begin() + goodMoveIdx);
+			moves->insert(moves->begin(), goodMove);
+		}
+	}*/
+
 	if (!moves->empty())
 		DCUtils::applyXMove(board, moves->front());
 
-	this_thread::sleep_for(chrono::milliseconds(100));
+	//this_thread::sleep_for(chrono::milliseconds(100));
 }
 
 float Deepchad::minimax(uint8_t(*board)[13][13], uint8_t depth, float alpha, float beta, bool isWhiteTurn)
@@ -128,6 +148,7 @@ float Deepchad::negamax(uint8_t(*board)[13][13], uint8_t depth, float alpha, flo
 
 	shared_ptr<vector<vector<BasicGenerator::xMove>>> moves =
 		BasicGenerator::getMoves(isWhite, board);
+	sortMoves(board, moves);
 	float value = -numeric_limits<float>::infinity();
 
 	for (int i = 1; i < moves->size(); i++)
@@ -150,13 +171,15 @@ int Deepchad::negamaxAtRoot(uint8_t(*board)[13][13], shared_ptr<vector<vector<Ba
 	bool isWhite = (color == 1);
 	
 	if (depth == 0 || DCUtils::gameOver(board))
-		return heuristic(board, isWhite) * color;
+		return -1;
 
 	int bestMove = -1;
 	float eval, value = -numeric_limits<float>::infinity();
 
+	sortMoves(board, moves);
 	for (int i = 0; i < moves->size(); i++)
 	{
+		
 		DCUtils::wrapWithXMove(board, moves->at(i), [&]() {
 			eval = -negamax(board, depth - 1, -beta, -alpha, -color);
 			});
@@ -169,6 +192,34 @@ int Deepchad::negamaxAtRoot(uint8_t(*board)[13][13], shared_ptr<vector<vector<Ba
 			break; // cutoff
 	}
 	return bestMove;
+}
+
+queue<pair<int, int>> Deepchad::searchRootMultBestMoves(uint8_t(*board)[13][13], shared_ptr<vector<vector<BasicGenerator::xMove>>> moves,
+	uint8_t depth, float alpha, float beta, int color, size_t movesAmount)
+{
+	bool isWhite = (color == 1);
+
+	if (depth == 0 || DCUtils::gameOver(board))
+		return queue<pair<int, int>>();
+
+	queue<pair<int, int>> bestMoves;
+	float eval, value = -numeric_limits<float>::infinity();
+
+	for (int i = 0; i < moves->size(); i++)
+	{
+
+		DCUtils::wrapWithXMove(board, moves->at(i), [&]() {
+			eval = -negamax(board, depth - 1, alpha, beta, -color);
+			});
+		if (eval > value) {
+			value = eval;
+			bestMoves.push(pair(i, 0));
+			//ensure that we do not track more moves than nessecary
+			if (bestMoves.size() > movesAmount)
+				bestMoves.pop();
+		}
+	}
+	return bestMoves;
 }
 
 float Deepchad::heuristic(uint8_t(*board)[13][13], bool isWhiteTurn)
@@ -212,6 +263,20 @@ float Deepchad::heuristic(uint8_t(*board)[13][13], bool isWhiteTurn)
 	//return rand() % 100;
 }
 
+void Deepchad::sortMoves(uint8_t(*board)[13][13], shared_ptr<vector<vector<BasicGenerator::xMove>>> moves)
+{
+	//ideal would be in order:
+	// - merges onto addon
+	// - captures of addOn
+	// - normal captures
+	// - moves with addOn
+	// - the rest
+
+	auto compareMoves = [](const vector<BasicGenerator::xMove>& i1, const vector<BasicGenerator::xMove>& i2) {
+		return i1.size() > i2.size();
+	};
+	sort(moves.get()->begin(), moves.get()->end(), compareMoves);
+}
 
 /*
 (* Initial call *)

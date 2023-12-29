@@ -131,7 +131,7 @@ int main() {
 	}
 	else if ( DEEPCHADTESTINGSUITE ) 
 	{
-		DCTestSuite::run(globalHwnd);
+		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
 		Player* p1 = new Deepchad();

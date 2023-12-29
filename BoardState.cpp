@@ -680,7 +680,7 @@ void BoardState::loadPos(std::string str)
 		token = str.substr(0, pos);
 		uint8_t piece = 0;
 		if (token[0] == 'b') piece |= Piece::Blue;
-		if (token[0] == 'r') piece |= Piece::Blue;
+		if (token[0] == 'r') piece |= Piece::Red;
 		if (token[1] == 'B') piece |= Piece::Black;
 		piece += token[2] - '0';
 		int x = 10 * (token[3] - '0') + (token[4] - '0');
