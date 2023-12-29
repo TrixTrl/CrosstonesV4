@@ -150,7 +150,7 @@ void BoardState::wipe()
 	}
 }
 
-void BoardState::copyBoard(uint8_t(*dest)[13][13])
+void BoardState::copyBoard(uint8_t(*dest)[13][13]) const
 {
 	std::memcpy(dest, &pieces, sizeof(pieces));
 }
@@ -175,7 +175,7 @@ void forceDebugPrint(std::string str) {
 	OutputDebugString(wideString);
 }
 
-std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) {
+std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) const {
 	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
 	moves->reserve(700);
 
@@ -198,7 +198,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 	return moves;
 }
 
-void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite)
+void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
 	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
 	move.reserve(10);
@@ -399,7 +399,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 }
 
 
-void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite)
+void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
 	/*
 		0

@@ -22,9 +22,11 @@
     <ClCompile Include="BoardState.cpp" />
     <ClCompile Include="GameMaster.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="DCTestSuite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoardState.h" />
+    <ClInclude Include="DCTestSuite.h" />
     <ClInclude Include="GameMaster.h" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

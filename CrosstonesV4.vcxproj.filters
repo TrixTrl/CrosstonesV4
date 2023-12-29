@@ -24,12 +24,18 @@
     <ClCompile Include="GameMaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DCTestSuite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoardState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameMaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DCTestSuite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

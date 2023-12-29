@@ -1,14 +1,20 @@
 #pragma once
 
 #include "../Globals/Player.h"
+#include "DCUtils.h"
 #include "../Test Bots/BasicGenerator.h"
 #include <vector>
 
 class Deepchad : public Player
 {
+public:
 	void getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime);
-	float minimax(uint8_t(*board)[13][13], uint8_t depth, bool isWhite);
+	float minimax(uint8_t(*board)[13][13], uint8_t depth, float alpha, float beta, bool isWhite);
+
+	float negamax(uint8_t(*board)[13][13], uint8_t depth, float alpha, float beta, int color);
+	int negamaxAtRoot(uint8_t(*board)[13][13], std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves,
+		uint8_t depth, float alpha, float beta, int color);
+
 	float heuristic(uint8_t(*board)[13][13], bool isWhite);
-	void applyXMove(uint8_t(*board)[13][13], std::vector<BasicGenerator::xMove>& move);
 };
 

@@ -15,13 +15,13 @@ public:
 	void rst(std::bitset<3>& tps);
 	void wipe();
 
-	void copyBoard(uint8_t(*dest)[13][13]);
+	void copyBoard(uint8_t(*dest)[13][13]) const;
 
 	struct xMove;
 
-	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite);
-	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite);
-	void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite);
+	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite) const;
+	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
+	void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
 
 	void unsafeMakeMove(std::vector<xMove>* move);
 	int makeMove(std::vector<xMove>* move, bool isWhiteTurn);	//return -1 for invalid, 0 for passing, and 1 for any other valid move
