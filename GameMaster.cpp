@@ -27,6 +27,7 @@ void GameMaster::play(HWND globalHwnd) {
 	while (bs.gameOver(!isWhiteTurn) == BoardState::winValue::none && !ended) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
 		uint8_t board[13][13];
 		bs.copyBoard(&board);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		int timeEnd = Time::millis() + timeControl;
 		(*players[isWhiteTurn ? 0 : 1]).getMoveToPlay(&board, isWhiteTurn, timeEnd);
 		if (timeEnforcement[isWhiteTurn ? 0 : 1] && timeEnd < Time::millis()) {
