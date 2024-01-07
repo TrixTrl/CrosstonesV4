@@ -20,6 +20,9 @@
 #include <string>
 #include <chrono>
 
+#pragma comment(linker, "/STACK:200000000")
+#pragma comment(linker, "/HEAP:200000000")
+
 #define KEYBOARDCONTROLL 1
 #define EXPLOREMOVEGENERATION 0
 #define EVALUATIONTESTING 0
