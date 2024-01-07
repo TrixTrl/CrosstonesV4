@@ -1,25 +1,21 @@
-#include "DCUtils.h"
+#include "Utility.h"
 #include "../Globals/Piece.h"
 #include <vector>
 
 using namespace std;
+using namespace dc;
 
-void DCUtils::applyXMove(uint8_t(*board)[13][13], vector<BasicGenerator::xMove>& move)
+std::vector<BasicGenerator::xMove> Utility::nullMove;
+Utility::_init Utility::_initializer;
+
+void Utility::applyXMove(uint8_t(*board)[13][13], Move& move)
 {
 	for (int i = 0; i < move.size(); i++) {
 		(*board)[move[i].i][move[i].j] ^= move[i].delta;
 	}
 }
 
-inline void DCUtils::wrapWithXMove(uint8_t(*board)[13][13], vector<BasicGenerator::xMove>& move, 
-	function<void()> action) 
-{
-	applyXMove(board, move);
-	action();
-	applyXMove(board, move);
-}
-
-DCUtils::WinValue DCUtils::calcWinValue(uint8_t(*board)[13][13], bool isWhite) 
+GameResult Utility::calcWinValue(uint8_t(*board)[13][13], bool isWhite) 
 {
 	// Totally not copied from trix
 	bool bases[2][2] = { {false, false}, {false, false} }; //[0] white   [1] black   [x][0] white base   [x][1] black base
@@ -49,12 +45,12 @@ DCUtils::WinValue DCUtils::calcWinValue(uint8_t(*board)[13][13], bool isWhite)
 	bool blackWin = (bases[1][0] && !bases[0][0]);
 
 	if (whiteWin) {
-		return (blackWin ? WinValue::draw : WinValue::white);
+		return (blackWin ? GameResult::Draw : GameResult::WhiteHasWon);
 	}
-	return (blackWin ? WinValue::black : WinValue::none);
+	return (blackWin ? GameResult::BlackHasWon : GameResult::InProgress);
 }
 
-bool DCUtils::gameOver(uint8_t(*board)[13][13]) 
+bool Utility::gameOver(uint8_t(*board)[13][13]) 
 {
 	// check for whin in black base
 	bool blackBaseContested = false;

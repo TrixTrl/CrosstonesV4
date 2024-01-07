@@ -21,6 +21,7 @@
 BoardState::BoardState() {
 	for (int i = 0; i < 13; i++) { for (int j = 0; j < 13; j++) { pieces[i][j] = 0; } }
 
+	//Ports
 	//pieces[0][0] = turnPiece;
 	pieces[2][0] = turnPiece;
 	pieces[0][2] = turnPiece;
@@ -41,15 +42,13 @@ BoardState::BoardState() {
 	pieces[10][10] = turnPiece;
 	pieces[12][10] = turnPiece;
 
-
-
+	//Bases
 	pieces[6][0] = turnPiece;
 	pieces[6][2] = turnPiece;
 	pieces[6][10] = turnPiece;
 	pieces[6][12] = turnPiece;
 
-
-
+	//Gates
 	pieces[2][6] = turnPiece;
 	pieces[4][6] = turnPiece;
 	pieces[8][6] = turnPiece;

@@ -149,13 +149,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DCUtils.cpp" />
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="DebugPrinting.cpp" />
     <ClCompile Include="Deepchad.cpp" />
+    <ClCompile Include="Evaluation.cpp" />
+    <ClCompile Include="Searcher.cpp" />
+    <ClCompile Include="Zobrist.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DCUtils.h" />
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="GameResult.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="Deepchad.h" />
+    <ClInclude Include="Evaluation.h" />
+    <ClInclude Include="Searcher.h" />
+    <ClInclude Include="TranspositionTable.h" />
+    <ClInclude Include="Zobrist.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

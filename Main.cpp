@@ -12,7 +12,6 @@
 #include "GameMaster.h"
 #include "Test Bots/TestBotRnd.h"
 #include "Felix Bots/Deepchad.h"
-#include "Felix Bots/DCUtils.h"
 #include "Trix Bots/TheFirst.h"
 #include "Trix Bots/Utils.h"
 
@@ -101,8 +100,7 @@ int main() {
 			Utils::debugContainer debug;
 			Utils::print("First: ", false);
 			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 4, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
-			Utils::print("Chad: ", false);
-			Utils::print(chad.negamax(&(displayBoard[0]), 4, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite), true);
+			//Utils::print("Chad: ", false);
 			Utils::print(debug.n, true);
 			Utils::print(debug.depthCounts[4], true);
 			Utils::print(debug.depthCounts[3], true);

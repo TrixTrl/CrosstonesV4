@@ -1,7 +1,7 @@
 #include "BasicGenerator.h"
 #include "../Globals/Piece.h"
 
-std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> BasicGenerator::getMoves(bool isWhite, uint8_t (*pieces)[13][13]) {
+std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> BasicGenerator::getMoves(const bool isWhite, const uint8_t (*pieces)[13][13]) {
 	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
 	moves->reserve(700);
 
@@ -23,7 +23,7 @@ std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> BasicGenerator:
 	return moves;
 }
 
-void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t(*pieces)[13][13])
+void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, const uint8_t(*pieces)[13][13])
 {
 	std::vector<xMove> move = std::vector<xMove>();
 	move.reserve(10);
@@ -219,7 +219,7 @@ void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMov
 }
 
 
-void BasicGenerator::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t(*pieces)[13][13])
+void BasicGenerator::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, const uint8_t(*pieces)[13][13])
 {
 	/*
 		0

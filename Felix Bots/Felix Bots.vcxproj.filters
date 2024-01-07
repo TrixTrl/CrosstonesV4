@@ -13,24 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{003add7b-8368-442c-8bf6-11b3df03556f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{814352d7-79f4-4ddd-bd46-f0be8313435d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Search">
+      <UniqueIdentifier>{b54a94f1-8d63-4b26-9581-265ffe5984f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Search">
+      <UniqueIdentifier>{5c116866-69f7-4fa3-a3a7-4674ddaf2c88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Deepchad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DCUtils.cpp">
+    <ClCompile Include="Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DebugPrinting.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Zobrist.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Evaluation.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Searcher.cpp">
+      <Filter>Source Files\Core\Search</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Deepchad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DCUtils.h">
+    <ClInclude Include="Utility.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Zobrist.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Evaluation.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameResult.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TranspositionTable.h">
+      <Filter>Header Files\Core\Search</Filter>
+    </ClInclude>
+    <ClInclude Include="Searcher.h">
+      <Filter>Header Files\Core\Search</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

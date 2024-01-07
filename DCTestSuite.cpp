@@ -1,5 +1,5 @@
 #include "Felix Bots/Deepchad.h"
-#include "Felix Bots/DCUtils.h"
+#include "Felix Bots/Utility.h"
 #include "DCTestSuite.h"
 #include <Windows.h>
 #include <WinUser.h>
@@ -19,9 +19,9 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 
 	gameMaster.play(globalHwnd);*/
 
-	std::vector<DCTestSuite::Board> boards = loadExampleBoards();
+	std::vector<dc::Board> boards = loadExampleBoards();
 
-	std::memcpy(display, &(boards.at(0).data), sizeof(boards.at(0).data));
+	std::memcpy(display, &(boards.at(3).square), sizeof(boards.at(3).square));
 	InvalidateRect(globalHwnd, NULL, NULL);
 
 	/* Display the board
@@ -30,34 +30,39 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 	*/
 	auto execTime = doTimed([&]()
 		{
-			for (auto& board : boards) {
-				uint8_t boardCopy[13][13];
-				std::memcpy(&boardCopy, &(board.data), sizeof(boardCopy));
+			//for (auto& board : boards) {
+			dc::Board& board = boards.at(3);
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, &(board.square), sizeof(boardCopy));
 
-				deepchad.getMoveToPlay(&boardCopy, true, 3000);
-			}
+			deepchad.getMoveToPlay(&boardCopy, true, 3000);
+
+			std::memcpy(display, &(boardCopy), sizeof(boardCopy));
+			InvalidateRect(globalHwnd, NULL, NULL);
+			//}
 		});
-	DCUtils::print(std::format("Deepchad Time: {}", execTime), true);
+	dc::Utility::print(std::format("Deepchad Time: {}", execTime), true);
 	return true;
 }
 
-std::vector<DCTestSuite::Board> DCTestSuite::loadExampleBoards() {
-	std::vector<DCTestSuite::Board> boards;
+std::vector<dc::Board> DCTestSuite::loadExampleBoards() {
+	std::vector<dc::Board> boards;
 	BoardState bsService;
 
-	const std::vector<std::string> positions = {
-		"b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111", //Dragon start
-		"b-10000 b-10012 b-11200 b-11212 -W30512 -W30712 -W10808 rW30406 bW40506 -B30700 -B10404 rB50704 -B30402 -B10602 11110110101111101111", //self played position
-		"-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010", //"unsolved" endgame
-		"b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111", //seagull gambit
-		"-B10700 -W10803 -W10602 00000000000000000000" //win in 4 ply
+	const std::vector<std::pair<std::string, bool>> positions = {
+		std::pair("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111", true), //Dragon start
+		std::pair("b-10000 b-10012 b-11200 b-11212 -W30512 -W30712 -W10808 rW30406 bW40506 -B30700 -B10404 rB50704 -B30402 -B10602 11110110101111101111", true), //self played position
+		std::pair("-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010", true), //"unsolved" endgame
+		std::pair("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111", false), //seagull gambit
+		std::pair("-B10700 -W10803 -W10602 00000000000000000000", true) //win in 4 ply
 	};
 
 	// convert positions
 	for (int i = 0; i < positions.size(); i++) {
-		Board board;
-		bsService.loadPos(positions[i]);
-		bsService.copyBoard(&(board.data));
+		dc::Board board;
+		board.isWhiteTurn = positions[i].second;
+		bsService.loadPos(positions[i].first);
+		bsService.copyBoard(&(board.square));
 		boards.push_back(board);
 	}
 
