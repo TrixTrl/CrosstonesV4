@@ -20,7 +20,7 @@
 #include <string>
 #include <chrono>
 
-#pragma comment(linker, "/STACK:200000000")
+#pragma comment(linker, "/STACK:20000000000")
 #pragma comment(linker, "/HEAP:200000000")
 
 #define KEYBOARDCONTROLL 1

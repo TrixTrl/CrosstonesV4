@@ -27,7 +27,7 @@ namespace dc
 
 			Entry() : key(0), value(0), depth(0), nodeType(0) {}
 
-			Entry(uint64_t _key, int _value, uint8_t _depth, uint8_t _nodeType, Move& _move)
+			Entry(uint64_t _key, int _value, uint8_t _depth, uint8_t _nodeType, const Move& _move)
 				: key(_key), value(_value), depth(_depth), nodeType(_nodeType), move() 
 			{
 				for (auto& xMove : _move)
@@ -122,7 +122,7 @@ namespace dc
 			return LookupFailed;
 		}
 
-		void storeEvaluation(int depth, int numPlySearched, int eval, int evalType, Move& move)
+		void storeEvaluation(int depth, int numPlySearched, int eval, int evalType, const Move& move)
 		{
 			if (!enabled)
 			{

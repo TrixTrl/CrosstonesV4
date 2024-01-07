@@ -26,7 +26,7 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 // This allows the search to be cancelled at any time and still yield a useful result.
 void Searcher::runIterativeDeepeningSearch()
 {
-	for (int searchDepth = 1; searchDepth <= 10; searchDepth++)
+	for (int searchDepth = 1; searchDepth <= 4; searchDepth++)
 	{
 		hasSearchedAtLeastOneMove = false;
 		search(searchDepth, 0, negativeInfinity, positiveInfinity);
@@ -127,7 +127,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	}
 
 	int evaluationBound = TranspositionTable<1>::UpperBound;
-	Move* bestMoveInThisPosition = &Utility::nullMove;
+	Move* bestMoveInThisPosition = nullptr;
 
 	// Skip i = 0 to not allow the Null move
 	for (int i = 1; i < moves->size(); i++)
@@ -165,7 +165,8 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 			}
 		}
 	}
-	transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, alpha, evaluationBound, *bestMoveInThisPosition);
+	if (bestMoveInThisPosition != nullptr)
+		transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, alpha, evaluationBound, *bestMoveInThisPosition);
 
 	return alpha;
 }
