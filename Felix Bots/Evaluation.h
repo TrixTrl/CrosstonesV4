@@ -24,7 +24,7 @@ namespace dc
 			1,1,2,3,2,3,4,3,2,3,2,1,1
 		};
 
-		const int positionWeight = 5;
+		const int positionWeight = 10;
 
 		int evaluate(Board& board);
 	};
