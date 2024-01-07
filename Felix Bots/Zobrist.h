@@ -18,7 +18,7 @@ namespace dc
 		// Random numbers are generated for each aspect of the game state, and are used for calculating the hash:
 
 		// piece type, colour, square index
-		static uint64_t piecesArray[53][169];
+		static uint64_t piecesArray[54][169];
 
 		// turn pieces in constant order
 		// only applied if turn piece is set (vertical)
@@ -33,7 +33,7 @@ namespace dc
 		public:
 			_init() 
 			{
-				for (int squareIndex = 0; squareIndex < 133; squareIndex++)
+				for (int squareIndex = 0; squareIndex < 169; squareIndex++)
 				{
 					for (const int piece : Piece::pieceIndices)
 					{
