@@ -20,7 +20,7 @@
 #include <string>
 #include <chrono>
 
-#pragma comment(linker, "/STACK:20000000000")
+#pragma comment(linker, "/STACK:200000000000")
 #pragma comment(linker, "/HEAP:200000000")
 
 #define KEYBOARDCONTROLL 1
@@ -136,7 +136,7 @@ int main() {
 	}
 	else {
 		Player* p1 = new Deepchad();
-		Player* p2 = new TestBotRnd();
+		Player* p2 = new TheFirst();
 		std::bitset<3> gamemode(0b111);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 

@@ -6,7 +6,7 @@ using namespace dc;
 
 //execute the initializer
 uint64_t Zobrist::whiteToMove = 0;
-uint64_t Zobrist::piecesArray[53][169];
+uint64_t Zobrist::piecesArray[54][169];
 uint64_t Zobrist::turnPiecesArray[20];
 std::mt19937_64 Zobrist::gen64;
 Zobrist::_init Zobrist::_initializer;
