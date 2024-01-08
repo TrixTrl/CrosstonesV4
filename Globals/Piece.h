@@ -74,6 +74,7 @@ public:
 	//full indices from 0 to 169
 	static const uint8_t turnPiecePositions[20];
 	static const uint8_t turnPieceIndices[169];
+	static const uint8_t portIndices[4][12];
 
 	static const uint8_t colour(uint8_t const piece) { return (piece & colourMask); }
 	static const uint8_t height(uint8_t const piece) { return (piece & heightMask); }

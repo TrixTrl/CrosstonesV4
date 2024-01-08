@@ -33,6 +33,14 @@ const uint8_t Piece::turnPieceIndices[] =
 	0,0,18,0,0,0,19,0,0,0,20,0,0
 };
 
+const uint8_t Piece::portIndices[4][12]
+{
+	{ 0, 1, 2, 3,13,15,26,27,28,29,39,41},
+	{ 9,10,11,12,23,25,35,36,37,38,49,51},
+	{117,119,130,131,132,133,143,145,156,157,158,159},
+	{127,129,139,140,141,142,153,155,165,166,167,168}
+};
+
 uint8_t Piece::maxSteps(uint8_t piece) {
 	uint8_t maxSteps = 0;
 	switch (height(piece)) {

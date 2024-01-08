@@ -12,19 +12,17 @@ int Evaluation::evaluate(Board& board)
 {
 	int8_t color = 2 * board.isWhiteTurn - 1;
 
-	auto winValue = Utility::calcWinValue(&board.square, board.isWhiteTurn);
-	if (winValue != GameResult::InProgress) {
-		switch (winValue)
-		{
-		case GameResult::WhiteHasWon:
-			return Searcher::positiveInfinity * color;
-		case GameResult::BlackHasWon:
-			return Searcher::negativeInfinity * color;
-		case GameResult::Draw:
-			return 0;
-		}
+	switch (board.gameResult)
+	{
+	case GameResult::WhiteHasWon:
+		return Searcher::positiveInfinity * color;
+	case GameResult::BlackHasWon:
+		return Searcher::negativeInfinity * color;
+	case GameResult::Draw:
+		return 0;
+	case GameResult::InProgress:
+		break;
 	}
-	const int pieceWeight = 100;
 
 	int blackWhitePoints[2] = { 0, 0 }; // 0: points for black; 1: points for white
 	for (int x = 0; x < 13; x++)
@@ -38,7 +36,7 @@ int Evaluation::evaluate(Board& board)
 				int pieceVal = (Piece::height(content)
 					+ (Piece::isBlue(content) ? 1 : 0)
 					+ (Piece::isRed(content) ? 3 : 0));
-				blackWhitePoints[blackWhiteIndex] += pieceVal * pieceWeight 
+				blackWhitePoints[blackWhiteIndex] += pieceVal * materialWeight 
 					+ pieceVal * positionMap[x][y] * positionWeight;
 			}
 		}

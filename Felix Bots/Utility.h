@@ -69,6 +69,8 @@ namespace dc
 
 		static std::string toString(Move& move) 
 		{
+			if (move.size() == 0)
+				return "Null move";
 			std::string result = "";
 			for (auto& xMove : move)
 			{

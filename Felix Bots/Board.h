@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "Utility.h"
+#include "GameResult.h"
 
 namespace dc
 { 
@@ -13,12 +14,18 @@ namespace dc
 		uint64_t zobristKey;
 		uint8_t square[13][13];
 		bool isWhiteTurn;
+		GameResult gameResult;
 
-		Board() {}
+		Board() : gameResult(GameResult::NotStarted) {}
 
 		void initialize(uint8_t(*state)[13][13], bool isWhiteTurn);
 
+		void updateWinValue();
 		void makeMove(Move& move);
 		void unmakeMove(Move& move);
+	
+	private:
+
+		void appyMoveReversible(Move& move);
 	};
 }

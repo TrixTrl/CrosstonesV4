@@ -21,7 +21,7 @@ namespace dc
 	private:
 
 		Board& board;
-		TranspositionTable<10/*MB*/> transpositionTable;
+		TranspositionTable<5/*MB*/> transpositionTable;
 		Evaluation evaluation;
 
 		Move bestMove;

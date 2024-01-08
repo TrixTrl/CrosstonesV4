@@ -25,6 +25,7 @@ namespace dc
 		};
 
 		const int positionWeight = 10;
+		const int materialWeight = 100;
 
 		int evaluate(Board& board);
 	};

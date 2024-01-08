@@ -105,7 +105,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		return ttVal;
 	}
 
-	if (plyRemaining == 0 || Utility::gameOver(&board.square))
+	if (plyRemaining == 0 || board.gameResult != GameResult::InProgress)
 	{
 		int eval = evaluation.evaluate(board);
 		return eval;
