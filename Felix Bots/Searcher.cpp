@@ -26,7 +26,7 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 // This allows the search to be cancelled at any time and still yield a useful result.
 void Searcher::runIterativeDeepeningSearch()
 {
-	for (int searchDepth = 1; searchDepth <= 4; searchDepth++)
+	for (int searchDepth = 1; searchDepth <= 3; searchDepth++)
 	{
 		hasSearchedAtLeastOneMove = false;
 		search(searchDepth, 0, negativeInfinity, positiveInfinity);

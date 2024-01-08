@@ -14,6 +14,7 @@
 #include "Felix Bots/Deepchad.h"
 #include "Trix Bots/TheFirst.h"
 #include "Trix Bots/Utils.h"
+#include "Trix Bots/DemoKnight.h"
 
 #include <bitset>
 #include <thread>
@@ -135,10 +136,12 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p1 = new Deepchad();
-		Player* p2 = new TheFirst();
+		Player* p1 = new DemoKnight();
+		Player* p2 = new Deepchad();
 		std::bitset<3> gamemode(0b111);
 		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
+
+		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 
 		gameMaster.play(globalHwnd);
 	}

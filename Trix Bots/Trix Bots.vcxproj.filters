@@ -21,12 +21,18 @@
     <ClInclude Include="TheFirst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DemoKnight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TheFirst.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoKnight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
