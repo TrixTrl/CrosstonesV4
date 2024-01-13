@@ -146,6 +146,9 @@
   <ItemGroup>
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="PlayerInputKey.h" />
+	</ItemGroup>
   <ItemGroup>
     <ClInclude Include="Piece.h" />
   </ItemGroup>

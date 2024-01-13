@@ -4,6 +4,7 @@
 #include <bitset>
 #include <chrono>
 #include "Globals/Player.h"
+#include "Globals/PlayerInputKey.h"
 #include <Windows.h>
 #include <WinUser.h>
 
@@ -21,6 +22,7 @@ public:
 	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, uint8_t (*displayBoard)[13][13]);
 	void play(HWND globalHwnd);
 	void loadPos(std::string str);
+	void notifyPlayersKeyDown(PlayerInputKey key);
 };
 
 class Time {

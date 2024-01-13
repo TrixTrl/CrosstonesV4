@@ -6,6 +6,10 @@
 class DemoKnight : public Player
 {
 	void getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime);
+	bool listensToKeyInputs() override {
+		return false;
+	}
+
 	int n = 0;
 
 	int positions[8][4] = { {7, 10, 8, 8}, { 8, 8, 8, 4 }, { 8, 4, 10, 2 },

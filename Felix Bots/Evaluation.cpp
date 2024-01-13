@@ -37,7 +37,7 @@ int Evaluation::evaluate(Board& board)
 					+ (Piece::isBlue(content) ? 1 : 0)
 					+ (Piece::isRed(content) ? 3 : 0));
 				blackWhitePoints[blackWhiteIndex] += pieceVal * materialWeight 
-					+ pieceVal * positionMap[x][y] * positionWeight;
+					+ pieceValue[content & 0b00011111] * positionMap[x][y] * positionWeight;
 			}
 		}
 	}

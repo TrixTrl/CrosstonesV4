@@ -39,19 +39,7 @@ namespace dc
 			return (T(0) < val) - (val < T(0));
 		}
 
-
-		static inline void wrapWithXMove(uint8_t(*board)[13][13], Move& move,
-			std::function<void()> action)
-		{
-			applyXMove(board, move);
-			action();
-			applyXMove(board, move);
-		}
-
-		static void applyXMove(uint8_t(*board)[13][13], Move& move);
-
-		static GameResult calcWinValue(uint8_t(*board)[13][13], bool isWhite);
-		static bool gameOver(uint8_t(*board)[13][13]);
+		static void applyXMove(uint8_t(*state)[13][13], Move& move);
 
 		static bool isWinScore(int score)
 		{
@@ -78,6 +66,11 @@ namespace dc
 			}
 			return result.substr(1);
 		}
+
+		static bool sameMove(const Move& moveA, const Move& moveB);
+
+		static bool sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB);
+
 	};
 }
 

@@ -7,6 +7,7 @@
 #include "Evaluation.h"
 #include "TranspositionTable.h"
 #include <vector>
+#include "MoveOrdering.h"
 
 namespace dc
 {
@@ -23,6 +24,7 @@ namespace dc
 		Board& board;
 		TranspositionTable<5/*MB*/> transpositionTable;
 		Evaluation evaluation;
+		MoveOrdering moveOrdering;
 
 		Move bestMove;
 		int bestEval;
@@ -36,15 +38,10 @@ namespace dc
 
 	public:
 
-		Searcher(Board& _board) : board(_board), transpositionTable(board)
+		Searcher(Board& _board) : board(_board), transpositionTable(board), moveOrdering()
 		{
 			availableMoves = std::vector<Move>();
 		}
-
-		//
-		int negamax(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int beta);
-		int negamaxAtRoot(std::shared_ptr<std::vector<Move>> moves,
-			uint8_t depth, int alpha, int beta);
 
 		void startSearch(std::vector<Move>& _availableMoves);
 		void runIterativeDeepeningSearch();

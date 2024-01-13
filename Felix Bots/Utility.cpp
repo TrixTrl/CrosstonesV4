@@ -8,84 +8,29 @@ using namespace dc;
 std::vector<BasicGenerator::xMove> Utility::nullMove;
 Utility::_init Utility::_initializer;
 
-void Utility::applyXMove(uint8_t(*board)[13][13], Move& move)
+
+void Utility::applyXMove(uint8_t(*state)[13][13], Move& move)
 {
-	for (int i = 0; i < move.size(); i++) {
-		(*board)[move[i].i][move[i].j] ^= move[i].delta;
+	for (auto& xMove : move)
+	{
+		(*state)[xMove.i][xMove.j] ^= xMove.delta;
 	}
 }
 
-GameResult Utility::calcWinValue(uint8_t(*board)[13][13], bool isWhite) 
+bool Utility::sameMove(const Move& moveA, const Move& moveB)
 {
-	// Totally not copied from trix
-	bool bases[2][2] = { {false, false}, {false, false} }; //[0] white   [1] black   [x][0] white base   [x][1] black base
-	for (int i = 5; i < 8; i++) {
-		for (int j = 0; j < 4; j++) {
-			if (Piece::isTower((*board)[i][j])) {
-				if (Piece::isWhite((*board)[i][j])) {
-					bases[0][1] = true;	//black base white piece
-				}
-				else {
-					bases[1][1] = true;	//black base black piece
-				}
-			}
+	if (moveA.size() != moveB.size())
+		return false;
 
-			if (Piece::isTower((*board)[i][12 - j])) {
-				if (Piece::isWhite((*board)[i][12 - j])) {
-					bases[0][0] = true;	//white base white piece
-				}
-				else {
-					bases[1][0] = true;	//white base black piece
-				}
-			}
-		}
+	for (int i = 0; i < moveA.size(); i++)
+	{
+		if (!sameXMove(moveA[i], moveB[i]))
+			return false;
 	}
-
-	bool whiteWin = (bases[0][1] && !bases[1][1]);
-	bool blackWin = (bases[1][0] && !bases[0][0]);
-
-	if (whiteWin) {
-		return (blackWin ? GameResult::Draw : GameResult::WhiteHasWon);
-	}
-	return (blackWin ? GameResult::BlackHasWon : GameResult::InProgress);
+	return true;
 }
 
-bool Utility::gameOver(uint8_t(*board)[13][13]) 
+bool Utility::sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB)
 {
-	// check for whin in black base
-	bool blackBaseContested = false;
-	for (int i = 5; i < 8; i++) {
-		for (int j = 0; j < 4; j++) {
-			if (Piece::isTower((*board)[i][j])) {
-				if (Piece::isWhite((*board)[i][j])) {
-					blackBaseContested = true;
-				}
-				else {
-					goto blackBaseSafe;
-				}
-			}
-		}
-	}
-	if (blackBaseContested) 
-		return true;
-blackBaseSafe:
-
-	// check for whin in white base
-	bool whiteBaseContested = false;
-	for (int i = 5; i < 8; i++) {
-		for (int j = 0; j < 4; j++) {
-			if (Piece::isTower((*board)[i][12 - j])) {
-				if (Piece::isWhite((*board)[i][12 - j])) {
-					goto whiteBaseSafe;
-				}
-				else {
-					whiteBaseContested = true;
-				}
-			}
-		}
-	}
-	if (whiteBaseContested)
-		return true;
-whiteBaseSafe:
-	return false;
+	return moveA.i == moveB.i && moveA.j == moveB.j && moveA.delta == moveB.delta;
 }

@@ -56,7 +56,7 @@ void GameMaster::play(HWND globalHwnd) {
 					ended = true;
 					print("\n");
 					print(isWhiteTurn ? "White" : "Black");
-					print(" has lost due to resigning through double passing\n");
+					print(" has lost due to resigning through passing twice\n");
 				}
 				else {
 					passed[isWhiteTurn] = true;
@@ -79,4 +79,14 @@ void GameMaster::play(HWND globalHwnd) {
 void GameMaster::loadPos(std::string str)
 {
 	bs.loadPos(str);
+}
+
+void GameMaster::notifyPlayersKeyDown(PlayerInputKey key)
+{
+	uint8_t activeIndex = 1 - isWhiteTurn;
+	Player* activePlayer = players[activeIndex];
+	if (activePlayer->listensToKeyInputs())
+	{
+		activePlayer->keyDown(key);
+	}
 }

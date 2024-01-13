@@ -20,6 +20,9 @@ public:
 
 	void getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime);
 
+	bool listensToKeyInputs() override {
+		return false;
+	}
 };
 
 

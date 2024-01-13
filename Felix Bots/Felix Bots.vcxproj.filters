@@ -48,6 +48,9 @@
     <ClCompile Include="Searcher.cpp">
       <Filter>Source Files\Core\Search</Filter>
     </ClCompile>
+    <ClCompile Include="MoveOrdering.cpp">
+      <Filter>Source Files\Core\Search</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Deepchad.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files\Core\Search</Filter>
     </ClInclude>
     <ClInclude Include="Searcher.h">
+      <Filter>Header Files\Core\Search</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveOrdering.h">
       <Filter>Header Files\Core\Search</Filter>
     </ClInclude>
   </ItemGroup>

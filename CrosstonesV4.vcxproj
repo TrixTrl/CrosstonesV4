@@ -23,11 +23,13 @@
     <ClCompile Include="GameMaster.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="DCTestSuite.cpp" />
+    <ClCompile Include="ManualPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoardState.h" />
     <ClInclude Include="DCTestSuite.h" />
     <ClInclude Include="GameMaster.h" />
+    <ClInclude Include="ManualPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Felix Bots\Felix Bots.vcxproj">

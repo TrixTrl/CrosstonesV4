@@ -114,6 +114,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	shared_ptr<vector<vector<BasicGenerator::xMove>>> moves =
 		BasicGenerator::getMoves(board.isWhiteTurn, &(board.square));
 	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
+	moveOrdering.orderMoves(*moves, prevBestMove);
 
 	// Detect draw by no moves available
 	if (moves->size() == 0)
@@ -152,7 +153,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		}
 
 		// Found a new best move in this position
-		if (eval > alpha)
+		if (eval > alpha )//|| (eval == alpha && plyFromRoot == 0 && (rand() % 10 == 0)))
 		{
 			evaluationBound = TranspositionTable<1>::Exact;
 			bestMoveInThisPosition = move;
@@ -176,73 +177,6 @@ std::pair<Move, int> Searcher::getSearchResult()
 	return std::pair(bestMove, bestEval);
 }
 
-int Searcher::negamax(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int beta)
-{
-	// color: 1 when white, -1 when black
-	uint8_t color = 2 * board.isWhiteTurn - 1;
-
-	if (plyRemaining == 0 || Utility::gameOver(&board.square))
-		return evaluation.evaluate(board) * color; 
-	
-	// Try looking up the current position in the transposition table.
-	// If the same position has already been searched to at least an equal depth
-	// to the search we're doing now,we can just use the recorded evaluation.
-	int ttVal = transpositionTable.lookupEvaluation(plyRemaining, plyFromRoot, alpha, beta);
-	if (ttVal != TranspositionTable<1>::LookupFailed)
-	{
-		return ttVal;
-	}
-
-	shared_ptr<vector<vector<BasicGenerator::xMove>>> moves =
-		BasicGenerator::getMoves(board.isWhiteTurn, &(board.square));
-	//sortMoves(squares, moves);
-	int value = negativeInfinity;
-
-	for (int i = 1; i < moves->size(); i++)
-	{
-		board.makeMove(moves->at(i));
-
-		value = max(value, -negamax(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha));
-
-		board.unmakeMove(moves->at(i));
-
-		alpha = max(alpha, value);
-		if (alpha >= beta)
-			break; // cutoff
-	}
-	return value;
-}
-
-/* returns index of best move*/
-int Searcher::negamaxAtRoot(shared_ptr<vector<Move>> moves,
-	uint8_t depth, int alpha, int beta)
-{
-
-	if (depth == 0 || Utility::gameOver(&board.square))
-		return -1;
-
-	int bestMove = -1;
-	int eval, value = negativeInfinity;
-
-	//sortMoves(board, moves);
-	for (int i = 0; i < moves->size(); i++)
-	{
-		board.makeMove(moves->at(i));
-
-		eval = -negamax(depth - 1, 0, -beta, -alpha);
-
-		board.unmakeMove(moves->at(i));
-
-		if (eval > value) {
-			value = eval;
-			bestMove = i;
-		}
-		alpha = max(alpha, value);
-		if (alpha >= beta)
-			break; // cutoff
-	}
-	return bestMove;
-}
 
 void Searcher::sortMoves(shared_ptr<vector<vector<BasicGenerator::xMove>>> moves)
 {

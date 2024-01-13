@@ -10,11 +10,14 @@
 #include "BoardState.h"
 #include "Globals/Piece.h"
 #include "GameMaster.h"
+#include "ManualPlayer.h"
 #include "Test Bots/TestBotRnd.h"
 #include "Felix Bots/Deepchad.h"
 #include "Trix Bots/TheFirst.h"
 #include "Trix Bots/Utils.h"
 #include "Trix Bots/DemoKnight.h"
+
+#include "Globals/PlayerInputKey.h"
 
 #include <bitset>
 #include <thread>
@@ -34,7 +37,9 @@ int screenHeight = 750;
 
 uint8_t displayBoard[3][13][13];
 HWND globalHwnd = NULL;
+GameMaster* gameMaster;
 bool firstDraw = true;
+PlayerInputKey playerInputKey = PlayerInputKey::None;
 int switchMove = 0;
 
 int main() {
@@ -136,14 +141,17 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p1 = new DemoKnight();
 		Player* p2 = new Deepchad();
+			//new ManualPlayer(globalHwnd, &(displayBoard[0]));//
+		Player* p1 = new Deepchad();
 		std::bitset<3> gamemode(0b111);
-		GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
+		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 
 		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 
-		gameMaster.play(globalHwnd);
+		//std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);
+		gameMaster->play(globalHwnd);
+		//while(true) {}
 	}
 	return 0;
 }
@@ -399,21 +407,95 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(globalHwnd, NULL, NULL);
 		}
 		if (KEYBOARDCONTROLL) {
-			if ((wchar_t)wParam == 0x27) { switchMove = 1; }
-			if ((wchar_t)wParam == 0x25) { switchMove = -1; }
-			if ((wchar_t)wParam == 0x26) { switchMove = 10; }
-			if ((wchar_t)wParam == 0x28) { switchMove = -10; }
-			if ((wchar_t)wParam == 0x2E) { switchMove = -99999; }
+			switch ((wchar_t)wParam)
+			{
+			case 'W':
+			case VK_UP:// Process the UP ARROW key. 
+				switchMove = 10;
+				playerInputKey = PlayerInputKey::Up;
+				break;
+
+			case 'A':
+			case VK_LEFT:// Process the LEFT ARROW key. 
+				switchMove = -1;
+				playerInputKey = PlayerInputKey::Left;
+				break;
+
+			case 'S':
+			case VK_DOWN:// Process the DOWN ARROW key. 
+				switchMove = -10;
+				playerInputKey = PlayerInputKey::Down;
+				break;
+
+			case 'D':
+			case VK_RIGHT:// Process the RIGHT ARROW key. 
+				switchMove = 1;
+				playerInputKey = PlayerInputKey::Right;
+				break;
+
+			case VK_DELETE:// Process the DEL key. 
+				switchMove = -99999;
+				playerInputKey = PlayerInputKey::Undo;
+				break;
+
+			case '1':
+				playerInputKey = PlayerInputKey::One;
+				break;
+
+			case '2':
+				playerInputKey = PlayerInputKey::Two;
+				break;
+
+			case '3':
+				playerInputKey = PlayerInputKey::Three;
+				break;
+
+			case '4':
+				playerInputKey = PlayerInputKey::Four;
+				break;
+
+			case '5':
+				playerInputKey = PlayerInputKey::Five;
+				break;
+
+			case ' ':
+				playerInputKey = PlayerInputKey::Turn;
+				break;
+			}
+			// Notify player controller
+			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			playerInputKey = PlayerInputKey::None;
 		}
 		break;
 
 	case WM_KEYUP:
+		playerInputKey = PlayerInputKey::None;
 		break;
 		swprintf_s(msg, L"WM_KEYUP: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
 		break;
 
 	case WM_CHAR:
+		if (KEYBOARDCONTROLL) {
+			switch ((wchar_t)wParam)
+			{
+			case 0x08: // or '\b' // Process a backspace.
+				playerInputKey = PlayerInputKey::Reset;
+				break;
+
+			case 0x09:// or '\t' // Process the TAB key. 
+				playerInputKey = PlayerInputKey::SwitchPushMergeMode;
+				break;
+
+			case 0x0D: // Process a carriage return / ENTER.
+				playerInputKey = PlayerInputKey::Submit;
+				break;
+			}
+			// Notify player controller
+
+			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			playerInputKey = PlayerInputKey::None;
+		}
 		break;
 		swprintf_s(msg, L"WM_CHAR: %c\n", (wchar_t)wParam);
 		OutputDebugString(msg);
