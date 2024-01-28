@@ -13,6 +13,7 @@
 #include "../Test Bots/BasicGenerator.h"
 
 #define MAXEVAL 9999
+#define BITSETINDEX i+(j*13)
 
 void Utils::print(std::string str, bool newLine = false) {
 	if (newLine) str += "\n";
@@ -56,6 +57,11 @@ void Utils::print(BasicGenerator::xMove f, bool newLine = false) {
 	std::wstring temp = std::wstring(str.begin(), str.end());
 	LPCWSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
+}
+
+Utils::winValue Utils::gameOver(bool isWhite, extraBoardData metaData)
+{
+	return winValue();
 }
 
 Utils::winValue Utils::gameOver(bool isWhite, uint8_t(*pieces)[13][13]) //last player to make a move
@@ -263,6 +269,21 @@ int Utils::trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13])
 	print(bestMove, true);
 
 	return bestMove;
+}
+
+Utils::extraBoardData Utils::generateMetadata(uint8_t(*pieces)[13][13])
+{
+	extraBoardData data = extraBoardData();
+
+	for (int i = 0; i < 13; i ++) {
+		for (int j = 0; j < 13; j++) {
+			uint8_t piece = (*pieces)[i][j];
+			if (!Piece::isTower(piece)) continue;
+			data.colorBitboards[Piece::isWhiteTower(piece)][BITSETINDEX/64] += 1 << BITSETINDEX%64;
+		}
+	}
+
+	return data;
 }
 
 std::shared_ptr<std::vector<std::vector<Utils::xMove>>> Utils::getMoves_halfSplit_noPush(bool isWhite, uint8_t(*pieces)[13][13]) {

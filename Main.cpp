@@ -141,9 +141,8 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p2 = new Deepchad();
-			//new ManualPlayer(globalHwnd, &(displayBoard[0]));//
-		Player* p1 = new Deepchad();
+		Player* p1 = new TheFirst();
+		Player* p2 = new TheFirst();
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 

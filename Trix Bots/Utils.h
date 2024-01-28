@@ -15,6 +15,27 @@ public:
 		draw
 	};
 
+	struct extraBoardData {
+		uint64_t colorBitboards[2][2];
+
+		extraBoardData() {
+			colorBitboards[0][0] = 0;
+			colorBitboards[0][1] = 0;
+			colorBitboards[1][0] = 0;
+			colorBitboards[1][1] = 0;
+		};
+
+		extraBoardData(extraBoardData *data) {
+			colorBitboards[0][0] = data->colorBitboards[0][0];
+			colorBitboards[0][1] = data->colorBitboards[0][1];
+			colorBitboards[1][0] = data->colorBitboards[1][0];
+			colorBitboards[1][1] = data->colorBitboards[1][1];
+		};
+	};
+
+	extraBoardData generateMetadata(uint8_t(*pieces)[13][13]);
+
+	static winValue gameOver(bool isWhite, extraBoardData metaData);
 	static winValue gameOver(bool isWhite, uint8_t (*pieces)[13][13]);
 	static float basicPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
 	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13]);
