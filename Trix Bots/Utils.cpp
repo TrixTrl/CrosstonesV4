@@ -13,16 +13,16 @@
 #include "../Test Bots/BasicGenerator.h"
 
 #define MAXEVAL 9999
-#define BITSETINDEX i+(j*13)
+#define BITSETINDEX (i+(j*13))
 
-void Utils::print(std::string str, bool newLine = false) {
+void Utils::print(std::string str, bool newLine) {
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
 	LPCWSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
-void Utils::print(float f, bool newLine = false) {
+void Utils::print(float f, bool newLine) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -30,7 +30,7 @@ void Utils::print(float f, bool newLine = false) {
 	OutputDebugString(wideString);
 }
 
-void Utils::print(int f, bool newLine = false) {
+void Utils::print(int f, bool newLine) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -38,7 +38,7 @@ void Utils::print(int f, bool newLine = false) {
 	OutputDebugString(wideString);
 }
 
-void Utils::print(size_t f, bool newLine = false) {
+void Utils::print(size_t f, bool newLine) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -46,7 +46,7 @@ void Utils::print(size_t f, bool newLine = false) {
 	OutputDebugString(wideString);
 }
 
-void Utils::print(BasicGenerator::xMove f, bool newLine = false) {
+void Utils::print(BasicGenerator::xMove f, bool newLine) {
 	std::string str = std::to_string(f.i);
 	str += " | ";
 	str += std::to_string(f.j);
@@ -59,9 +59,107 @@ void Utils::print(BasicGenerator::xMove f, bool newLine = false) {
 	OutputDebugString(wideString);
 }
 
+void Utils::print(extraBoardData data, bool formatted)
+{
+	std::string str;
+	if (formatted) {
+		str = "White:           Black:\n";
+
+		std::string board[13];
+		for (int i = 0; i < 2; i++) {
+
+			for (int s = 0; s < 13; s++) {
+				board[s] += (i == 0) ? "   " : "    ";
+			}
+
+			int X = 0;
+			int Y = 0;
+			for (int j = 0; j < 3; j++) {
+				std::bitset<64> x(data.colorBitboards[i][j]);
+
+				//str += "   ";
+				//str += x.to_string();
+				//str += "\n";
+
+				for (int k = 0; k < 64 && Y < 13; k++) {
+					board[Y] += x[k] ? "1" : "0";
+					X++;
+					if (X >= 13) {
+						X = 0;
+						Y++;
+					}
+				}
+			}
+
+		}
+
+		for (int k = 0; k < 13; k++) {
+			str += board[k] + "\n";
+		}
+	}
+	else {
+		for (int i = 0; i < 2; i++) {
+			str += (i == 0) ? "White:\n" : "Black:\n";
+			for (int j = 0; j < 3; j++) {
+				std::bitset<64> x(data.colorBitboards[i][j]);
+
+				str += "   ";
+				str += x.to_string();
+				str += "\n";
+			}
+		}
+	}
+
+	std::wstring temp = std::wstring(str.begin(), str.end());
+	LPCWSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
 Utils::winValue Utils::gameOver(bool isWhite, extraBoardData metaData)
 {
-	return winValue();
+	bool whiteNoPieces = !(metaData.colorBitboards[0][0] | metaData.colorBitboards[0][1] | metaData.colorBitboards[0][2]);
+	bool blackNoPieces = !(metaData.colorBitboards[1][0] | metaData.colorBitboards[1][1] | metaData.colorBitboards[1][2]);
+
+	if (whiteNoPieces) return winValue::black;
+	if (blackNoPieces) return winValue::white;
+
+	//[0] white   [1] black   [x][0] white base   [x][1] black base
+
+	bool bases[2][2] = { {(metaData.colorBitboards[0][1] & 0b0001110000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000000000111000000000011100000000001110000000),
+						  (metaData.colorBitboards[0][0] & 0b0000000000000000011100000000001110000000000111000000000011100000)},
+						 {(metaData.colorBitboards[1][1] & 0b0001110000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[1][2] & 0b0000000000000000000000000000111000000000011100000000001110000000),
+						  (metaData.colorBitboards[1][0] & 0b0000000000000000011100000000001110000000000111000000000011100000)}
+	};
+
+	bool whiteWin = false;
+	bool blackWin = false;
+	if (bases[0][1] && !bases[1][1]) whiteWin = true;
+	if (bases[1][0] && !bases[0][0]) blackWin = true;
+
+	//[top left, top right, bottom left, bottom right],[white, black]
+	bool portControll[4][2] = { {(metaData.colorBitboards[0][0] & 0b0000000000000000000001111000000000111100000000011110000000001111), (metaData.colorBitboards[1][0] & 0b0000000000000000000001111000000000111100000000011110000000001111)},
+
+								{(metaData.colorBitboards[0][0] & 0b0000000000001111000000000111100000000011110000000001111000000000), (metaData.colorBitboards[1][0] & 0b0000000000001111000000000111100000000011110000000001111000000000)},
+
+								{(metaData.colorBitboards[0][1] & 0b0000000111100000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000000000000011110000000001111000000000111100),
+								 (metaData.colorBitboards[1][1] & 0b0000000111100000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[1][2] & 0b0000000000000000000000000000000011110000000001111000000000111100)},
+
+								{(metaData.colorBitboards[0][1] & 0b1100000000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000011110000000001111000000000111100000000011), 
+								 (metaData.colorBitboards[1][1] & 0b1100000000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[1][2] & 0b0000000000000000000000011110000000001111000000000111100000000011)} };
+
+	int portNumbers[2] = { 0, 0 };
+	for (int i = 0; i < 4; i++) {
+		portNumbers[0] += portControll[i][0];
+		portNumbers[1] += portControll[i][1];
+	}
+	if (portNumbers[0] == 4 && portNumbers[1] == 0) whiteWin = true;
+	if (portNumbers[1] == 4 && portNumbers[0] == 0) blackWin = true;
+	if (!(whiteWin || blackWin)) {
+		return winValue::none;
+	}
+	if (whiteWin && !blackWin) return winValue::white;
+	if (!whiteWin && blackWin) return winValue::black;
+	return isWhite ? winValue::white : winValue::black;
 }
 
 Utils::winValue Utils::gameOver(bool isWhite, uint8_t(*pieces)[13][13]) //last player to make a move
@@ -178,7 +276,7 @@ float Utils::basicPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 	return eval;
 }
 
-int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
+int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13], int depth)
 {
 	std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
 	moves = BasicGenerator::getMoves(isWhite, pieces);
@@ -186,36 +284,33 @@ int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13])
 	std::vector<int> bestMoves;
 	float bestEval = -99999;
 
-	int depth = 2;
-
 	debugContainer debug;
 
+	float newBestThreshold = 0.1;
+	float bestMoveLeniency = 0.005;
+
+
 	for (int j = 1; j < moves->size(); j++) {
-		//if (((*moves)[j]).size() == 0) continue;
 		uint8_t boardCopy[13][13];
 		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
 		for (int i = 0; i < ((*moves)[j]).size(); i++) {
 			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
 		}
 
-		if (gameOver(isWhite, &boardCopy) == (isWhite ? winValue::white : winValue::black)) return j;
+		Utils::extraBoardData metaData = generateMetadata(&boardCopy);
 
-		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);//basicPosEval(isWhite, &boardCopy) * (isWhite ? 1 : -1);
-		//printU(std::to_string(bestEval));
-		//printU(" : ");
-		//printU(std::to_string(posEval));
+		if (gameOver(isWhite, metaData) == (isWhite ? winValue::white : winValue::black)) return j;	//return if we find a forced win for us
 
-		if (posEval > (bestEval + 0)) {
-			//printU(" +");
+		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);
+
+		if (posEval > (bestEval + newBestThreshold)) {
 			bestMoves.clear();
 			bestMoves.emplace_back(j);
 			bestEval = posEval;
 		}
-		else if (posEval >= bestEval - 0.005) {
+		else if (posEval >= bestEval - bestMoveLeniency) {
 			bestMoves.emplace_back(j);
-			//printU(" =");
 		}
-		//printU("\n");
 	}
 
 	print("getBestMoveBasic: ");
@@ -275,13 +370,26 @@ Utils::extraBoardData Utils::generateMetadata(uint8_t(*pieces)[13][13])
 {
 	extraBoardData data = extraBoardData();
 
-	for (int i = 0; i < 13; i ++) {
+	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = (*pieces)[i][j];
 			if (!Piece::isTower(piece)) continue;
-			data.colorBitboards[Piece::isWhiteTower(piece)][BITSETINDEX/64] += 1 << BITSETINDEX%64;
+			/*print(i, false);
+			print("|", false);
+			print(j, false);
+			print(" -> ", false);
+			print(BITSETINDEX, false);
+			print(" - ", false);
+			print(BITSETINDEX / 64, false);
+			print(" : ", false);
+			print(BITSETINDEX % 64, false);
+			print(" - ", false);
+			print(static_cast<unsigned long long>(1) << (BITSETINDEX % 64), true);*/
+			data.colorBitboards[!Piece::isWhiteTower(piece)][BITSETINDEX / 64] += static_cast<unsigned long long>(1) << (BITSETINDEX % 64);
 		}
 	}
+
+	//print(data);
 
 	return data;
 }
@@ -417,7 +525,7 @@ void Utils::basicGenerator_halfSplit_noPush(std::shared_ptr<std::vector<std::vec
 		}
 
 		if (remainingSteps >= 2 && Piece::isTower(dest) && Piece::colour(dest) != Piece::colour(piece)) {		//capturing
-																												//making sure we have enough moves left to be able to capture
+			//making sure we have enough moves left to be able to capture
 			if (!Piece::isBlue(piece) && Piece::height(dest) > Piece::height(piece)) continue;		//capturing height check
 
 			//Logic: figure out all ways to capture and then generate all splitting options at the end to not redo the work over and over again (this might be something good to cache when trying to optimize)

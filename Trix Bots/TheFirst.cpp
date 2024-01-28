@@ -9,7 +9,7 @@
 
 void TheFirst::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
 {
-	int bestMove = Utils::trivialBestMove(isWhite, board);//Utils::getBestMoveBasic(isWhite, board);
+	int bestMove = Utils::getBestMoveBasic(isWhite, board, depth);//Utils::trivialBestMove(isWhite, board);
 	//Utils::print(bestMove);
 	//Utils::print("\n");
 	std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
