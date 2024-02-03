@@ -18,8 +18,10 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 
 	// Initialize debug info
 	currentDepth = 0;
-	Utility::print("Starting DC search", true);
+	Utility::print("Starting DC search for ", false);
+	Utility::print(board.isWhiteTurn?"white":"black", true);
 	runIterativeDeepeningSearch();
+	Utility::print("Exiting DC search", true);
 }
 
 // Run iterative deepening. This means doing a full search with a depth of 1, then with a depth of 2, and so on.
@@ -53,10 +55,11 @@ void Searcher::runIterativeDeepeningSearch()
 			bestEval = bestEvalThisIteration;
 
 			Utility::print(std::format(
-					"\nIteration {} result: \n{} \nEval: {}", 
+					"\nIteration {} result: \n{} \nEval: {}\nPOV: {}", 
 					searchDepth,
 					Utility::toString(bestMove),
-					bestEval),
+					bestEval,
+					board.isWhiteTurn?"white":"black"),
 				true);
 			if (isWinScore(bestEval))
 			{
@@ -70,7 +73,7 @@ void Searcher::runIterativeDeepeningSearch()
 			// A win found outside of search depth (due to extensions) may not be the fastest win.
 			if (isWinScore(bestEval) && numPlyToWinFromScore(bestEval) <= searchDepth)
 			{
-				Utility::print("Exitting search due to mate found within search depth", true);
+				Utility::print("Exiting search due to mate found within search depth", true);
 				break;
 			}
 		}
@@ -153,7 +156,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		}
 
 		// Found a new best move in this position
-		if (eval > alpha )//|| (eval == alpha && plyFromRoot == 0 && (rand() % 10 == 0)))
+		if (eval > alpha ) //(eval == alpha && plyFromRoot == 0 && (rand() % 100 == 9)))
 		{
 			evaluationBound = TranspositionTable<1>::Exact;
 			bestMoveInThisPosition = move;

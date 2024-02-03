@@ -60,7 +60,7 @@ blackBaseSafe:
 			gameResult = GameResult::Draw;
 			return;
 		}
-		result = GameResult::WhiteHasWon;
+		result = GameResult::BlackHasWon;
 	}
 whiteBaseSafe:
 

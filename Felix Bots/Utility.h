@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 #include <format>
-
+#include <bitset>
 
 
 namespace dc
@@ -62,7 +62,11 @@ namespace dc
 			std::string result = "";
 			for (auto& xMove : move)
 			{
-				result += std::format("\n{} | {} | {}", xMove.i, xMove.j, xMove.delta);
+				result += std::format("\n{} | {} | {}", 
+					xMove.i, 
+					xMove.j, 
+					std::bitset<8>(xMove.delta).to_string()
+				);
 			}
 			return result.substr(1);
 		}

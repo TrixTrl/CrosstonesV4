@@ -28,8 +28,8 @@
 #pragma comment(linker, "/HEAP:200000000")
 
 #define KEYBOARDCONTROLL 1
-#define EXPLOREMOVEGENERATION 0
-#define EVALUATIONTESTING 0
+#define EXPLOREMOVEGENERATION 1
+#define EVALUATIONTESTING 1
 #define DEEPCHADTESTINGSUITE 0
 
 int screenWidth = 750;//1200;
@@ -37,7 +37,7 @@ int screenHeight = 750;
 
 uint8_t displayBoard[3][13][13];
 HWND globalHwnd = NULL;
-GameMaster* gameMaster;
+GameMaster* gameMaster = nullptr;
 bool firstDraw = true;
 PlayerInputKey playerInputKey = PlayerInputKey::None;
 int switchMove = 0;
@@ -50,14 +50,17 @@ int main() {
 		std::bitset<3> set(5);
 		bs.rst(set);
 
+		//bs.loadPos("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111"); //Dragon start
+		bs.loadPos("-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010"); //"unsolved" endgame
 		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
-		bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
+		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
+		bool isWhite = false;
 		
 		bs.copyBoard(&(displayBoard[0]));
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 
-		bool isWhite = true;
+		
 		std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
 		moves = bs.getMoves(isWhite);
 
@@ -66,7 +69,6 @@ int main() {
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		LPCWSTR wideString = temp.c_str();
 		OutputDebugString(wideString);
-
 
 		//Timing testing code
 
@@ -97,6 +99,7 @@ int main() {
 			bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
 			bs.copyBoard(&(displayBoard[0]));
 			bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
+			InvalidateRect(globalHwnd, NULL, NULL);
 
 			Utils::print("--------", true);
 
@@ -105,11 +108,10 @@ int main() {
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
 			OutputDebugString(wideString2);
-			Deepchad chad = Deepchad();
+			//Trix
 			Utils::debugContainer debug;
 			Utils::print("First: ", false);
-			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 4, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
-			//Utils::print("Chad: ", false);
+			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
 			Utils::print(debug.n, true);
 			Utils::print(debug.depthCounts[4], true);
 			Utils::print(debug.depthCounts[3], true);
@@ -117,6 +119,24 @@ int main() {
 			Utils::print(debug.depthCounts[1], true);
 			Utils::print(debug.depthCounts[0], true);
 
+			//Felix
+			Deepchad chad = Deepchad();
+			/*std::shared_ptr<std::vector<Move>> movesForFelix =
+				BasicGenerator::getMoves(isWhite, &displayBoard[0]);
+			// remove the passing move
+			movesForFelix->erase(movesForFelix->begin());
+
+			chad.searcher.startSearch(*movesForFelix);
+			auto result = chad.searcher.getSearchResult();
+			Utils::print(result.second, true);*/
+
+			Utils::print("Chad: ", false);
+			uint8_t dcTempBoard[13][13];
+			std::memcpy(dcTempBoard, displayBoard[0], sizeof(dcTempBoard));
+			chad.getMoveToPlay(&dcTempBoard, !isWhite, 1000);
+
+
+		EXPLORE_WAIT_FOR_UPDATE:
 			InvalidateRect(globalHwnd, NULL, NULL);
 			if (!KEYBOARDCONTROLL) {
 				i++;
@@ -124,12 +144,22 @@ int main() {
 			}
 			else {
 				while (switchMove == 0) std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				if (switchMove != -99999) {
-					i += moves->size() * 3 + switchMove;
-					i %= moves->size();
+				// reset move
+				if (switchMove == -99999) {
+					i = 0;
+				}
+				// Show the move that DC would have played for the opponent (on second call undo it)
+				else if (switchMove == -12345) {
+					uint8_t copiedBoard[13][13];
+					std::memcpy(copiedBoard, displayBoard[0], sizeof(copiedBoard));
+					std::memcpy(displayBoard[0], dcTempBoard, sizeof(dcTempBoard));
+					std::memcpy(dcTempBoard, copiedBoard, sizeof(dcTempBoard));
+					switchMove = 0;
+					goto EXPLORE_WAIT_FOR_UPDATE;
 				}
 				else {
-					i = 0;
+					i += moves->size() * 3 + switchMove;
+					i %= moves->size();
 				}
 				switchMove = 0;
 			}
@@ -141,7 +171,7 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p2 = new Deepchad();
+		Player* p2 = new TheFirst();
 			//new ManualPlayer(globalHwnd, &(displayBoard[0]));//
 		Player* p1 = new Deepchad();
 		std::bitset<3> gamemode(0b111);
@@ -459,11 +489,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 
 			case ' ':
+				switchMove = -12345;
 				playerInputKey = PlayerInputKey::Turn;
 				break;
 			}
 			// Notify player controller
-			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			if (gameMaster != nullptr)
+				gameMaster->notifyPlayersKeyDown(playerInputKey);
 			playerInputKey = PlayerInputKey::None;
 		}
 		break;
@@ -492,8 +524,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			// Notify player controller
-
-			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			if (gameMaster != nullptr)
+				gameMaster->notifyPlayersKeyDown(playerInputKey);
 			playerInputKey = PlayerInputKey::None;
 		}
 		break;
