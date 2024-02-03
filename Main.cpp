@@ -56,7 +56,14 @@ int main() {
 		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
 		bool isWhite = false;
 		
+
+		//bs.loadPos("-B10800 -W10803 -W10602 00000000000000000000");
+		//bs.loadPos("-B10500 -B10600 -B10700 -B10501 -B10601 -B10701 -B10502 -B10602 -B10702 -B10503 -B10603 -B10703 -W10509 -W10609 -W10709 -W10510 -W10610 -W10710 -W10511 -W10611 -W10711 -W10512 -W10612 -W10712 00000000000000000000");
+		//bs.loadPos("-W10909 -W11209 -W10910 -W11210 -W10911 -W11211 -W10912 -W11212 00000000000000000000");
+		//bs.loadPos("-W10009 -W10309 -W10010 -W10310 -W10011 -W10311 -W10012 -W10312 00000000000000000000");
 		bs.copyBoard(&(displayBoard[0]));
+
+		Utils::print(Utils::generateMetadata(&(displayBoard[0])), false);
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 
@@ -103,7 +110,7 @@ int main() {
 
 			Utils::print("--------", true);
 
-			std::string str2 = EVALUATIONTESTING?std::to_string(Utils::basicPosEval(isWhite, &(displayBoard[0]))):std::to_string(i);
+			std::string str2 = EVALUATIONTESTING ? std::to_string(Utils::basicPosEval(isWhite, &(displayBoard[0]))) : std::to_string(i);
 			str2 += "\n";
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
@@ -166,12 +173,12 @@ int main() {
 		}
 
 	}
-	else if ( DEEPCHADTESTINGSUITE ) 
+	else if (DEEPCHADTESTINGSUITE)
 	{
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p2 = new TheFirst();
+		Player* p2 = new TheFirst(2);
 			//new ManualPlayer(globalHwnd, &(displayBoard[0]));//
 		Player* p1 = new Deepchad();
 		std::bitset<3> gamemode(0b111);

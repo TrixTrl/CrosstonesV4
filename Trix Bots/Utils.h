@@ -15,16 +15,42 @@ public:
 		draw
 	};
 
+	struct extraBoardData {
+		uint64_t colorBitboards[2][3];
+
+		extraBoardData() {
+			colorBitboards[0][0] = 0;
+			colorBitboards[0][1] = 0;
+			colorBitboards[0][2] = 0;
+			colorBitboards[1][0] = 0;
+			colorBitboards[1][1] = 0;
+			colorBitboards[1][2] = 0;
+		};
+
+		extraBoardData(extraBoardData *data) {
+			colorBitboards[0][0] = data->colorBitboards[0][0];
+			colorBitboards[0][1] = data->colorBitboards[0][1];
+			colorBitboards[0][2] = data->colorBitboards[0][2];
+			colorBitboards[1][0] = data->colorBitboards[1][0];
+			colorBitboards[1][1] = data->colorBitboards[1][1];
+			colorBitboards[1][2] = data->colorBitboards[1][2];
+		};
+	};
+
+	static extraBoardData generateMetadata(uint8_t(*pieces)[13][13]);
+
+	static winValue gameOver(bool isWhite, extraBoardData metaData);
 	static winValue gameOver(bool isWhite, uint8_t (*pieces)[13][13]);
 	static float basicPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
-	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13]);
+	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13], int depth);
 	static int trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13]);
 
-	static void print(std::string s, bool newLine);
-	static void print(int s, bool newLine);
-	static void print(size_t s, bool newLine);
-	static void print(float s, bool newLine);
-	static void print(BasicGenerator::xMove, bool newLine);
+	static void print(std::string s, bool newLine = false);
+	static void print(int s, bool newLine = false);
+	static void print(size_t s, bool newLine = false);
+	static void print(float s, bool newLine = false);
+	static void print(BasicGenerator::xMove, bool newLine = false);
+	static void print(extraBoardData, bool formatted = true);
 
 	struct debugContainer {
 		int n = 0;
