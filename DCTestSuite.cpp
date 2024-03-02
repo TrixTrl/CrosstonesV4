@@ -1,6 +1,8 @@
 #include "Felix Bots/Deepchad.h"
+#include "Felix Bots/Board.h"
 #include "Felix Bots/Utility.h"
 #include "DCTestSuite.h"
+
 #include <Windows.h>
 #include <WinUser.h>
 #include <string>
@@ -41,7 +43,23 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 			InvalidateRect(globalHwnd, NULL, NULL);
 			//}
 		});
-	dc::Utility::print(std::format("Deepchad Time: {}", execTime), true);
+	dc::Utility::print(std::format("Deepchad Time: {}\n", execTime), true);
+
+
+	const int perftDepth = 3;
+	dc::Utility::print(std::format("Executing Perft {}:", perftDepth), true);
+	// The first board should be a dragon start for consistent results
+	int nodes = 0;
+	auto perftTime = doTimed([&]()
+		{
+			nodes = boards[0].bulk_perft(perftDepth);
+		});
+	dc::Utility::print(std::format(
+			"Perft Nodes: {}\nPerft Time: {}", 
+			nodes,
+			perftTime
+		), true);
+
 	return true;
 }
 
@@ -69,7 +87,7 @@ std::vector<dc::Board> DCTestSuite::loadExampleBoards() {
 	return boards;
 }
 
-long long DCTestSuite::doTimed( std::function<void()> action)
+u64 DCTestSuite::doTimed( std::function<void()> action)
 {
 	auto start = std::chrono::system_clock::now();
 	action();

@@ -2,6 +2,7 @@
 
 #include "BoardState.h"
 #include "Felix Bots/Board.h"
+#include "Felix Bots/Utility.h"
 #include <Windows.h>
 #include <WinUser.h>
 #include <vector>
@@ -13,5 +14,5 @@ public:
 	static bool run(HWND globalHwnd, uint8_t(*display)[13][13]);
 private:
 	static std::vector<dc::Board> loadExampleBoards();
-	static long long doTimed(std::function<void()> action);
+	static dc::u64 doTimed(std::function<void()> action);
 };

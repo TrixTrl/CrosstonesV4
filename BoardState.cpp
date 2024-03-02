@@ -474,7 +474,10 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
 				debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);		//if dest is empty, continue the move if possible
+				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);		//do last move
+				//TODO: Wrong ruleset bug, verify this change is correct
+				// //if dest is empty, continue the move if possible
+				//basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite); 
 			}
 		}
 		else if (remainingSteps + Piece::isBlue(origin) > 1 && Piece::isTower(dest) && Piece::colour(origin) != Piece::colour(dest)) {

@@ -29,5 +29,5 @@ void Deepchad::getMoveToPlay(uint8_t(*state)[13][13], bool isWhite, int endTime)
 	//if (result.first != Utility::nullMove)
 	Utility::applyXMove(state, result.first);
 
-	//this_thread::sleep_for(chrono::milliseconds(100));
+	//this_thread::sleep_for(chrono::milliseconds(1000));
 }

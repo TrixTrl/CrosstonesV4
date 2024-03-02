@@ -11,8 +11,8 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 	availableMoves = _availableMoves;
 
 	// Initialize search
-	bestEvalThisIteration = 0; 
-	bestEval = 0;
+	bestEvalThisIteration = negativeInfinity; 
+	bestEval = negativeInfinity;
 	bestMoveThisIteration = Utility::createNullMove();
 	bestMove = Utility::createNullMove();
 
@@ -28,7 +28,7 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 // This allows the search to be cancelled at any time and still yield a useful result.
 void Searcher::runIterativeDeepeningSearch()
 {
-	for (int searchDepth = 1; searchDepth <= 3; searchDepth++)
+	for (int searchDepth = 1; searchDepth <= maxDepth; searchDepth++)
 	{
 		hasSearchedAtLeastOneMove = false;
 		search(searchDepth, 0, negativeInfinity, positiveInfinity);
@@ -57,7 +57,7 @@ void Searcher::runIterativeDeepeningSearch()
 			Utility::print(std::format(
 					"\nIteration {} result: \n{} \nEval: {}\nPOV: {}", 
 					searchDepth,
-					Utility::toString(bestMove),
+					board.moveToString(bestMove),
 					bestEval,
 					board.isWhiteTurn?"white":"black"),
 				true);
@@ -137,11 +137,10 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	for (int i = 1; i < moves->size(); i++)
 	{
 		Move* move = &(*moves)[i];
-		int eval = 0;
 
 		board.makeMove(moves->at(i));
 
-		eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
+		int eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
 
 		board.unmakeMove(moves->at(i));
 

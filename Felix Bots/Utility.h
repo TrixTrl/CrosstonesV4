@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../Test Bots/BasicGenerator.h"
+#include "../Globals/Piece.h"
 #include "GameResult.h"
+
 #include <functional>
 #include <vector>
 #include <string>
@@ -13,6 +15,7 @@
 namespace dc
 {
 	typedef std::vector<BasicGenerator::xMove> Move;
+	typedef unsigned long long u64;
 
 	static struct Utility
 	{
@@ -54,22 +57,6 @@ namespace dc
 		static void print(size_t s, bool newLine);
 		static void print(float s, bool newLine);
 		static void print(BasicGenerator::xMove, bool newLine);
-
-		static std::string toString(Move& move) 
-		{
-			if (move.size() == 0)
-				return "Null move";
-			std::string result = "";
-			for (auto& xMove : move)
-			{
-				result += std::format("\n{} | {} | {}", 
-					xMove.i, 
-					xMove.j, 
-					std::bitset<8>(xMove.delta).to_string()
-				);
-			}
-			return result.substr(1);
-		}
 
 		static bool sameMove(const Move& moveA, const Move& moveB);
 
