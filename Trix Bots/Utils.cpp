@@ -7,6 +7,7 @@
 #include <bitset>
 #include <limits>
 #include <algorithm>
+#include <thread>
 
 #include "Utils.h"
 #include "../Globals/Piece.h"
@@ -144,7 +145,7 @@ Utils::winValue Utils::gameOver(bool isWhite, extraBoardData metaData)
 								{(metaData.colorBitboards[0][1] & 0b0000000111100000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000000000000011110000000001111000000000111100),
 								 (metaData.colorBitboards[1][1] & 0b0000000111100000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[1][2] & 0b0000000000000000000000000000000011110000000001111000000000111100)},
 
-								{(metaData.colorBitboards[0][1] & 0b1100000000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000011110000000001111000000000111100000000011), 
+								{(metaData.colorBitboards[0][1] & 0b1100000000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[0][2] & 0b0000000000000000000000011110000000001111000000000111100000000011),
 								 (metaData.colorBitboards[1][1] & 0b1100000000000000000000000000000000000000000000000000000000000000) | (metaData.colorBitboards[1][2] & 0b0000000000000000000000011110000000001111000000000111100000000011)} };
 
 	int portNumbers[2] = { 0, 0 };
@@ -258,7 +259,8 @@ Utils::winValue Utils::gameOver(bool isWhite, uint8_t(*pieces)[13][13]) //last p
 
 float Utils::basicPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 {
-	winValue win = gameOver(isWhite, pieces);
+	extraBoardData data = generateMetadata(pieces);
+	winValue win = gameOver(isWhite, data);
 	if (win == winValue::black) return -9999;
 	if (win == winValue::white) return 9999;
 
@@ -366,6 +368,81 @@ int Utils::trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13])
 	return bestMove;
 }
 
+void Utils::evaluatePositionsThread(bool isWhite, uint8_t(*pieces)[13][13], std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves, std::vector<float>& evaluations, int depth, int threadIndex, int threadCount, debugContainer& debug) {
+	int j = threadIndex;
+	while (j < moves->size()) {
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+
+		for (int i = 0; i < ((*moves)[j]).size(); i++) {
+			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
+		}
+
+		Utils::extraBoardData metaData = generateMetadata(&boardCopy);
+
+		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);
+		evaluations[j] = posEval;
+
+
+		j += threadCount;
+	}
+}
+
+
+int Utils::getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth, int threadCount)
+{
+	std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
+	moves = BasicGenerator::getMoves(isWhite, pieces);
+
+	debugContainer debug;
+
+	std::vector<std::thread> threads = std::vector<std::thread>();
+	std::vector<float> evaluations = std::vector<float>(moves->size());
+
+	//std::vector<int>* e = &evaluations;
+
+	for (int i = 0; i < threadCount; i++) {
+		threads.emplace_back(std::thread(&Utils::evaluatePositionsThread, isWhite, std::ref(pieces), std::ref(moves), std::ref(evaluations), depth, i, threadCount, std::ref(debug)));
+		//threads.emplace_back(std::thread(&Utils::test, std::ref(evaluations)));
+	}
+	for (int i = 0; i < threadCount; i++) {
+		threads[i].join();
+	}
+
+	/*for (int i = 0; i < evaluations.size(); i++) {
+		print(evaluations[i], true);
+	}
+
+	print("------------------");*/
+
+	std::vector<int> bestMoves;
+	bestMoves.emplace_back(0);
+	float bestEval = -99999;
+
+	float newBestThreshold = 0.1;
+	float bestMoveLeniency = 0.005;
+
+	for (int i = 1; i < evaluations.size(); i++) {	//skip the null move
+		float posEval = evaluations[i];
+		if (posEval > (bestEval + newBestThreshold)) {
+			bestMoves.clear();
+			bestMoves.emplace_back(i);
+			bestEval = posEval;
+		}
+		else if (posEval >= bestEval - bestMoveLeniency) {
+			bestMoves.emplace_back(i);
+		}
+	}
+
+	print("getBestMoveThreaded: ");
+	print(debug.n, true);
+	print(bestEval, true);
+	print(bestMoves.size(), true);
+
+	int random = rand() % bestMoves.size();
+	return bestMoves[random];
+}
+
 Utils::extraBoardData Utils::generateMetadata(uint8_t(*pieces)[13][13])
 {
 	extraBoardData data = extraBoardData();
@@ -373,7 +450,7 @@ Utils::extraBoardData Utils::generateMetadata(uint8_t(*pieces)[13][13])
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
 			uint8_t piece = (*pieces)[i][j];
-			if (!Piece::isTower(piece)) continue;
+			if ((piece & 0b00111111) == 0 || !Piece::isTower(piece)) continue;
 			/*print(i, false);
 			print("|", false);
 			print(j, false);
@@ -630,13 +707,18 @@ void Utils::captureGenerator_singleSplit(std::shared_ptr<std::vector<std::vector
 	}
 }
 
-float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), debugContainer* debug = nullptr)
+float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), debugContainer* debug)
 {
 	if (debug != nullptr) debug->n++;
 	if (debug != nullptr) debug->depthCounts[depth]++;
 
 
-	if (depth == 0 || (Utils::gameOver(maximizing, pieces) != winValue::none)) {
+	if (depth == 0) {// || (Utils::gameOver(maximizing, pieces) != winValue::none)) {
+		return evalFunc(maximizing, pieces);
+	}
+
+	extraBoardData data = generateMetadata(pieces);
+	if (Utils::gameOver(maximizing, data) != winValue::none) {
 		return evalFunc(maximizing, pieces);
 	}
 

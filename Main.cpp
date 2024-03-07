@@ -16,6 +16,7 @@
 #include "Trix Bots/TheFirst.h"
 #include "Trix Bots/Utils.h"
 #include "Trix Bots/DemoKnight.h"
+#include "Trix Bots/Hydra.h"
 
 #include "Globals/PlayerInputKey.h"
 
@@ -147,7 +148,7 @@ int main() {
 	}
 	else {
 		Player* p1 = new TheFirst(2);
-		Player* p2 = new TheFirst(2);
+		Player* p2 = new Hydra(2, 10);
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
 
