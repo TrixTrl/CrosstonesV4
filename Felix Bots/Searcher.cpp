@@ -11,22 +11,24 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 	availableMoves = _availableMoves;
 
 	// Initialize search
-	bestEvalThisIteration = 0; 
-	bestEval = 0;
+	bestEvalThisIteration = negativeInfinity; 
+	bestEval = negativeInfinity;
 	bestMoveThisIteration = Utility::createNullMove();
 	bestMove = Utility::createNullMove();
 
 	// Initialize debug info
 	currentDepth = 0;
-	Utility::print("Starting DC search", true);
+	Utility::print("Starting DC search for ", false);
+	Utility::print(board.isWhiteTurn?"white":"black", true);
 	runIterativeDeepeningSearch();
+	Utility::print("Exiting DC search", true);
 }
 
 // Run iterative deepening. This means doing a full search with a depth of 1, then with a depth of 2, and so on.
 // This allows the search to be cancelled at any time and still yield a useful result.
 void Searcher::runIterativeDeepeningSearch()
 {
-	for (int searchDepth = 1; searchDepth <= 3; searchDepth++)
+	for (int searchDepth = 1; searchDepth <= maxDepth; searchDepth++)
 	{
 		hasSearchedAtLeastOneMove = false;
 		search(searchDepth, 0, negativeInfinity, positiveInfinity);
@@ -53,10 +55,11 @@ void Searcher::runIterativeDeepeningSearch()
 			bestEval = bestEvalThisIteration;
 
 			Utility::print(std::format(
-					"\nIteration {} result: \n{} \nEval: {}", 
+					"\nIteration {} result: \n{} \nEval: {}\nPOV: {}", 
 					searchDepth,
-					Utility::toString(bestMove),
-					bestEval),
+					board.moveToString(bestMove),
+					bestEval,
+					board.isWhiteTurn?"white":"black"),
 				true);
 			if (isWinScore(bestEval))
 			{
@@ -70,7 +73,7 @@ void Searcher::runIterativeDeepeningSearch()
 			// A win found outside of search depth (due to extensions) may not be the fastest win.
 			if (isWinScore(bestEval) && numPlyToWinFromScore(bestEval) <= searchDepth)
 			{
-				Utility::print("Exitting search due to mate found within search depth", true);
+				Utility::print("Exiting search due to mate found within search depth", true);
 				break;
 			}
 		}
@@ -134,11 +137,10 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	for (int i = 1; i < moves->size(); i++)
 	{
 		Move* move = &(*moves)[i];
-		int eval = 0;
 
 		board.makeMove(moves->at(i));
 
-		eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
+		int eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
 
 		board.unmakeMove(moves->at(i));
 
@@ -153,7 +155,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		}
 
 		// Found a new best move in this position
-		if (eval > alpha )//|| (eval == alpha && plyFromRoot == 0 && (rand() % 10 == 0)))
+		if (eval > alpha ) //(eval == alpha && plyFromRoot == 0 && (rand() % 100 == 9)))
 		{
 			evaluationBound = TranspositionTable<1>::Exact;
 			bestMoveInThisPosition = move;

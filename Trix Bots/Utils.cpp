@@ -334,7 +334,7 @@ int Utils::trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13])
 	float bestEval = -99999;
 	int bestMove = 0;
 
-	int depth = 2;
+	int depth = 1;
 
 	debugContainer debug;
 

@@ -23,6 +23,11 @@ namespace dc
 		void updateWinValue();
 		void makeMove(Move& move);
 		void unmakeMove(Move& move);
+
+		std::string moveToString(Move& move);
+		
+		/* Testing */
+		u64 bulk_perft(int depth);/* >= 1 */
 	
 	private:
 

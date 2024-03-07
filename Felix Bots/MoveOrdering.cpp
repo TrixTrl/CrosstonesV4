@@ -18,7 +18,4 @@ void MoveOrdering::orderMoves(std::vector<Move>& moveList, Move& bestMoveByValue
 	if (pivot != moveList.end()) {
 		std::rotate(moveList.begin(), pivot, pivot + 1);
 	}
-
-
-
 }

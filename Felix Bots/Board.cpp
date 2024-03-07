@@ -60,7 +60,7 @@ blackBaseSafe:
 			gameResult = GameResult::Draw;
 			return;
 		}
-		result = GameResult::WhiteHasWon;
+		result = GameResult::BlackHasWon;
 	}
 whiteBaseSafe:
 
@@ -154,13 +154,13 @@ candidateElimination:
 
 void Board::makeMove(Move& move)
 {
-	updateWinValue();
 	appyMoveReversible(move);
+	updateWinValue();
 }
 void Board::unmakeMove(Move& move)
 {
-	gameResult = GameResult::InProgress;
 	appyMoveReversible(move);
+	gameResult = GameResult::InProgress;
 }
 
 void Board::appyMoveReversible(Move& move)
@@ -182,4 +182,69 @@ void Board::appyMoveReversible(Move& move)
 	isWhiteTurn = !isWhiteTurn;
 
 	zobristKey ^= Zobrist::whiteToMove;
+}
+
+
+u64 Board::bulk_perft(int depth /* >= 1 */)
+{
+	int n_moves, i;
+	u64 nodes = 0;
+
+	std::shared_ptr<std::vector<Move>> moves =
+		BasicGenerator::getMoves(isWhiteTurn, &square);
+	// remove the passing move
+	moves->erase(moves->begin());
+
+	n_moves = moves->size();
+
+	if (depth == 1)
+		return (u64)n_moves;
+
+	for (i = 0; i < n_moves; i++) {
+		makeMove(moves->at(i));
+		nodes += bulk_perft(depth - 1);
+		unmakeMove(moves->at(i));
+	}
+	return nodes;
+}
+
+std::string Board::moveToString(Move& move)
+{
+	if (move.size() == 0)
+		return "Null move";
+	std::string result = "";
+	for (auto& xMove : move)
+	{
+		// use binary xor value or concrete information if there is context
+		std::string value = "";
+		const uint8_t fieldBefore = square[xMove.i][xMove.j];
+		const uint8_t fieldAfter = fieldBefore ^ xMove.delta;
+
+		if (Piece::height(fieldAfter) != Piece::height(fieldBefore)) {
+			value += (Piece::height(fieldAfter) > Piece::height(fieldBefore))
+				? "+" : "";
+
+			value += std::to_string(Piece::height(fieldAfter) - Piece::height(fieldBefore));
+
+			value += ((fieldAfter | fieldBefore) & Piece::Black)
+				? "B" : "W";
+
+			if ((fieldBefore ^ fieldAfter) & Piece::Red)
+				value += "_Red";
+			if ((fieldBefore ^ fieldAfter) & Piece::Blue)
+				value += "_Blue";
+		}
+
+		if (xMove.delta & Piece::setTurnPiece)
+			value += "_T";
+		if (xMove.delta & Piece::turnPiece)
+			value += " _turnPieceCreate";
+
+		result += std::format("\n({}, {}) | {}",
+			std::string(1, (char)xMove.i + 'A'),
+			xMove.j + 1,
+			value
+		);
+	}
+	return result.substr(1);
 }

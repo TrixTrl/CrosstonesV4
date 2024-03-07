@@ -38,7 +38,7 @@ int screenHeight = 750;
 
 uint8_t displayBoard[3][13][13];
 HWND globalHwnd = NULL;
-GameMaster* gameMaster;
+GameMaster* gameMaster = nullptr;
 bool firstDraw = true;
 PlayerInputKey playerInputKey = PlayerInputKey::None;
 int switchMove = 0;
@@ -51,19 +51,31 @@ int main() {
 		std::bitset<3> set(5);
 		bs.rst(set);
 
+		//bs.loadPos("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111"); //Dragon start
+		//bs.loadPos("-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010"); //"unsolved" endgame
+		bs.loadPos("b-10000 b-10012 rW30406 -W30512 -W10602 -W10603 -B10700 r-10704 -W30712 -B20806 -B10906 b-11200 b-11212 11110111111101111111");
 		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
+		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
+		bool isWhite = false;
+
+		/* 
+		* !!!! Move Generation error here (White to move) !!!!
+		* After white captures the black 1, it does not stop and keeps moving further
+		*/
+		//bs.loadPos("b-10000 r-10006 b-10012 -B10206 -W20207 -B20402 -W10408 -B30500 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
+		
+
 		//bs.loadPos("-B10800 -W10803 -W10602 00000000000000000000");
 		//bs.loadPos("-B10500 -B10600 -B10700 -B10501 -B10601 -B10701 -B10502 -B10602 -B10702 -B10503 -B10603 -B10703 -W10509 -W10609 -W10709 -W10510 -W10610 -W10710 -W10511 -W10611 -W10711 -W10512 -W10612 -W10712 00000000000000000000");
 		//bs.loadPos("-W10909 -W11209 -W10910 -W11210 -W10911 -W11211 -W10912 -W11212 00000000000000000000");
-		bs.loadPos("-W10009 -W10309 -W10010 -W10310 -W10011 -W10311 -W10012 -W10312 00000000000000000000");
-
+		//bs.loadPos("-W10009 -W10309 -W10010 -W10310 -W10011 -W10311 -W10012 -W10312 00000000000000000000");
 		bs.copyBoard(&(displayBoard[0]));
 
 		Utils::print(Utils::generateMetadata(&(displayBoard[0])), false);
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 
-		bool isWhite = true;
+		
 		std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
 		moves = bs.getMoves(isWhite);
 
@@ -72,7 +84,6 @@ int main() {
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		LPCWSTR wideString = temp.c_str();
 		OutputDebugString(wideString);
-
 
 		//Timing testing code
 
@@ -103,6 +114,7 @@ int main() {
 			bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
 			bs.copyBoard(&(displayBoard[0]));
 			bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
+			InvalidateRect(globalHwnd, NULL, NULL);
 
 			Utils::print("--------", true);
 
@@ -111,11 +123,10 @@ int main() {
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
 			OutputDebugString(wideString2);
-			Deepchad chad = Deepchad();
+			//Trix
 			Utils::debugContainer debug;
 			Utils::print("First: ", false);
-			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 4, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
-			//Utils::print("Chad: ", false);
+			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
 			Utils::print(debug.n, true);
 			Utils::print(debug.depthCounts[4], true);
 			Utils::print(debug.depthCounts[3], true);
@@ -123,6 +134,24 @@ int main() {
 			Utils::print(debug.depthCounts[1], true);
 			Utils::print(debug.depthCounts[0], true);
 
+			//Felix
+			Deepchad chad = Deepchad();
+			/*std::shared_ptr<std::vector<Move>> movesForFelix =
+				BasicGenerator::getMoves(isWhite, &displayBoard[0]);
+			// remove the passing move
+			movesForFelix->erase(movesForFelix->begin());
+
+			chad.searcher.startSearch(*movesForFelix);
+			auto result = chad.searcher.getSearchResult();
+			Utils::print(result.second, true);*/
+
+			Utils::print("Chad: ", false);
+			uint8_t dcTempBoard[13][13];
+			std::memcpy(dcTempBoard, displayBoard[0], sizeof(dcTempBoard));
+			chad.getMoveToPlay(&dcTempBoard, !isWhite, 1000);
+
+
+		EXPLORE_WAIT_FOR_UPDATE:
 			InvalidateRect(globalHwnd, NULL, NULL);
 			if (!KEYBOARDCONTROLL) {
 				i++;
@@ -130,12 +159,22 @@ int main() {
 			}
 			else {
 				while (switchMove == 0) std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				if (switchMove != -99999) {
-					i += moves->size() * 3 + switchMove;
-					i %= moves->size();
+				// reset move
+				if (switchMove == -99999) {
+					i = 0;
+				}
+				// Show the move that DC would have played for the opponent (on second call undo it)
+				else if (switchMove == -12345) {
+					uint8_t copiedBoard[13][13];
+					std::memcpy(copiedBoard, displayBoard[0], sizeof(copiedBoard));
+					std::memcpy(displayBoard[0], dcTempBoard, sizeof(dcTempBoard));
+					std::memcpy(dcTempBoard, copiedBoard, sizeof(dcTempBoard));
+					switchMove = 0;
+					goto EXPLORE_WAIT_FOR_UPDATE;
 				}
 				else {
-					i = 0;
+					i += moves->size() * 3 + switchMove;
+					i %= moves->size();
 				}
 				switchMove = 0;
 			}
@@ -464,11 +503,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 
 			case ' ':
+				switchMove = -12345;
 				playerInputKey = PlayerInputKey::Turn;
 				break;
 			}
 			// Notify player controller
-			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			if (gameMaster != nullptr)
+				gameMaster->notifyPlayersKeyDown(playerInputKey);
 			playerInputKey = PlayerInputKey::None;
 		}
 		break;
@@ -497,8 +538,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			// Notify player controller
-
-			gameMaster->notifyPlayersKeyDown(playerInputKey);
+			if (gameMaster != nullptr)
+				gameMaster->notifyPlayersKeyDown(playerInputKey);
 			playerInputKey = PlayerInputKey::None;
 		}
 		break;

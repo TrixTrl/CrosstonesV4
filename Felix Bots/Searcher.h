@@ -15,8 +15,8 @@ namespace dc
 	{
 	public:
 
-		static const int immediateWinScore = 100000;
-		static const int positiveInfinity = 9999999;
+		static const int immediateWinScore = 1000000;
+		static const int positiveInfinity = 99999999;
 		static const int negativeInfinity = -positiveInfinity;
 
 	private:
@@ -36,9 +36,11 @@ namespace dc
 
 		std::vector<Move> availableMoves;
 
+		int maxDepth;
+
 	public:
 
-		Searcher(Board& _board) : board(_board), transpositionTable(board), moveOrdering()
+		Searcher(Board& _board, int _maxDepth) : board(_board), transpositionTable(board), moveOrdering(), maxDepth(_maxDepth)
 		{
 			availableMoves = std::vector<Move>();
 		}

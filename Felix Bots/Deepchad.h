@@ -16,7 +16,7 @@ public:
 	Board board;
 	Searcher searcher;
 
-	Deepchad() : board(), searcher(board) {}
+	Deepchad(int maxDepth = 3) : board(), searcher(board, maxDepth) {}
 
 	void getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime);
 

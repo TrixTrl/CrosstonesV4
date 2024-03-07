@@ -6,12 +6,11 @@
 
 
 class Piece {
-private:
+public:
 	static const uint8_t heightMask = 0b00000111;
 	static const uint8_t addOnMask =  0b00011000;
 	static const uint8_t colourMask = 0b00100000;
 
-public:
 	//Addon colors
 	static const uint8_t Blue = 8;
 	static const uint8_t Red = 16;
