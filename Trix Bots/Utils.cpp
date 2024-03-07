@@ -692,7 +692,7 @@ void Utils::captureGenerator_singleSplit(std::shared_ptr<std::vector<std::vector
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			basicGenerator_halfSplit_noPush(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite, pieces);		//if dest is empty, continue the move if possible
+			basicGenerator_halfSplit_noPush(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite, pieces);		//end move
 		}
 		else if (remainingSteps + Piece::isBlue(origin) > 1 && Piece::isTower(dest) && Piece::colour(origin) != Piece::colour(dest)) {
 			if (!Piece::isBlue(origin) && Piece::height(dest) > Piece::height(origin)) continue;		//capturing height check
