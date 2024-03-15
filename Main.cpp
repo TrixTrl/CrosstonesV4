@@ -126,7 +126,7 @@ int main() {
 			//Trix
 			Utils::debugContainer debug;
 			Utils::print("First: ", false);
-			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
+			//Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, 0, &debug), true);
 			Utils::print(debug.n, true);
 			Utils::print(debug.depthCounts[4], true);
 			Utils::print(debug.depthCounts[3], true);
@@ -186,7 +186,7 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p1 = new TheFirst(2);
+		Player* p1 = new Hydra(3, 14);
 		Player* p2 = new Hydra(2, 10);
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));

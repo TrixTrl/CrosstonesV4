@@ -12,6 +12,7 @@
 #include "Utils.h"
 #include "../Globals/Piece.h"
 #include "../Test Bots/BasicGenerator.h"
+#include "TranspositionTable.h"
 
 #define MAXEVAL 9999
 #define BITSETINDEX (i+(j*13))
@@ -378,9 +379,8 @@ void Utils::evaluatePositionsThread(bool isWhite, uint8_t(*pieces)[13][13], std:
 			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
 		}
 
-		Utils::extraBoardData metaData = generateMetadata(&boardCopy);
-
-		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);
+		//float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug) * (isWhite ? 1 : -1);
+		float posEval = alphaBeta_wTable(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, ZobristHasher::zobristKey(&boardCopy, isWhite), &debug) * (isWhite ? 1 : -1);
 		evaluations[j] = posEval;
 
 
@@ -403,7 +403,6 @@ int Utils::getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth
 
 	for (int i = 0; i < threadCount; i++) {
 		threads.emplace_back(std::thread(&Utils::evaluatePositionsThread, isWhite, std::ref(pieces), std::ref(moves), std::ref(evaluations), depth, i, threadCount, std::ref(debug)));
-		//threads.emplace_back(std::thread(&Utils::test, std::ref(evaluations)));
 	}
 	for (int i = 0; i < threadCount; i++) {
 		threads[i].join();
@@ -434,8 +433,12 @@ int Utils::getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth
 		}
 	}
 
-	print("getBestMoveThreaded: ");
+	print("getBestMoveThreaded: ", true);
 	print(debug.n, true);
+	print(debug.exact, true);
+	print(debug.alpha, true);
+	print(debug.beta, true);
+	print(debug.sanityCheck, true);
 	print(bestEval, true);
 	print(bestMoves.size(), true);
 
@@ -712,6 +715,10 @@ float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float b
 	if (debug != nullptr) debug->n++;
 	if (debug != nullptr) debug->depthCounts[depth]++;
 
+	/*if (ZobristHasher::zobristKey(pieces, maximizing) != zobristKey) {
+		print("Well fuck ");
+		print(debug->n, true);
+	}*/
 
 	if (depth == 0) {// || (Utils::gameOver(maximizing, pieces) != winValue::none)) {
 		return evalFunc(maximizing, pieces);
@@ -728,8 +735,8 @@ float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float b
 		//std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
 		//moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
 
-		std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
-		moves = BasicGenerator::getMoves(maximizing, pieces);
+		std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+		moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
 
 		for (int j = 1; j < moves->size(); j++) {
 			uint8_t boardCopy[13][13];
@@ -766,6 +773,99 @@ float Utils::alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float b
 			beta = min(beta, value);
 		}
 
+		return value;
+	}
+}
+
+float Utils::alphaBeta_wTable(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), uint64_t zobristKey, debugContainer* debug)
+{
+	if (debug != nullptr) debug->n++;
+	if (debug != nullptr) debug->depthCounts[depth]++;
+
+	TranspositionTable::Entry entry = TranspositionTable::probeHash(zobristKey);
+	if (entry.key == zobristKey) {
+		if (entry.flags == hashfEXACT) {
+			if (debug != nullptr) debug->exact++;
+			return entry.value;
+		}
+		if (entry.flags == hashfALPHA) {
+			alpha = max(alpha, entry.value);
+			if (debug != nullptr) debug->alpha++;
+		}
+		if (entry.flags == hashfBETA) {
+			beta = min(beta, entry.value);
+			if (debug != nullptr) debug->beta++;
+		}
+	}
+
+	if (depth == 0) {// || (Utils::gameOver(maximizing, pieces) != winValue::none)) {
+		float eval = evalFunc(maximizing, pieces);
+		TranspositionTable::recordHash(zobristKey, depth, hashfEXACT, eval, -1);
+		return eval;
+	}
+
+	extraBoardData data = generateMetadata(pieces);
+	if (Utils::gameOver(maximizing, data) != winValue::none) {
+		float eval = evalFunc(maximizing, pieces);
+		TranspositionTable::recordHash(zobristKey, depth, hashfEXACT, eval, -1);
+		return eval;
+	}
+
+	/*
+		TODO:
+
+		Figure out when to cache other things into the table and like... what and how
+		Make move ordering a thing
+
+	*/
+
+
+	if (maximizing) {
+		float value = -std::numeric_limits<float>::infinity();//-MAXEVAL;
+
+		//std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+		//moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
+
+		std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+		moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
+
+		for (int j = 1; j < moves->size(); j++) {
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+			for (int i = 0; i < ((*moves)[j]).size(); i++) {
+				boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
+			}
+
+			float alphabeta = alphaBeta_wTable(&boardCopy, depth - 1, alpha, beta, false, evalFunc, ZobristHasher::zobristKey(pieces, &boardCopy, &(*moves)[j], zobristKey), debug);
+			value = max(value, alphabeta);
+
+			//if (value > beta) break;
+			alpha = max(alpha, value);
+		}
+		TranspositionTable::recordHash(zobristKey, depth, hashfALPHA, value, -1);
+		return value;
+	}
+	else {
+		float value = std::numeric_limits<float>::infinity();//MAXEVAL;
+
+		std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+		moves = Utils::getMoves_halfSplit_noPush(maximizing, pieces);
+
+		for (int j = 1; j < moves->size(); j++) {
+			uint8_t boardCopy[13][13];
+			std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+			for (int i = 0; i < ((*moves)[j]).size(); i++) {
+				boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
+			}
+
+			float alphabeta = alphaBeta_wTable(&boardCopy, depth - 1, alpha, beta, true, evalFunc, ZobristHasher::zobristKey(pieces, &boardCopy, &(*moves)[j], zobristKey), debug);
+			value = min(value, alphabeta);
+
+			//if (value < alpha) break;
+			beta = min(beta, value);
+		}
+		if (debug != nullptr) debug->sanityCheck++;
+		TranspositionTable::recordHash(zobristKey, depth, hashfBETA, value, -1);
 		return value;
 	}
 }
