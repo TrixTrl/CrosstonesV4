@@ -29,7 +29,19 @@ void GameMaster::play(HWND globalHwnd) {
 		bs.copyBoard(&board);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		int timeEnd = Time::millis() + timeControl;
-		(*players[isWhiteTurn ? 0 : 1]).getMoveToPlay(&board, isWhiteTurn, timeEnd);
+		try {
+			(*players[isWhiteTurn ? 0 : 1]).getMoveToPlay(&board, isWhiteTurn, timeEnd);
+		}
+		catch (const std::exception& e)
+		{
+			ended = true;
+			print("\n");
+			print(isWhiteTurn ? "White" : "Black");
+			print(" has lost by program error\n");
+			print("Caught exception: ");
+			print(e.what());
+		}
+
 		if (timeEnforcement[isWhiteTurn ? 0 : 1] && timeEnd < Time::millis()) {
 			ended = true;
 			print("\n");
@@ -88,5 +100,15 @@ void GameMaster::notifyPlayersKeyDown(PlayerInputKey key)
 	if (activePlayer->listensToKeyInputs())
 	{
 		activePlayer->keyDown(key);
+	}
+}
+
+void GameMaster::notifyPlayersClicked(bool isLeft, POINT gridPos)
+{
+	uint8_t activeIndex = 1 - isWhiteTurn;
+	Player* activePlayer = players[activeIndex];
+	if (activePlayer->listensToKeyInputs())
+	{
+		activePlayer->mouseDown(isLeft, gridPos);
 	}
 }

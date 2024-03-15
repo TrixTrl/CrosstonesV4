@@ -119,22 +119,19 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
 	moveOrdering.orderMoves(*moves, prevBestMove);
 
-	// Detect draw by no moves available
+	//add passing move if there are no moves left
 	if (moves->size() == 0)
 	{
-		/*if (Utility::isWon())
-		{
-			int winScore = immediateWinScore - plyFromRoot;
-			return -mateScore;
-		}*/
-		return 0;
+		/*if (Utility::isWon()){}*/
+		//int winScore = immediateWinScore - plyFromRoot;
+		//return -winScore;
+		(*moves).push_back(Utility::createNullMove());
 	}
 
 	int evaluationBound = TranspositionTable<1>::UpperBound;
 	Move* bestMoveInThisPosition = nullptr;
 
-	// Skip i = 0 to not allow the Null move
-	for (int i = 1; i < moves->size(); i++)
+	for (int i = 0; i < moves->size(); i++)
 	{
 		Move* move = &(*moves)[i];
 

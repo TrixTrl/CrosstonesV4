@@ -17,7 +17,7 @@ int Evaluation::evaluate(Board& board)
 	case GameResult::WhiteHasWon:
 		return Searcher::immediateWinScore * color;
 	case GameResult::BlackHasWon:
-		return Searcher::immediateWinScore * color;
+		return Searcher::immediateWinScore * -color;
 	case GameResult::Draw:
 		return 0;
 	case GameResult::InProgress:

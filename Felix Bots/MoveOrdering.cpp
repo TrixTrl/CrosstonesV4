@@ -5,11 +5,16 @@ using namespace dc;
 
 void MoveOrdering::orderMoves(std::vector<Move>& moveList, Move& bestMoveByValue)
 {
+	if (moveList.size() == 0)
+		return;
+
+	//remove null element
+	moveList.erase(moveList.begin());
 
 	if (bestMoveByValue.size() == 0)
 		return;
-	// Find the best move in the list and rotate it to the front
 
+	// Find the best move in the list and rotate it to the front
 	auto pivot = std::find_if(moveList.begin(),
 		moveList.end(),
 		[&bestMoveByValue](const Move& s) -> bool {
