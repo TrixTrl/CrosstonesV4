@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "PlayerInputKey.h"
+#include <wtypes.h>
 
 class Player {
 public:
@@ -12,4 +13,5 @@ public:
 		return false;
 	};
 	virtual void keyDown(PlayerInputKey key) {}
+	virtual void mouseDown(bool isLeft, POINT gridPos) {}
 };

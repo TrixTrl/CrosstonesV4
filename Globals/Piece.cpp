@@ -41,7 +41,7 @@ const uint8_t Piece::portIndices[4][12]
 	{127,129,139,140,141,142,153,155,165,166,167,168}
 };
 
-uint8_t Piece::maxSteps(uint8_t piece) {
+const uint8_t Piece::maxSteps(const uint8_t piece) {
 	uint8_t maxSteps = 0;
 	switch (height(piece)) {
 	case 1:

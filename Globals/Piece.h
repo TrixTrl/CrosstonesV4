@@ -11,6 +11,8 @@ public:
 	static const uint8_t addOnMask =  0b00011000;
 	static const uint8_t colourMask = 0b00100000;
 
+	static const uint8_t towerMask = heightMask | addOnMask | colourMask;
+
 	//Addon colors
 	static const uint8_t Blue = 8;
 	static const uint8_t Red = 16;
@@ -19,8 +21,11 @@ public:
 	static const uint8_t Black = 32;
 	static const uint8_t White = 0;
 
-	static const uint8_t turnPiece = 128;
+	//Turn Piece
+	static const uint8_t hasTurnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
+
+	static const uint8_t turnPieceMask = hasTurnPiece | setTurnPiece;
 
 	//Piece Types
 	static const uint8_t None = 0;
@@ -75,10 +80,11 @@ public:
 	static const uint8_t turnPieceIndices[169];
 	static const uint8_t portIndices[4][12];
 
-	static const uint8_t colour(uint8_t const piece) { return (piece & colourMask); }
-	static const uint8_t height(uint8_t const piece) { return (piece & heightMask); }
-	static const uint8_t addOn(uint8_t const piece) { return (piece & addOnMask); }
-	static const uint8_t tower(uint8_t const piece) { return (piece & (colourMask | heightMask | addOnMask)); }
+	static const inline uint8_t colour(uint8_t const piece) { return piece & colourMask; }
+	static const inline uint8_t height(uint8_t const piece) { return piece & heightMask; }
+	static const inline uint8_t addOn(uint8_t const piece) { return piece & addOnMask; }
+	static const inline uint8_t tower(uint8_t const piece) { return piece & towerMask; }
+	static const inline uint8_t turnPiece(uint8_t const piece) { return piece & turnPieceMask; }
 
 	static bool isColour(uint8_t piece, int colour);
 	static bool isWhite(uint8_t piece);
@@ -92,7 +98,7 @@ public:
 
 	static bool isAddOn(uint8_t piece);
 
-	static uint8_t maxSteps(uint8_t piece);
+	static const uint8_t maxSteps(const uint8_t piece);
 };
 
 

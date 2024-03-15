@@ -37,7 +37,7 @@ void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMov
 		moves->emplace_back(move);
 	}
 
-	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
+	if (!turned && (((*state)[x][y] & hasTurnPiece) != 0)) {		//Turn in place if we can and haven't yet
 		uint8_t boardCopy[13][13];
 		std::memcpy(&boardCopy, state, sizeof(boardCopy));
 		boardCopy[x][y] ^= setTurnPiece;
@@ -56,7 +56,7 @@ void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMov
 	*/
 	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
 		uint8_t piece = ((*state)[x][y]);
-		if ((piece & turnPiece) != 0) {		//Obey turn pieces
+		if ((piece & hasTurnPiece) != 0) {		//Obey turn pieces
 			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
 		}
 		int i = x;
@@ -80,7 +80,7 @@ void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMov
 		if (i < 0 || i > 12 || j < 0 || j > 12) continue;
 		if (i % 2 == 1 && j % 2 == 1) continue;
 		if ((*visited)[i][j]) continue;		//Bounds and revisiting check
-		if ((dest & turnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
+		if ((dest & hasTurnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
 
 		if ((dest & 0b00111111) == 0) {		//Most basic case : empty target square
 			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++) {		//number of moved pieces
@@ -168,7 +168,7 @@ void BasicGenerator::basicGenerator(std::shared_ptr<std::vector<std::vector<xMov
 
 				uint8_t pushPiece = ((*state)[pushX][pushY]);
 
-				if ((pushPiece & turnPiece) != 0) {		//Obey turn pieces
+				if ((pushPiece & hasTurnPiece) != 0) {		//Obey turn pieces
 					if (((pushPiece & setTurnPiece)) == (d % 2) * setTurnPiece) break;		//This feels deeply cursed
 				}
 				if (Piece::height(pushPiece) == 0) {
@@ -228,7 +228,7 @@ void BasicGenerator::captureGenerator(std::shared_ptr<std::vector<std::vector<xM
 	*/
 	uint8_t origin = ((*state)[originX][originY]);
 
-	if (!turned && (((*state)[x][y] & turnPiece) != 0)) {		//Turn in place if we can and haven't yet
+	if (!turned && (((*state)[x][y] & hasTurnPiece) != 0)) {		//Turn in place if we can and haven't yet
 		uint8_t boardCopy[13][13];
 		std::memcpy(&boardCopy, state, sizeof(boardCopy));
 		boardCopy[x][y] ^= setTurnPiece;
@@ -239,7 +239,7 @@ void BasicGenerator::captureGenerator(std::shared_ptr<std::vector<std::vector<xM
 
 	for (int d = 0; d < 4; d++) {		//Loop through the 4 possible directions
 		uint8_t piece = ((*state)[x][y]);
-		if ((piece & turnPiece) != 0) {		//Obey turn pieces
+		if ((piece & hasTurnPiece) != 0) {		//Obey turn pieces
 			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece) continue;		//This feels deeply cursed
 		}
 		int i = x;
@@ -263,7 +263,7 @@ void BasicGenerator::captureGenerator(std::shared_ptr<std::vector<std::vector<xM
 		if (i < 0 || i > 12 || j < 0 || j > 12) continue;
 		if (i % 2 == 1 && j % 2 == 1) continue;
 		if ((*visited)[i][j]) continue;		//Bounds and revisiting check
-		if ((dest & turnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
+		if ((dest & hasTurnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece)) continue;
 
 		//piece is the position where an enemy piece used to be that we are currently taking, this value has already been wiped
 		//dest is the piece we are now looking to move to, either to complete the capture or to continue the chain

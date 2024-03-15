@@ -36,7 +36,7 @@ public:
 
 	winValue gameOver(bool isWhite);
 
-	static const uint8_t turnPiece = 128;
+	static const uint8_t hasTurnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
 
 	std::string dumpPos();

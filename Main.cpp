@@ -2,9 +2,10 @@
 #define UNICODE
 #endif 
 
-#include <windows.h>
+#include <Windows.h>
 #include <WinUser.h>
 #include <wchar.h>
+#include <windowsx.h>
 
 #include "DCTestSuite.h"
 #include "BoardState.h"
@@ -24,6 +25,7 @@
 #include <thread>
 #include <string>
 #include <chrono>
+#include "UI.h"
 
 #pragma comment(linker, "/STACK:200000000000")
 #pragma comment(linker, "/HEAP:200000000")
@@ -33,12 +35,15 @@
 #define EVALUATIONTESTING 0
 #define DEEPCHADTESTINGSUITE 0
 
-int screenWidth = 750;//1200;
-int screenHeight = 750;
+const int screenWidth = 1200;
+const int screenHeight = 755;
 
 uint8_t displayBoard[3][13][13];
 HWND globalHwnd = NULL;
+
 GameMaster* gameMaster = nullptr;
+UI ui = UI();
+
 bool firstDraw = true;
 PlayerInputKey playerInputKey = PlayerInputKey::None;
 int switchMove = 0;
@@ -57,13 +62,6 @@ int main() {
 		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
 		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
 		bool isWhite = false;
-
-		/* 
-		* !!!! Move Generation error here (White to move) !!!!
-		* After white captures the black 1, it does not stop and keeps moving further
-		*/
-		//bs.loadPos("b-10000 r-10006 b-10012 -B10206 -W20207 -B20402 -W10408 -B30500 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
-		
 
 		//bs.loadPos("-B10800 -W10803 -W10602 00000000000000000000");
 		//bs.loadPos("-B10500 -B10600 -B10700 -B10501 -B10601 -B10701 -B10502 -B10602 -B10702 -B10503 -B10603 -B10703 -W10509 -W10609 -W10709 -W10510 -W10610 -W10710 -W10511 -W10611 -W10711 -W10512 -W10612 -W10712 00000000000000000000");
@@ -186,13 +184,19 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else {
-		Player* p1 = new Hydra(3, 14);
-		Player* p2 = new Hydra(2, 10);
-		std::bitset<3> gamemode(0b111);
-		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
+		Player* p2 = new 
+			//TheFirst(2);
+			//Deepchad(3);
+			//Hydra(2, 10);
+			ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+		Player* p1 = new Deepchad(3);
 
+		std::bitset<3> gamemode(0b011);
+		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
+		
 		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
-
+		//gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
+		//gameMaster->loadPos("b-10000 b-10012 b-11200 b-11212 -W30512 -W30712 -W10808 rW30406 bW40506 -B30700 -B10404 rB50704 -B30402 -B10602 11110110101111101111");
 		//std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);
 		gameMaster->play(globalHwnd);
 		//while(true) {}
@@ -269,163 +273,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_PAINT:
 	{
-		//OutputDebugString(L"Painting\n");
-
 		memcpy(displayBoard[2], displayBoard[1], sizeof(displayBoard[0]));
 		memcpy(displayBoard[1], displayBoard[0], sizeof(displayBoard[0]));
 
-
-		/*std::string str = std::to_string((int)displayBoard[1][6][0]);
-		str += "\n";
-		std::wstring temp = std::wstring(str.begin(), str.end());
-		LPCWSTR wideString = temp.c_str();
-		OutputDebugString(wideString);*/
-
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hwnd, &ps);
-
-		// All painting occurs here, between BeginPaint and EndPaint.
-
-		if (firstDraw) {
-			HBRUSH background = CreateSolidBrush(RGB(0, 0, 255));
-			FillRect(hdc, &ps.rcPaint, background);		//Background
-		}
-
-		std::string drawTypes[] = {
-		"ahthbht",
-		"v v b v",
-		"ththbht",
-		"v v b v",
-		"bbbbbbb",
-		"b v v b",
-		"ahththa"
-		};
-
-		RECT rect;
-		float padding = 20;
-		float sideLength = (screenHeight - padding * 2) / 13;
-
-		enum DrawPath
-		{
-			NONE = 0, HORIZONTAL, VERTICAL
-		};
-
-		//SetRect(&rect, 0, 650, 100, 750);
-		//FillRect(hdc, &rect, (HBRUSH)(CreateSolidBrush(RGB(255, 0, 0))));
-		//DrawText(hdc, L"Hello World!", -1, &ps.rcPaint, DT_CENTER);
-
-		for (int i = 0; i < 13; i++) {
-			for (int j = 0; j < 13; j++) {
-				//if (!(i == 2 && j == 2)) {
-				if (!firstDraw && displayBoard[1][i][j] == displayBoard[2][i][j]) continue;
-				//}
-				SetRect(&rect, padding + i * sideLength, padding + j * sideLength, padding + (i + 1) * sideLength, padding + (j + 1) * sideLength);
-				HBRUSH col;
-				DrawPath path = NONE;
-				uint8_t piece = displayBoard[1][i][j];		//------------------------------------------------------------------
-				switch (drawTypes[j < 7 ? j : 5 - (j % 7)][i < 7 ? i : 5 - (i % 7)]) {
-				case 'a':
-					col = CreateSolidBrush(RGB(63, 45, 35));
-					break;
-				case ' ':
-					col = CreateSolidBrush(RGB(122, 70, 58));
-					break;
-				case 'h':
-					col = CreateSolidBrush(RGB(214, 176, 116));
-					path = DrawPath::HORIZONTAL;
-					break;
-				case 'v':
-					col = CreateSolidBrush(RGB(214, 176, 116));
-					path = DrawPath::VERTICAL;
-					break;
-				case 'b':
-					col = CreateSolidBrush(RGB(231, 176, 88));
-					break;
-				case 't':
-					col = CreateSolidBrush(RGB(214, 176, 116));
-					path = (piece & BoardState::setTurnPiece) == 0 ? DrawPath::HORIZONTAL : DrawPath::VERTICAL;
-					break;
-				default:
-					col = CreateSolidBrush(RGB(255, 0, 0));
-					break;
-				}
-
-				FillRect(hdc, &rect, col);
-				switch (path) {
-				case DrawPath::NONE:
-					break;
-				case DrawPath::HORIZONTAL:
-					rect.top += sideLength / 3;
-					rect.bottom -= sideLength / 3;
-					col = CreateSolidBrush(RGB(63, 45, 35));
-					FillRect(hdc, &rect, col);
-					break;
-				case DrawPath::VERTICAL:
-					rect.left += sideLength / 3;
-					rect.right -= sideLength / 3;
-					col = CreateSolidBrush(RGB(63, 45, 35));
-					FillRect(hdc, &rect, col);
-					break;
-				}
-
-				if ((piece & 0b00111111) != 0) {
-					float piecePadding = 0.1;
-					float pieceBorder = 0.07;
-					COLORREF colors[4][2] = { {RGB(15, 15, 15), RGB(250, 250, 250)}, {RGB(250, 250, 250), RGB(15, 15, 15)}, {RGB(224, 36, 36), RGB(230, 37, 37)}, {RGB(31, 20, 250), RGB(44, 35, 219)} };
-					int ringColorIndex = 0;
-					int centerColorIndex = 0;
-
-					if (Piece::isRed(piece)) {
-						ringColorIndex = 2;
-					}
-					else if (Piece::isBlue(piece)) {
-						ringColorIndex = 3;
-					}
-
-					if (Piece::isAddOn(piece)) {
-						centerColorIndex = ringColorIndex;
-					}
-					else if (Piece::isWhite(piece)) {
-						centerColorIndex = 1;
-						if (ringColorIndex == 0) ringColorIndex = 1;
-					}
-
-
-					HBRUSH hbr = CreateSolidBrush(colors[ringColorIndex][1]);
-					HBRUSH hOld = (HBRUSH)SelectObject(hdc, hbr);
-
-
-					Ellipse(hdc, padding + (i + piecePadding) * sideLength, padding + (j + piecePadding) * sideLength, padding + (i + 1 - piecePadding) * sideLength, padding + (j + 1 - piecePadding) * sideLength);
-					hbr = CreateSolidBrush(colors[centerColorIndex][0]);
-					hOld = (HBRUSH)SelectObject(hdc, hbr);
-					Ellipse(hdc, padding + (i + piecePadding + pieceBorder) * sideLength, padding + (j + piecePadding + pieceBorder) * sideLength, padding + (i + 1 - piecePadding - pieceBorder) * sideLength, padding + (j + 1 - piecePadding - pieceBorder) * sideLength);
-
-					SelectObject(hdc, hOld);
-					DeleteObject(hbr);
-
-					if (Piece::isAddOn(piece)) continue;
-
-					SetRect(&rect, padding + i * sideLength, padding + (j + 0.35) * sideLength, padding + (i + 1) * sideLength, padding + (j + 0.7) * sideLength);
-					SetTextColor(hdc, colors[(centerColorIndex + 1) % 2][0]);
-					SetBkColor(hdc, colors[centerColorIndex][0]);
-
-
-					std::string str = std::to_string(Piece::height(piece));
-					std::wstring temp = std::wstring(str.begin(), str.end());
-					LPCWSTR wideString = temp.c_str();
-					DrawText(hdc, wideString, -1, &rect, DT_CENTER);
-
-				}
-
-			}
-		}
-
-		EndPaint(hwnd, &ps);
+		ui.paint(hwnd, firstDraw, &displayBoard[1]);
+		
 		firstDraw = false;
+		return 0;
 	}
-	return 0;
 
-	case WM_SYSKEYDOWN:
+	case WM_LBUTTONDOWN:
+	{ // handle left mouse click
+		POINT pos = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+		POINT gridPos = ui.lclick(hwnd, pos);
+		
+		// Notify player controller
+		if (gameMaster != nullptr)
+			gameMaster->notifyPlayersClicked(true, gridPos);
+
+		break;
+	}
+	/*case WM_SYSKEYDOWN:
 		break;
 		swprintf_s(msg, L"WM_SYSKEYDOWN: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
@@ -441,12 +309,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 		swprintf_s(msg, L"WM_SYSKEYUP: 0x%x\n", (wchar_t)wParam);
 		OutputDebugString(msg);
-		break;
+		break;*/
 
 	case WM_KEYDOWN:
 		//swprintf_s(msg, L"WM_KEYDOWN: 0x%x\n", (wchar_t)wParam);
 		//outputDebugString(msg);
-		if ((wchar_t)wParam == 0x20) {
+		if ((wchar_t)wParam == 'R') {
 			firstDraw = true;
 			InvalidateRect(globalHwnd, NULL, NULL);
 		}
@@ -517,9 +385,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		playerInputKey = PlayerInputKey::None;
 		break;
-		swprintf_s(msg, L"WM_KEYUP: 0x%x\n", (wchar_t)wParam);
-		OutputDebugString(msg);
-		break;
 
 	case WM_CHAR:
 		if (KEYBOARDCONTROLL) {
@@ -543,10 +408,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			playerInputKey = PlayerInputKey::None;
 		}
 		break;
-		swprintf_s(msg, L"WM_CHAR: %c\n", (wchar_t)wParam);
-		OutputDebugString(msg);
+	default:
 		break;
-
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

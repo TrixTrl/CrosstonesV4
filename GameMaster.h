@@ -23,6 +23,7 @@ public:
 	void play(HWND globalHwnd);
 	void loadPos(std::string str);
 	void notifyPlayersKeyDown(PlayerInputKey key);
+	void notifyPlayersClicked(bool isLeft, POINT gridPos);
 };
 
 class Time {
