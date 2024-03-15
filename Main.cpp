@@ -17,6 +17,7 @@
 #include "Trix Bots/TheFirst.h"
 #include "Trix Bots/Utils.h"
 #include "Trix Bots/DemoKnight.h"
+#include "Trix Bots/Hydra.h"
 
 #include "Globals/PlayerInputKey.h"
 
@@ -186,11 +187,14 @@ int main() {
 		Player* p2 = new 
 			//TheFirst(2);
 			//Deepchad(3);
+			//Hydra(2, 10);
 			ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
 		Player* p1 = new Deepchad(3);
+
 		std::bitset<3> gamemode(0b011);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
-
+		
+		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		//gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
 		//gameMaster->loadPos("b-10000 b-10012 b-11200 b-11212 -W30512 -W30712 -W10808 rW30406 bW40506 -B30700 -B10404 rB50704 -B30402 -B10602 11110110101111101111");
 		//std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);

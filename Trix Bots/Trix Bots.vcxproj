@@ -150,12 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DemoKnight.h" />
+    <ClInclude Include="Hydra.h" />
     <ClInclude Include="TheFirst.h" />
+    <ClInclude Include="TranspositionTable.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DemoKnight.cpp" />
+    <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="TheFirst.cpp" />
+    <ClCompile Include="TranspositionTable.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

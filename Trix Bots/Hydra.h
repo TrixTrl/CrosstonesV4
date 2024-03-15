@@ -2,10 +2,10 @@
 
 #include "../Globals/Player.h"
 
-class TheFirst : public Player
+class Hydra : public Player
 {
 public:
-	TheFirst(int setDepth) : depth(setDepth) {};
+	Hydra(int setDepth, int setThreads) : depth(setDepth), threadCount(setThreads) {};
 	void getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime);
 	bool listensToKeyInputs() override {
 		return false;
