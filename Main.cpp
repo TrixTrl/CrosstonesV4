@@ -124,7 +124,7 @@ int main() {
 			//Trix
 			Utils::debugContainer debug;
 			Utils::print("First: ", false);
-			Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, &debug), true);
+			//Utils::print(Utils::alphaBeta(&(displayBoard[0]), 2, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::basicPosEval, 0, &debug), true);
 			Utils::print(debug.n, true);
 			Utils::print(debug.depthCounts[4], true);
 			Utils::print(debug.depthCounts[3], true);

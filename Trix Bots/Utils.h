@@ -40,6 +40,10 @@ public:
 	struct debugContainer {
 		int n = 0;
 		int depthCounts[5] = { 0, 0, 0, 0, 0 };
+		int exact = 0;
+		int alpha = 0;
+		int beta = 0;
+		int sanityCheck = 0;
 	};
 
 	struct xMove {
@@ -74,8 +78,6 @@ public:
 	static const uint8_t setTurnPiece = 64;
 
 	static float alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), debugContainer* debug = nullptr);
-
-
-	static void test(std::vector<float>& test) {};
+	static float alphaBeta_wTable(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), uint64_t zobristKey, debugContainer* debug = nullptr);
 };
 
