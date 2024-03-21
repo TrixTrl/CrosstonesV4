@@ -242,7 +242,9 @@ void ManualPlayer::moveInDirection(ManualPlayer::Direction dir)
 	}
 	else if (isCapturing)
 	{
-		newMoveInfo.currentSelection = (isWhite ? Piece::White : Piece::Black)
+		newMoveInfo.currentSelection = 
+			destTP
+			| (isWhite ? Piece::White : Piece::Black)
 			| (moveInfo.isSplitting ? 0 : Piece::addOn(moveInfo.currentSelection))
 			+ moveInfo.split;
 	}
@@ -327,7 +329,7 @@ void ManualPlayer::changeSplitSelection(const int amountToMoveWith)
 		moveInfo.split = max(amountToMoveWith, 1);
 		moveInfo.isSplitting = true;
 	}
-	Utils::print("changing selection to: ", false);
+	Utils::print("Changing selection to: ", false);
 	Utils::print(moveInfo.split, true);
 }
 
