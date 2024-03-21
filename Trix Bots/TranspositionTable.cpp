@@ -54,16 +54,21 @@ uint64_t ZobristHasher::zobristKey(uint8_t(*board)[13][13], uint8_t(*changedBoar
 	return hash;
 }
 
-std::array<TranspositionTable::Entry, TranspositionTable::count> TranspositionTable::table;
+std::array<TranspositionTable::Entry, TranspositionTable::count> TranspositionTable::table_alwaysReplace;
+std::array<TranspositionTable::Entry, TranspositionTable::count> TranspositionTable::table_maximizeDepth;
 
 void TranspositionTable::recordHash(uint64_t zobristKey, uint8_t depth, uint8_t flags, float value, int best)
 {
-	table[zobristKey % count] = Entry(zobristKey, depth, flags, value, best);
+	table_alwaysReplace[zobristKey % count] = Entry(zobristKey, depth, flags, value, best);
+	if (depth > table_maximizeDepth[zobristKey % count].depth) {
+		table_maximizeDepth[zobristKey % count] = Entry(zobristKey, depth, flags, value, best);
+	}
 }
 
 TranspositionTable::Entry TranspositionTable::probeHash(uint64_t zobristKey)
 {
-	return table[zobristKey%count];
+	if (table_alwaysReplace[zobristKey % count].key == zobristKey) return table_alwaysReplace[zobristKey % count];
+	return table_maximizeDepth[zobristKey%count];
 }
 /*int ProbeHash(int depth, int alpha, int beta)
 	{

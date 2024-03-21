@@ -17,7 +17,12 @@ public:
 
 	void copyBoard(uint8_t(*dest)[13][13]) const;
 
-	struct xMove;
+	struct xMove {
+		int i;
+		int j;
+		uint8_t delta;
+		xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
+	};
 
 	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite) const;
 	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
@@ -41,6 +46,9 @@ public:
 
 	std::string dumpPos();
 	void loadPos(std::string str);
+
+	std::vector<std::string> gameRecord;
+	void dumpGame();
 private:
 	uint8_t pieces[13][13];
 };

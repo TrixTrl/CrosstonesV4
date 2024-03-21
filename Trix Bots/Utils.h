@@ -44,6 +44,8 @@ public:
 		int alpha = 0;
 		int beta = 0;
 		int sanityCheck = 0;
+		int alphaCutoff = 0;
+		int betaCutoff = 0;
 	};
 
 	struct xMove {
@@ -57,7 +59,10 @@ public:
 
 	static winValue gameOver(bool isWhite, extraBoardData metaData);
 	static winValue gameOver(bool isWhite, uint8_t(*pieces)[13][13]);
+
 	static float basicPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
+	static float improvedPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
+
 	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13], int depth);
 	static int trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13]);
 	static int getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth, int threadCount);
@@ -70,10 +75,20 @@ public:
 	static void print(float s, bool newLine = false);
 	static void print(BasicGenerator::xMove, bool newLine = false);
 	static void print(extraBoardData, bool formatted = true);
+	static void print(std::string s, int n, bool newLine = false);
+	static void print(std::string s, float n, bool newLine = false);
+	static void print(std::string s, size_t n, bool newLine = false);
 
 	static std::shared_ptr<std::vector<std::vector<xMove>>> getMoves_halfSplit_noPush(bool isWhite, uint8_t(*pieces)[13][13]);
 	static void basicGenerator_halfSplit_noPush(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t(*pieces)[13][13]);
 	static void captureGenerator_singleSplit(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t(*pieces)[13][13]);
+	
+	/*
+	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves_qiessence(bool isWhite) const;
+	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
+	void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int originX, int originY, int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
+	*/
+	
 	static const uint8_t hasTurnPiece = 128;
 	static const uint8_t setTurnPiece = 64;
 

@@ -154,13 +154,6 @@ void BoardState::copyBoard(uint8_t(*dest)[13][13]) const
 	std::memcpy(dest, &pieces, sizeof(pieces));
 }
 
-struct BoardState::xMove {
-	int i;
-	int j;
-	uint8_t delta;
-	xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
-};
-
 void debugPrint(std::string str) {
 	if (!DEBUG_PRINTING) return;
 	std::wstring temp = std::wstring(str.begin(), str.end());
@@ -539,6 +532,8 @@ int BoardState::makeMove(uint8_t(*newState)[13][13], bool isWhiteTurn)
 
 			forceDebugPrint(dumpPos());
 			forceDebugPrint("\n");
+
+			gameRecord.emplace_back(std::to_string(i) + " ");
 			return i == 0 ? 0 : 1;
 		}
 	}
@@ -700,4 +695,14 @@ void BoardState::loadPos(std::string str)
 			n++;
 		}
 	}
+}
+
+void BoardState::dumpGame()
+{
+
+	forceDebugPrint("\nGame record:\n\n");
+	for (int i = 0; i < gameRecord.size(); i++) {
+		forceDebugPrint(gameRecord[i]);
+	}
+	forceDebugPrint("\n\n");
 }
