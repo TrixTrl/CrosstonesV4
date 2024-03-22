@@ -271,9 +271,9 @@ int main() {
 		Player* p1 = new 
 			//TheFirst(2);
 			//Deepchad(3);
-			Hydra(2, 4);
+			Hydra(3, 4);
 			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		Player* p2 = new Deepchad(4);
+		Player* p2 = new Deepchad(3);
 
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);

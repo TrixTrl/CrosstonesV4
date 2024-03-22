@@ -429,7 +429,7 @@ void Utils::evaluatePositionsThread(bool isWhite, uint8_t(*pieces)[13][13], std:
 			boardCopy[((*moves)[j])[i].i][((*moves)[j])[i].j] ^= ((*moves)[j])[i].delta;
 		}
 
-		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::improvedPosEval, &debug) * (isWhite ? 1 : -1);
+		float posEval = alphaBeta(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), !isWhite, Utils::improvedPosEval, &debug) * (isWhite ? 1 : -1);
 		//float posEval = alphaBeta_wTable(&boardCopy, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), isWhite, Utils::improvedPosEval, ZobristHasher::zobristKey(&boardCopy, isWhite), &debug) * (isWhite ? 1 : -1);
 		evaluations[j] = posEval;
 
@@ -468,8 +468,8 @@ int Utils::getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth
 	bestMoves.emplace_back(0);
 	float bestEval = -99999;
 
-	float newBestThreshold = 0.1;
-	float bestMoveLeniency = 0.005;
+	float newBestThreshold = 0;
+	float bestMoveLeniency = 0;
 
 	for (int i = 1; i < evaluations.size(); i++) {	//skip the null move
 		float posEval = evaluations[i];
