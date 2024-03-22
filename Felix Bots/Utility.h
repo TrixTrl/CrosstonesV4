@@ -14,10 +14,17 @@
 
 namespace dc
 {
-	typedef std::vector<BasicGenerator::xMove> Move;
+	struct xMove {
+		int i;
+		int j;
+		uint8_t delta;
+		xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
+	};
+
+	typedef std::vector<xMove> Move;
 	typedef unsigned long long u64;
 
-	static struct Utility
+	struct Utility
 	{
 	public:
 
@@ -28,12 +35,12 @@ namespace dc
 		static class _init
 		{
 		public:
-			_init() { nullMove = std::vector<BasicGenerator::xMove>(); }
+			_init() { nullMove = std::vector<xMove>(); }
 		} _initializer;
 
 		static Move createNullMove() 
 		{
-			return std::vector<BasicGenerator::xMove>();
+			return std::vector<xMove>();
 		}
 
 		// The sign function
@@ -50,18 +57,21 @@ namespace dc
 			return abs(score) > immediateWinScore - maxMateDepth;
 		}
 
+		static bool isStartingBoard(uint8_t(*state)[13][13]);
+		static bool isLeftMove(Move& move);
+		static Move mirrorMoveLR(Move& move);
+
 		/* debug printing */
 		static void print(std::string s, bool newLine);
 		static void print(char* chars, bool newLine);
 		static void print(int s, bool newLine);
 		static void print(size_t s, bool newLine);
 		static void print(float s, bool newLine);
-		static void print(BasicGenerator::xMove, bool newLine);
+		static void print(xMove, bool newLine);
 
 		static bool sameMove(const Move& moveA, const Move& moveB);
 
-		static bool sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB);
-
+		static bool sameXMove(const xMove& moveA, const xMove& moveB);
 	};
 }
 

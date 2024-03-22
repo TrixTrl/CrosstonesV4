@@ -13,7 +13,7 @@ namespace dc
 
 		uint64_t zobristKey;
 		uint8_t square[13][13];
-		bool isWhiteTurn;
+		bool isWhiteTurn = false;
 		GameResult gameResult;
 
 		Board() : gameResult(GameResult::NotStarted) {}

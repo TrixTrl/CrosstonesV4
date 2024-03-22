@@ -6,10 +6,8 @@
 using namespace std;
 using namespace dc;
 
-void Searcher::startSearch(std::vector<Move>& _availableMoves)
+void Searcher::startSearch()
 {
-	availableMoves = _availableMoves;
-
 	// Initialize search
 	bestEvalThisIteration = negativeInfinity; 
 	bestEval = negativeInfinity;
@@ -18,6 +16,7 @@ void Searcher::startSearch(std::vector<Move>& _availableMoves)
 
 	// Initialize debug info
 	currentDepth = 0;
+	searchDiagnostics = SearchDiagnostics();
 	Utility::print("Starting DC search for ", false);
 	Utility::print(board.isWhiteTurn?"white":"black", true);
 	runIterativeDeepeningSearch();
@@ -61,6 +60,17 @@ void Searcher::runIterativeDeepeningSearch()
 					bestEval,
 					board.isWhiteTurn?"white":"black"),
 				true);
+			Utility::print(std::format(
+				"Found move at ordering {} / {}",
+				searchDiagnostics.bestMoveNumber,
+				searchDiagnostics.movesSize
+			), true);
+			Utility::print(std::format(
+				"Number of nodes visited: {} \nNumber of Cutoffs: {} \nNumber of Transposition Table hits: {}",
+				searchDiagnostics.numPositionsEvaluated,
+				searchDiagnostics.numCutOffs,
+				searchDiagnostics.numTranspositionHits
+			), true);
 			if (isWinScore(bestEval))
 			{
 				Utility::print(std::format("Mate in ply: {}", numPlyToWinFromScore(bestEval)), true);
@@ -69,6 +79,10 @@ void Searcher::runIterativeDeepeningSearch()
 			bestEvalThisIteration = negativeInfinity;
 			bestMoveThisIteration = Utility::createNullMove();
 
+			// Update diagnostics
+			searchDiagnostics.numCompletedIterations = searchDepth;
+			searchDiagnostics.move = board.moveToString(bestMove);
+			searchDiagnostics.eval = bestEval;
 			// Exit search if found a win within search depth.
 			// A win found outside of search depth (due to extensions) may not be the fastest win.
 			if (isWinScore(bestEval) && numPlyToWinFromScore(bestEval) <= searchDepth)
@@ -105,19 +119,21 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 			bestMoveThisIteration = transpositionTable.tryGetStoredMove();
 			bestEvalThisIteration = transpositionTable.tryGetEvalForMove();
 		}
+		searchDiagnostics.numTranspositionHits++;
 		return ttVal;
 	}
 
 	if (plyRemaining == 0 || board.gameResult != GameResult::InProgress)
 	{
+		searchDiagnostics.numPositionsEvaluated++;
 		int eval = evaluation.evaluate(board);
 		return eval;
 	}
 
-	shared_ptr<vector<vector<BasicGenerator::xMove>>> moves =
-		BasicGenerator::getMoves(board.isWhiteTurn, &(board.square));
+	unique_ptr<vector<vector<xMove>>> moves =
+		moveGenerator.getMoves(board.isWhiteTurn, &(board.square));
 	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
-	moveOrdering.orderMoves(*moves, prevBestMove);
+	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(prevBestMove, board, *moves);
 
 	//add passing move if there are no moves left
 	if (moves->size() == 0)
@@ -126,18 +142,20 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		//int winScore = immediateWinScore - plyFromRoot;
 		//return -winScore;
 		(*moves).push_back(Utility::createNullMove());
+		moveIndices.push_back(0);
 	}
 
 	int evaluationBound = TranspositionTable<1>::UpperBound;
 	Move* bestMoveInThisPosition = nullptr;
 
-	for (int i = 0; i < moves->size(); i++)
+	for (int moveNumber = 0; moveNumber < moves->size(); moveNumber++)
 	{
+		const int i = moveIndices[moveNumber];
 		Move* move = &(*moves)[i];
 
 		board.makeMove(moves->at(i));
 
-		int eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
+		const int eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
 
 		board.unmakeMove(moves->at(i));
 
@@ -148,6 +166,8 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 			// Store evaluation in transposition table. Note that since we're exiting the search early, there may be an
 			// even better move we haven't looked at yet, and so the current eval is a lower bound on the actual eval.
 			transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, beta, TranspositionTable<1>::LowerBound, *move);
+
+			searchDiagnostics.numCutOffs++;
 			return beta;
 		}
 
@@ -162,6 +182,8 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 			{
 				bestMoveThisIteration = *move;
 				bestEvalThisIteration = eval;
+				searchDiagnostics.bestMoveNumber = moveNumber;
+				searchDiagnostics.movesSize = moves->size();
 			}
 		}
 	}
@@ -177,7 +199,7 @@ std::pair<Move, int> Searcher::getSearchResult()
 }
 
 
-void Searcher::sortMoves(shared_ptr<vector<vector<BasicGenerator::xMove>>> moves)
+void Searcher::sortMoves(shared_ptr<vector<Move>> moves)
 {
 	//ideal would be in order:
 	// - merges onto addon
@@ -185,7 +207,7 @@ void Searcher::sortMoves(shared_ptr<vector<vector<BasicGenerator::xMove>>> moves
 	// - normal captures
 	// - moves with addOn
 	// - the rest
-	auto compareMoves = [](const vector<BasicGenerator::xMove>& i1, const vector<BasicGenerator::xMove>& i2) {
+	auto compareMoves = [](const Move& i1, const Move& i2) {
 		return i1.size() > i2.size();
 	};
 	sort(moves.get()->begin(), moves.get()->end(), compareMoves);

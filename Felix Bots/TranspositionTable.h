@@ -4,9 +4,7 @@
 #include <array>
 #include "../Test Bots/BasicGenerator.h"
 #include "Utility.h"
-#include "Searcher.h"
 
-typedef std::vector<BasicGenerator::xMove> Move;
 
 namespace dc
 {

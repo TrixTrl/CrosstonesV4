@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "Utility.h"
 #include "Zobrist.h"
+#include "MoveGenerator.h"
 
 using namespace dc;
 
@@ -187,13 +188,12 @@ void Board::appyMoveReversible(Move& move)
 
 u64 Board::bulk_perft(int depth /* >= 1 */)
 {
+
 	int n_moves, i;
 	u64 nodes = 0;
 
-	std::shared_ptr<std::vector<Move>> moves =
-		BasicGenerator::getMoves(isWhiteTurn, &square);
-	// remove the passing move
-	moves->erase(moves->begin());
+	std::unique_ptr<std::vector<Move>> moves =
+		MoveGenerator::getMovesStatic(isWhiteTurn, &square);
 
 	n_moves = moves->size();
 
@@ -229,12 +229,11 @@ std::string Board::moveToString(Move& move)
 
 			action += ((fieldAfter | fieldBefore) & Piece::Black)
 				? "B" : "W";
-
-			if ((fieldBefore ^ fieldAfter) & Piece::Red)
-				action += "_Red";
-			if ((fieldBefore ^ fieldAfter) & Piece::Blue)
-				action += "_Blue";
 		}
+		if ((fieldBefore ^ fieldAfter) & Piece::Red)
+			action += "_Red";
+		if ((fieldBefore ^ fieldAfter) & Piece::Blue)
+			action += "_Blue";
 
 		if (xMove.delta & Piece::setTurnPiece)
 			action += "_T";

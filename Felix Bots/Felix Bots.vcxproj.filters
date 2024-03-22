@@ -51,6 +51,9 @@
     <ClCompile Include="MoveOrdering.cpp">
       <Filter>Source Files\Core\Search</Filter>
     </ClCompile>
+    <ClCompile Include="MoveGenerator.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Deepchad.h">
@@ -80,5 +83,13 @@
     <ClInclude Include="MoveOrdering.h">
       <Filter>Header Files\Core\Search</Filter>
     </ClInclude>
+    <ClInclude Include="MoveGenerator.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="PosMap_Normal.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

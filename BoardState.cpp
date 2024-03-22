@@ -61,23 +61,23 @@ void BoardState::rst(std::bitset<3>& tps)
 	uint8_t turnPieceMask = 0b10111111;
 	uint8_t resetMask = 0b11000000;
 
-	pieces[0][0] = turnPieceMask & pieces[0][0] | (tps[0] * setTurnPiece);
+	//pieces[0][0] = turnPieceMask & pieces[0][0] | (tps[0] * setTurnPiece);
 	pieces[2][0] = turnPieceMask & pieces[2][0] | (tps[0] * setTurnPiece);
 	pieces[0][2] = turnPieceMask & pieces[0][2] | (tps[0] * setTurnPiece);
 	pieces[2][2] = turnPieceMask & pieces[2][2] | (tps[0] * setTurnPiece);
 
 	pieces[10][0] = turnPieceMask & pieces[10][0] | (tps[0] * setTurnPiece);
-	pieces[12][0] = turnPieceMask & pieces[12][0] | (tps[0] * setTurnPiece);
+	//pieces[12][0] = turnPieceMask & pieces[12][0] | (tps[0] * setTurnPiece);
 	pieces[10][2] = turnPieceMask & pieces[10][2] | (tps[0] * setTurnPiece);
 	pieces[12][2] = turnPieceMask & pieces[12][2] | (tps[0] * setTurnPiece);
 
-	pieces[0][12] = turnPieceMask & pieces[0][12] | (tps[0] * setTurnPiece);
+	//pieces[0][12] = turnPieceMask & pieces[0][12] | (tps[0] * setTurnPiece);
 	pieces[2][12] = turnPieceMask & pieces[2][12] | (tps[0] * setTurnPiece);
 	pieces[0][10] = turnPieceMask & pieces[0][10] | (tps[0] * setTurnPiece);
 	pieces[2][10] = turnPieceMask & pieces[2][10] | (tps[0] * setTurnPiece);
 
 	pieces[10][12] = turnPieceMask & pieces[10][12] | (tps[0] * setTurnPiece);
-	pieces[12][12] = turnPieceMask & pieces[12][12] | (tps[0] * setTurnPiece);
+	//pieces[12][12] = turnPieceMask & pieces[12][12] | (tps[0] * setTurnPiece);
 	pieces[10][10] = turnPieceMask & pieces[10][10] | (tps[0] * setTurnPiece);
 	pieces[12][10] = turnPieceMask & pieces[12][10] | (tps[0] * setTurnPiece);
 

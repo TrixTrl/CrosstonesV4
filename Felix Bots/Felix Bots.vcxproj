@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="MoveGenerator.cpp" />
     <ClCompile Include="MoveOrdering.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="DebugPrinting.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Board.h" />
     <ClInclude Include="GameResult.h" />
+    <ClInclude Include="MoveGenerator.h" />
     <ClInclude Include="MoveOrdering.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Deepchad.h" />
@@ -168,6 +170,9 @@
     <ClInclude Include="Searcher.h" />
     <ClInclude Include="TranspositionTable.h" />
     <ClInclude Include="Zobrist.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="PosMap_Normal.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

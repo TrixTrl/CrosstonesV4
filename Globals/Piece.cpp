@@ -72,6 +72,7 @@ bool Piece::isWhite(uint8_t piece) {
 	return (piece & colourMask) == White;
 }
 
+[[deprecated("Method does not provide the same functionality for white/black")]]
 bool Piece::isWhiteTower(uint8_t piece) {
 	return ((piece & colourMask) == White) && (height(piece) != 0);
 }

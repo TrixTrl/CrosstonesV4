@@ -15,16 +15,17 @@ using namespace std;
 void Deepchad::getMoveToPlay(uint8_t(*state)[13][13], bool isWhite, int endTime)
 {
 	board.initialize(state, isWhite);
-
-	shared_ptr<vector<Move>> moves =
-		BasicGenerator::getMoves(isWhite, &board.square);
 	
-	// remove the passing move
-	moves->erase(moves->begin());
-	
-	searcher.startSearch(*moves);
+	searcher.startSearch();
 
 	auto result = searcher.getSearchResult();
+
+	//Ensure first move of a game is left handed
+	if (isWhite && Utility::isStartingBoard(state) && !Utility::isLeftMove(result.first))
+	{
+		result.first = Utility::mirrorMoveLR(result.first);
+		Utility::print("Mirroring Move to the left.", true);
+	}
 
 	//if (result.first != Utility::nullMove)
 	Utility::applyXMove(state, result.first);
