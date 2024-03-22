@@ -21,6 +21,7 @@ GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player
 void GameMaster::play(HWND globalHwnd) {
 	bs.copyBoard(displayBoardPointer);
 	InvalidateRect(globalHwnd, NULL, NULL);
+	bs.gameRecord.emplace_back(bs.dumpPos() + " | ");
 
 	bool ended = false;
 	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
@@ -86,6 +87,7 @@ void GameMaster::play(HWND globalHwnd) {
 		print(bs.gameOver(isWhiteTurn) == BoardState::winValue::white ? "White" : "Black");
 		print(" has won\n");
 	}
+	bs.dumpGame();
 }
 
 void GameMaster::loadPos(std::string str)
