@@ -14,7 +14,7 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 {
 	//InvalidateRect(globalHwnd, NULL, NULL);
 
-	Deepchad deepchad = Deepchad();
+	Deepchad deepchad = Deepchad(1);
 	/*Player* p2 = new TestBotRnd();
 	std::bitset<3> gamemode(0b111);
 	GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
@@ -46,20 +46,48 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 	dc::Utility::print(std::format("Deepchad Time: {}\n", execTime), true);
 
 
+	std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> newMoveGenerator = 
+		[](uint8_t(*pieces)[13][13], bool isWhite)
+		{
+			std::vector<Move> moves;
+			dc::MoveGenerator::getMovesStatic(&moves, pieces, isWhite, false);
+			return moves;
+		};
+	std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> oldMoveGenerator =
+		[](uint8_t(*pieces)[13][13], bool isWhite)
+		{
+			std::shared_ptr<std::vector<Move>> moves = BasicGenerator::getMoves(isWhite, pieces);
+			return std::vector<Move>(moves->begin() + 1, moves->end());
+		};
+
+
+	// The first board should be a dragon start for consistent results
+	// Assuming no passing
+
 	const int perftDepth = 3;
 	dc::Utility::print(std::format("Executing Perft {}:", perftDepth), true);
-	// The first board should be a dragon start for consistent results
+
 	int nodes = 0;
 	auto perftTime = doTimed([&]()
 		{
-			nodes = boards[0].bulk_perft(perftDepth);
+			for (int i = 0; i < 10; i++)
+				nodes = boards[0].bulk_perft(perftDepth, newMoveGenerator);
 		});
 	dc::Utility::print(std::format(
-			"Perft Nodes: {}\nPerft Time: {}", 
+			"Perft Nodes: {}\nPerft Time: {} ms", 
 			nodes,
 			perftTime
 		), true);
+	/* 
+		BENCHMARK: Perft 4:
+		Perft Nodes: 315404724
+		Perft Time: 113650 ms
 
+		Perft 3 * 10: old
+		Perft Nodes: 2345176
+		Perft Time: 16436 ms
+		New Time: 9006 ms
+	*/
 	return true;
 }
 

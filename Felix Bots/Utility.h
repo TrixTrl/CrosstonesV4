@@ -14,14 +14,14 @@
 
 namespace dc
 {
-	struct xMove {
+	/*struct xMove {
 		int i;
 		int j;
 		uint8_t delta;
 		xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
-	};
+	};*/
 
-	typedef std::vector<xMove> Move;
+	typedef std::vector<BasicGenerator::xMove> Move;
 	typedef unsigned long long u64;
 
 	struct Utility
@@ -30,17 +30,9 @@ namespace dc
 
 		static const int immediateWinScore = 100000;
 
-		static Move nullMove;
-
-		static class _init
-		{
-		public:
-			_init() { nullMove = std::vector<xMove>(); }
-		} _initializer;
-
 		static Move createNullMove() 
 		{
-			return std::vector<xMove>();
+			return std::vector<BasicGenerator::xMove>();
 		}
 
 		// The sign function
@@ -67,11 +59,11 @@ namespace dc
 		static void print(int s, bool newLine);
 		static void print(size_t s, bool newLine);
 		static void print(float s, bool newLine);
-		static void print(xMove, bool newLine);
+		static void print(BasicGenerator::xMove, bool newLine);
 
 		static bool sameMove(const Move& moveA, const Move& moveB);
 
-		static bool sameXMove(const xMove& moveA, const xMove& moveB);
+		static bool sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB);
 	};
 }
 

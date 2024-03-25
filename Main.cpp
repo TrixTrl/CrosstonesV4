@@ -32,7 +32,7 @@
 
 #define KEYBOARDCONTROLL 1
 #define EXPLOREMOVEGENERATION 0
-#define EXPLORECHADMOVES 1
+#define EXPLORECHADMOVES 0
 #define EVALUATIONTESTING 0
 #define DEEPCHADTESTINGSUITE 0
 #define GAMEVIEWER 0
@@ -62,7 +62,7 @@ int main() {
 		//bs.loadPos("-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010"); //"unsolved" endgame
 		//bs.loadPos("b-10000 b-10012 rW30406 -W30512 -W10602 -W10603 -B10700 r-10704 -W30712 -B20806 -B10906 b-11200 b-11212 11110111111101111111");
 		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
-		bs.loadPos("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111"); //Seagull (black)
+		//bs.loadPos("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 b-10608 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111"); //Seagull (black)
 		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
 		bool isWhite = true;
 
@@ -106,8 +106,11 @@ int main() {
 		// Prepare chad move exploration
 		dc::Board chadBoard = dc::Board();
 		chadBoard.initialize(&displayBoard[0], isWhite);
-		std::unique_ptr<std::vector<dc::Move>> chadMoves = dc::MoveGenerator::getMovesStatic(isWhite, &displayBoard[0]);
-		std::vector<int> chadMoveIndices = MoveOrdering().makeMoveOrdering(Utility::createNullMove(), chadBoard, *chadMoves);
+
+		std::vector<dc::Move> chadMoves;
+		dc::Evaluation evaluator = dc::Evaluation();
+		dc::MoveGenerator::getMovesStatic(&chadMoves, &displayBoard[0], isWhite, true);
+		std::vector<int> chadMoveIndices = MoveOrdering(evaluator).makeMoveOrdering(Utility::createNullMove(), chadBoard, chadMoves, true);
 
 		//Cycle through moves with left and right arrow keys
 		//Up and down arrows incrent and decrement the counter by 10 respectively
@@ -116,16 +119,16 @@ int main() {
 		int i = 0;			//--------------------------------------------------------------
 		while (true) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
-			if (EXPLORECHADMOVES)
+			if (EXPLORECHADMOVES && chadMoves.size() > 0)
 			{
-				chadBoard.makeMove((*chadMoves)[chadMoveIndices[i % chadMoves->size()]]);
+				chadBoard.makeMove(chadMoves[chadMoveIndices[i % chadMoves.size()]]);
 				memcpy(&displayBoard[0], chadBoard.square, sizeof(displayBoard[0]));
-				chadBoard.unmakeMove((*chadMoves)[chadMoveIndices[i % chadMoves->size()]]);
+				chadBoard.unmakeMove(chadMoves[chadMoveIndices[i % chadMoves.size()]]);
 				Utils::print(std::format(
 						"\nShowing chad move at: {} / {}, ( trueIndex: {} )",
-						i % chadMoves->size(), 
-						chadMoves->size(),
-						chadMoveIndices[i % chadMoves->size()]
+						i % chadMoves.size(), 
+						chadMoves.size(),
+						chadMoveIndices[i % chadMoves.size()]
 					), false);
 			}
 			else
@@ -198,7 +201,7 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else if (GAMEVIEWER) {
-		std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 69 61 121 53 119 146 3 24 ";
+		std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 22 61 5 141 173 23 11 67 121 17 74 26 120 220 134 222 100 276 79 400 72 26 25 50 117 222 97 165 76 195 128 568 139 188 116 453 124 394 47 328 26 230";
 		BoardState bs;
 
 		size_t pos = gameCode.find("|");
@@ -268,12 +271,14 @@ int main() {
 		}
 	}
 	else {
+		Player* p2 = new 
+			//TheFirst(2);
+			Deepchad(3);
+			//Hydra(2, 4);
+			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
 		Player* p1 = new 
 			//TheFirst(2);
-			//Deepchad(3);
-			Hydra(3, 4);
-			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		Player* p2 = new Deepchad(3);
+			Deepchad(3);
 
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
@@ -281,7 +286,7 @@ int main() {
 		//gameMaster->loadPos("-W10006 -B11206 11010100001100111111");
 		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		//gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
-		//gameMaster->loadPos("b-10000 b-10012 -W30512 -B10600 rW30602 rW30607 -B30802 -W20811 b-11200 b-11212 11111110001101111111");
+		//gameMaster->loadPos("b-10000 b-10012 -W10302 -W30512 bB20602 rW40606 -B30610 -W30712 -B40804 b-11200 -W11207 -W11208 b-11212 11110110100101101111");
 		//std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);
 		gameMaster->play(globalHwnd);
 		//while(true) {}

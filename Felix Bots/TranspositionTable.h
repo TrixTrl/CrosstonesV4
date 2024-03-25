@@ -26,13 +26,8 @@ namespace dc
 			Entry() : key(0), value(0), depth(0), nodeType(0) {}
 
 			Entry(uint64_t _key, int _value, uint8_t _depth, uint8_t _nodeType, const Move& _move)
-				: key(_key), value(_value), depth(_depth), nodeType(_nodeType), move() 
-			{
-				for (auto& xMove : _move)
-				{
-					move.push_back(xMove);
-				}
-			}
+				: key(_key), value(_value), depth(_depth), nodeType(_nodeType), move(_move) 
+			{}
 		};
 
 	private:
@@ -127,8 +122,7 @@ namespace dc
 				return;
 			}
 			//if (depth >= entries[Index()].depth) {
-			Entry entry = Entry(board.zobristKey, correctMateScoreForStorage(eval, numPlySearched), (uint8_t)depth, (uint8_t)evalType, move);
-			entries[index()] = entry;
+			entries[index()] = Entry(board.zobristKey, correctMateScoreForStorage(eval, numPlySearched), (uint8_t)depth, (uint8_t)evalType, move);
 			//}
 		}
 

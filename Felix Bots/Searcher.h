@@ -41,14 +41,14 @@ namespace dc
 		};
 
 		// Constants
-		static const int immediateWinScore = 1000000;
-		static const int positiveInfinity = 99999999;
+		static const int immediateWinScore = 100000000;
+		static const int positiveInfinity = 999999999;
 		static const int negativeInfinity = -positiveInfinity;
 
 	private:
 		// References
 		Board& board;
-		TranspositionTable<5/*MB*/> transpositionTable;
+		TranspositionTable<100/*MB*/> transpositionTable;
 		Evaluation evaluation;
 		MoveOrdering moveOrdering;
 		MoveGenerator moveGenerator;
@@ -70,16 +70,11 @@ namespace dc
 
 	public:
 
-		Searcher(Board& _board, int _maxDepth) : board(_board), transpositionTable(_board), moveOrdering(), maxDepth(_maxDepth)
+		Searcher(Board& _board, int _maxDepth) : board(_board), transpositionTable(_board), moveOrdering(evaluation), maxDepth(_maxDepth)
 		{}
 
 		void startSearch();
-		void runIterativeDeepeningSearch();
-		int search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int beta);
-
 		std::pair<Move, int> getSearchResult();
-
-		void sortMoves(std::shared_ptr<std::vector<Move>> moves);
 
 		static bool isWinScore(int score)
 		{
@@ -90,5 +85,13 @@ namespace dc
 		{
 			return immediateWinScore - abs(score);
 		}
+
+	private:
+		void runIterativeDeepeningSearch();
+		int search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int beta);
+		int quiescenceSearch(int alpha, int beta);
+
+
+		void sortMoves(std::shared_ptr<std::vector<Move>> moves);
 	};
 }

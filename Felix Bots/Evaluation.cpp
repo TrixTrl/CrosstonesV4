@@ -10,11 +10,11 @@ const int Evaluation::positionMap[13][13] =
 {
 	1, 1, 2, 3, 2, 3, 4, 3, 2, 3, 2, 1, 1,
 	1, 0, 1, 0, 2, 0, 4, 0, 2, 0, 1, 0, 1,
-	2, 1, 3, 3, 2, 2, 6, 2, 2, 3, 3, 1, 2,
+	2, 1, 3, 3, 2, 2, 5, 2, 2, 3, 3, 1, 2,
 	2, 0, 2, 0, 4, 0, 3, 0, 4, 0, 2, 0, 1,
-	3, 3, 3, 3, 4, 4, 5, 4, 4, 3, 3, 3, 3,
+	3, 3, 3, 3, 5, 5, 5, 5, 5, 3, 3, 3, 3,
 	3, 0, 2, 0, 3, 0, 5, 0, 3, 0, 2, 0, 3,
-	3, 2, 4, 3, 4, 3, 5, 3, 4, 3, 4, 2, 3,
+	3, 2, 3, 3, 4, 3, 5, 3, 4, 3, 3, 2, 3,
 	3, 0, 2, 0, 3, 0, 5, 0, 3, 0, 2, 0, 3,
 	3, 3, 3, 3, 5, 4, 5, 4, 5, 3, 3, 3, 3,
 	2, 0, 2, 0, 3, 0, 3, 0, 3, 0, 2, 0, 1,
@@ -62,8 +62,8 @@ int Evaluation::evaluate(const Board& board)
 			uint8_t content = board.square[x][y];
 			if (Piece::isTower(content))
 			{
-				int blackWhiteIndex = Piece::isWhite(content);
-				int pieceColorFactor = 2 * blackWhiteIndex - 1; //1 for white, -1 for black
+				const int blackWhiteIndex = Piece::isWhite(content);
+				const int pieceColorFactor = 2 * blackWhiteIndex - 1; //1 for white, -1 for black
 
 				int pieceVal = (Piece::height(content)
 					+ (Piece::isBlue(content) ? 1 : 0)
@@ -77,13 +77,28 @@ int Evaluation::evaluate(const Board& board)
 		}
 	}
 	int relativeMatStrength = ((materialPoints[1] > materialPoints[0])
-			? (materialPoints[1] + 1) / (materialPoints[0] + 1)
-			: -(materialPoints[0] + 1) / (materialPoints[1] + 1));
+			? (materialPoints[1] + 1) * 100 / (materialPoints[0] + 1)
+			: -(materialPoints[0] + 1)  * 100 / (materialPoints[1] + 1));
 
-	for (int i = 0; i < relativeWeight; i++)
-		relativeMatStrength = relativeMatStrength * abs(relativeMatStrength); //make quadratic
-	
+	for (int i = 0; i < relativeExp; i++)
+		relativeMatStrength = relativeMatStrength * abs(relativeMatStrength) / 100; //make quadratic
+	relativeMatStrength = relativeMatStrength * relativeWeight / 100;
 
 	return (materialPoints[1] + positionalPoints[1] - materialPoints[0] - positionalPoints[0] + relativeMatStrength) * color;
 	//return rand() % 100;
+}
+
+int Evaluation::getEffectivePieceWorth(const Board& board, const uint8_t piece, const int x, const int y) const
+{
+	const int pieceVal = pieceValue[piece & 0b00011111];
+	const int blackWhiteIndex = Piece::isWhite(piece);
+	const int pieceColorFactor = 2 * blackWhiteIndex - 1;
+
+	const int positionVal = positionMap[(1 - blackWhiteIndex) * 12 + pieceColorFactor * y][x];
+
+	return (Piece::height(piece) 
+		+ Piece::isBlue(piece) 
+		+ 3 * Piece::isRed(piece) ) * materialWeight
+
+		+ pieceVal * positionVal * positionWeight;
 }

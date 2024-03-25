@@ -43,7 +43,7 @@ void Utility::print(size_t f, bool newLine = false) {
 	OutputDebugString(wideString);
 }
 
-void Utility::print(xMove f, bool newLine = false) {
+void Utility::print(BasicGenerator::xMove f, bool newLine = false) {
 	std::string str = std::to_string(f.i);
 	str += " | ";
 	str += std::to_string(f.j);

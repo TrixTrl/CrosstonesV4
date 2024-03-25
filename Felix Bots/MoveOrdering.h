@@ -2,6 +2,7 @@
 #include <vector>
 #include "Utility.h"
 #include "TranspositionTable.h"
+#include "Evaluation.h";
 
 namespace dc
 {
@@ -20,11 +21,13 @@ namespace dc
 		const int regularBias = 0;
 
 		//TranspositionTable<5>& transpositionTable;
+		Evaluation& evaluation;
 
 	public:
-		MoveOrdering(/*TranspositionTable<5>& tt) : transpositionTable(tt)*/)
+		MoveOrdering(Evaluation& _evaluation/*TranspositionTable<5>& tt) : transpositionTable(tt)*/)
+			: evaluation(_evaluation)
 		{
-			moveScores.reserve(700);
+			moveScores.reserve(1000);
 		}
 
 		std::vector<int> makeMoveOrdering(const Move& hashMove, const Board& board, const std::vector<Move>& moveList, bool debug = false);
