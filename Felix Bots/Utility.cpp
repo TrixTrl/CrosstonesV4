@@ -26,7 +26,7 @@ bool Utility::sameMove(const Move& moveA, const Move& moveB)
 	return true;
 }
 
-bool Utility::sameXMove(const xMove& moveA, const xMove& moveB)
+bool Utility::sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB)
 {
 	return moveA.i == moveB.i && moveA.j == moveB.j && moveA.delta == moveB.delta;
 }
@@ -55,7 +55,7 @@ bool Utility::isLeftMove(Move& move)
 }
 Move Utility::mirrorMoveLR(Move& move)
 {
-	Move newMove = std::vector<dc::xMove>();
+	Move newMove = std::vector<BasicGenerator::xMove>();
 	for (const auto& xMove : move)
 		newMove.emplace_back(12 - xMove.i, xMove.j, xMove.delta);
 	return newMove;

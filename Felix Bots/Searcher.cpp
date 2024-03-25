@@ -46,51 +46,51 @@ void Searcher::runIterativeDeepeningSearch()
 
 			debugInfo += "\nSearch aborted";
 			break;
-		}
-		else*/
+		}*/
+		
+		currentDepth = searchDepth;
+		bestMove = bestMoveThisIteration;
+		bestEval = bestEvalThisIteration;
+
+		Utility::print(std::format(
+				"\nIteration {} result: \n{} \nEval: {}\nPOV: {}", 
+				searchDepth,
+				board.moveToString(bestMove),
+				bestEval,
+				board.isWhiteTurn?"white":"black"),
+			true);
+		Utility::print(std::format(
+			"Found move at ordering {} / {}",
+			searchDiagnostics.bestMoveNumber,
+			searchDiagnostics.movesSize
+		), true);
+		Utility::print(std::format(
+			"Number of nodes visited: {} \nNumber of Cutoffs: {} \nNumber of Transposition Table hits: {}",
+			searchDiagnostics.numPositionsEvaluated,
+			searchDiagnostics.numCutOffs,
+			searchDiagnostics.numTranspositionHits
+		), true);
+
+		if (isWinScore(bestEval))
 		{
-			currentDepth = searchDepth;
-			bestMove = bestMoveThisIteration;
-			bestEval = bestEvalThisIteration;
-
-			Utility::print(std::format(
-					"\nIteration {} result: \n{} \nEval: {}\nPOV: {}", 
-					searchDepth,
-					board.moveToString(bestMove),
-					bestEval,
-					board.isWhiteTurn?"white":"black"),
-				true);
-			Utility::print(std::format(
-				"Found move at ordering {} / {}",
-				searchDiagnostics.bestMoveNumber,
-				searchDiagnostics.movesSize
-			), true);
-			Utility::print(std::format(
-				"Number of nodes visited: {} \nNumber of Cutoffs: {} \nNumber of Transposition Table hits: {}",
-				searchDiagnostics.numPositionsEvaluated,
-				searchDiagnostics.numCutOffs,
-				searchDiagnostics.numTranspositionHits
-			), true);
-			if (isWinScore(bestEval))
-			{
-				Utility::print(std::format("Mate in ply: {}", numPlyToWinFromScore(bestEval)), true);
-			}
-
-			bestEvalThisIteration = negativeInfinity;
-			bestMoveThisIteration = Utility::createNullMove();
-
-			// Update diagnostics
-			searchDiagnostics.numCompletedIterations = searchDepth;
-			searchDiagnostics.move = board.moveToString(bestMove);
-			searchDiagnostics.eval = bestEval;
-			// Exit search if found a win within search depth.
-			// A win found outside of search depth (due to extensions) may not be the fastest win.
-			if (isWinScore(bestEval) && numPlyToWinFromScore(bestEval) <= searchDepth)
-			{
-				Utility::print("Exiting search due to mate found within search depth", true);
-				break;
-			}
+			Utility::print(std::format("Mate in ply: {}", numPlyToWinFromScore(bestEval)), true);
 		}
+
+		bestEvalThisIteration = negativeInfinity;
+		bestMoveThisIteration = Utility::createNullMove();
+
+		// Update diagnostics
+		searchDiagnostics.numCompletedIterations = searchDepth;
+		searchDiagnostics.move = board.moveToString(bestMove);
+		searchDiagnostics.eval = bestEval;
+		// Exit search if found a win within search depth.
+		// A win found outside of search depth (due to extensions) may not be the fastest win.
+		if (isWinScore(bestEval) && numPlyToWinFromScore(bestEval) <= searchDepth)
+		{
+			Utility::print("Exiting search due to mate found within search depth.", true);
+			break;
+		}
+		
 	}
 }
 
@@ -126,38 +126,39 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	if (plyRemaining == 0 || board.gameResult != GameResult::InProgress)
 	{
 		searchDiagnostics.numPositionsEvaluated++;
-		int eval = evaluation.evaluate(board);
+		int eval = quiescenceSearch(alpha, beta);
+			//evaluation.evaluate(board);
 		return eval;
 	}
 
-	unique_ptr<vector<vector<xMove>>> moves =
-		moveGenerator.getMoves(board.isWhiteTurn, &(board.square));
+	std::vector<Move> moves = std::vector<Move>();
+	moveGenerator.getMoves(&moves, &(board.square), board.isWhiteTurn);
+
 	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
-	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(prevBestMove, board, *moves);
+	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(prevBestMove, board, moves);
 
 	//add passing move if there are no moves left
-	if (moves->size() == 0)
+	if (moves.size() == 0)
 	{
 		/*if (Utility::isWon()){}*/
 		//int winScore = immediateWinScore - plyFromRoot;
 		//return -winScore;
-		(*moves).push_back(Utility::createNullMove());
+		moves.emplace_back(Utility::createNullMove());
 		moveIndices.push_back(0);
 	}
 
 	int evaluationBound = TranspositionTable<1>::UpperBound;
 	Move* bestMoveInThisPosition = nullptr;
 
-	for (int moveNumber = 0; moveNumber < moves->size(); moveNumber++)
+	for (int moveNumber = 0; moveNumber < moves.size(); moveNumber++)
 	{
 		const int i = moveIndices[moveNumber];
-		Move* move = &(*moves)[i];
 
-		board.makeMove(moves->at(i));
+		board.makeMove(moves[i]);
 
 		const int eval = -search(plyRemaining - 1, plyFromRoot + 1, -beta, -alpha);
 
-		board.unmakeMove(moves->at(i));
+		board.unmakeMove(moves[i]);
 
 		// Move was *too* good, opponent will choose a different move earlier on to avoid this position.
 		// (Beta-cutoff / Fail high)
@@ -165,30 +166,77 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		{
 			// Store evaluation in transposition table. Note that since we're exiting the search early, there may be an
 			// even better move we haven't looked at yet, and so the current eval is a lower bound on the actual eval.
-			transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, beta, TranspositionTable<1>::LowerBound, *move);
+			transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, beta, TranspositionTable<1>::LowerBound, moves[i]);
 
 			searchDiagnostics.numCutOffs++;
 			return beta;
 		}
 
 		// Found a new best move in this position
-		if (eval > alpha ) //(eval == alpha && plyFromRoot == 0 && (rand() % 100 == 9)))
+		if (eval > alpha )//|| (eval == alpha && plyFromRoot == 0 && (rand() % 10 == 1)))
 		{
 			evaluationBound = TranspositionTable<1>::Exact;
-			bestMoveInThisPosition = move;
+			bestMoveInThisPosition = &moves[i];
 
 			alpha = eval;
 			if (plyFromRoot == 0)
 			{
-				bestMoveThisIteration = *move;
+				bestMoveThisIteration = moves[i];
 				bestEvalThisIteration = eval;
 				searchDiagnostics.bestMoveNumber = moveNumber;
-				searchDiagnostics.movesSize = moves->size();
+				searchDiagnostics.movesSize = moves.size();
 			}
 		}
 	}
 	if (bestMoveInThisPosition != nullptr)
 		transpositionTable.storeEvaluation(plyRemaining, plyFromRoot, alpha, evaluationBound, *bestMoveInThisPosition);
+
+	return alpha;
+}
+
+// Search capture moves until a 'quiet' position is reached.
+int Searcher::quiescenceSearch(int alpha, int beta)
+{
+	// A player isn't forced to make a capture (typically), so see what the evaluation is without capturing anything.
+	int eval = evaluation.evaluate(board);
+	searchDiagnostics.numPositionsEvaluated++;
+	if (eval >= beta)
+	{
+		searchDiagnostics.numCutOffs++;
+		return beta;
+	}
+	if (eval > alpha)
+	{
+		alpha = eval;
+	}
+	if (board.gameResult != GameResult::InProgress)
+	{
+		return alpha;
+	}
+
+	std::vector<Move> moves;
+	moveGenerator.getMoves(&moves, &(board.square), board.isWhiteTurn, true);
+	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(Utility::createNullMove(), board, moves);
+
+	for (int moveNumber = 0; moveNumber < moves.size(); moveNumber++)
+	{
+		const int i = moveIndices[moveNumber];
+		Move* move = &(moves[i]);
+
+		board.makeMove(*move);
+		eval = -quiescenceSearch(-beta, -alpha);
+		board.unmakeMove(*move);
+
+		if (eval >= beta)
+		{
+			searchDiagnostics.numCutOffs++;
+			return beta;
+		}
+		if (eval > alpha)
+		{
+			alpha = eval;
+		}
+	}
 
 	return alpha;
 }

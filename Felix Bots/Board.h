@@ -27,7 +27,7 @@ namespace dc
 		std::string moveToString(Move& move);
 		
 		/* Testing */
-		u64 bulk_perft(int depth);/* >= 1 */
+		u64 bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves);
 	
 	private:
 

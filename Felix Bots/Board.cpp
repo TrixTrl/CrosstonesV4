@@ -12,6 +12,7 @@ void Board::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
 
 	gameResult = GameResult::InProgress;
 	zobristKey = Zobrist::calculateZobristKey(*this);
+	updateWinValue();
 }
 
 void Board::updateWinValue()
@@ -186,24 +187,24 @@ void Board::appyMoveReversible(Move& move)
 }
 
 
-u64 Board::bulk_perft(int depth /* >= 1 */)
+u64 Board::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves)
 {
 
 	int n_moves, i;
 	u64 nodes = 0;
 
-	std::unique_ptr<std::vector<Move>> moves =
-		MoveGenerator::getMovesStatic(isWhiteTurn, &square);
+	std::vector<Move> moves = getMoves(&square, isWhiteTurn);
+	//MoveGenerator::getMovesStatic(&moves, &square, isWhiteTurn);
 
-	n_moves = moves->size();
+	n_moves = moves.size();
 
 	if (depth == 1)
 		return (u64)n_moves;
 
 	for (i = 0; i < n_moves; i++) {
-		makeMove(moves->at(i));
-		nodes += bulk_perft(depth - 1);
-		unmakeMove(moves->at(i));
+		makeMove(moves[i]);
+		nodes += bulk_perft(depth - 1, getMoves);
+		unmakeMove(moves[i]);
 	}
 	return nodes;
 }

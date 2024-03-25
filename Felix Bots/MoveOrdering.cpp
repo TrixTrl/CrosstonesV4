@@ -25,42 +25,56 @@ std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const Boar
 			continue;
 		}
 		int score = 0;
-		const xMove startXMove = move[0];
+		const BasicGenerator::xMove startXMove = move[0];
 
 		if (move.size() >= 2)
 		{
-			const xMove endXMove = move[1];
+			const BasicGenerator::xMove endXMove = move[1];
 			const uint8_t startPiece = Piece::tower(board.square[startXMove.i][startXMove.j]);
 			const uint8_t endPiece = Piece::tower(board.square[endXMove.i][endXMove.j]);
-			bool isCapture = false;
+			
 			//check if it is a capture
+			bool isCapture = false;
 			for (int visitedIdx = 2; visitedIdx < move.size(); visitedIdx++)
 			{
-				const xMove curXMove = move[visitedIdx];
+				const BasicGenerator::xMove curXMove = move[visitedIdx];
 				const uint8_t curPiece = Piece::tower(board.square[visitedIdx][visitedIdx]);
 				if (Piece::isTower(curPiece))
 				{
 					//check for capture
 					if (Piece::isWhite(curPiece) != board.isWhiteTurn)
 					{
-						score += normalCaptureBias + Evaluation::pieceValue[curPiece & 0b00011111];
+						score += evaluation.getEffectivePieceWorth(board, curPiece, curXMove.i, curXMove.j);
 						isCapture = true;
 					}
 				}
 			}
+			score += normalCaptureBias * isCapture;
+
 			//check for claim
 			if (Piece::isAddOn(endPiece))
 			{
 				score += (Piece::isBlue(endPiece) ? blueClaimBias : redClaimBias);
 			}
+			for (int visitedIdx = 0; visitedIdx < move.size(); visitedIdx++)
+			{
+				const BasicGenerator::xMove curXMove = move[visitedIdx];
+				const uint8_t pieceBefore = board.square[visitedIdx][visitedIdx];
+				const uint8_t pieceAfter = pieceBefore ^ curXMove.delta;
+				int scoreBefore = evaluation.getEffectivePieceWorth(board, pieceBefore, curXMove.i, curXMove.j);
+				int scoreAfter = evaluation.getEffectivePieceWorth(board, pieceAfter, curXMove.i, curXMove.j);
+				score += scoreAfter - scoreBefore;
+			}
+			/*
 			if (!isCapture)
 			{
 				score += Evaluation::pieceValue[startPiece & 0b00011111];
 			}
 			
-			int toScore = Evaluation::positionMap[(1 - Piece::isWhite(startPiece)) * 12 + (2 * Piece::isWhite(startPiece) - 1) * endXMove.j][endXMove.i];
-			int fromScore = Evaluation::positionMap[(1 - Piece::isWhite(startPiece)) * 12 + (2 * Piece::isWhite(startPiece) - 1) * startXMove.j][startXMove.i];
+			int toScore = evaluation.getEffectivePieceWorth(board, startPiece, endXMove.i, endXMove.j);
+			int fromScore = evaluation.getEffectivePieceWorth(board, startPiece, startXMove.i, startXMove.j);
 			score += toScore - fromScore;
+			*/
 		}
 		moveScores[i] = score;
 		
