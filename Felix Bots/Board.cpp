@@ -12,6 +12,7 @@ void Board::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
 
 	gameResult = GameResult::InProgress;
 	zobristKey = Zobrist::calculateZobristKey(*this);
+	updateWinValue();
 }
 
 void Board::updateWinValue()
