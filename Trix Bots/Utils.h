@@ -62,6 +62,7 @@ public:
 
 	static float basicPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
 	static float improvedPosEval(bool isWhite, uint8_t(*pieces)[13][13]);
+	static float felixEvalWrapper(bool isWhite, uint8_t(*pieces)[13][13]);
 
 	static int getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13], int depth);
 	static int trivialBestMove(bool isWhite, uint8_t(*pieces)[13][13]);

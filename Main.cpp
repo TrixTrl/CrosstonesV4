@@ -58,13 +58,14 @@ int main() {
 		std::bitset<3> set(5);
 		bs.rst(set);
 
-		bs.loadPos("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111"); //Dragon start
+		//bs.loadPos("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111"); //Dragon start
 		//bs.loadPos("-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 bW20212 r-10412 -W10512 -W20712 11110111110111111010"); //"unsolved" endgame
 		//bs.loadPos("b-10000 b-10012 rW30406 -W30512 -W10602 -W10603 -B10700 r-10704 -W30712 -B20806 -B10906 b-11200 b-11212 11110111111101111111");
 		//bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
-		bs.loadPos("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111"); //Seagull (black)
+		//bs.loadPos("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111"); //Seagull (black)
 		//bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
-		bool isWhite = true;
+		bs.loadPos("b-10000 rB20006 b-10012 -B30300 -B20404 -W20408 -W30512 -W20602 bW20605 -B30804 -W10805 -W30912 b-11200 rB21206 b-11212 11111111111111111111");
+		bool isWhite = false;
 
 		//bs.loadPos("-B10800 -W10803 -W10602 00000000000000000000");
 		//bs.loadPos("-B10500 -B10600 -B10700 -B10501 -B10601 -B10701 -B10502 -B10602 -B10702 -B10503 -B10603 -B10703 -W10509 -W10609 -W10709 -W10510 -W10610 -W10710 -W10511 -W10611 -W10711 -W10512 -W10612 -W10712 00000000000000000000");
@@ -85,6 +86,9 @@ int main() {
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		LPCWSTR wideString = temp.c_str();
 		OutputDebugString(wideString);
+
+
+		
 
 		//Timing testing code
 
@@ -198,7 +202,10 @@ int main() {
 		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
 	}
 	else if (GAMEVIEWER) {
-		std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 69 61 121 53 119 146 3 24 ";
+		//std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 41 63 93 69 104 223 100 90 126 19 92 43 120 115 175 23 102 26 169 41 177 117 144 134 115 180 97 93 66 209 ";
+		/*2 Hydras with Felix eval*/	//std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 29 132 75 63 186 255 32 290 38 276 37 128 67 222 129 266 103 23 192 166 120 154 149 194 143 150 ";
+		/*Hydra w/ dc eval depth 3 vs Deepchad depth 5*/	//std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 95 61 247 156 69 53 19 62 28 21 245 51 208 52 298 29 181 109 84 340 54 44 85 223 139 71 47 2 1 28 0 263 0 ";
+		/*2 Hydras with fixed Felix eval*/		std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 29 132 216 61 259 52 247 27 84 74 10 112 336 138 60 110 53 79 30 78 455 16 424 274 216 140 144 181 215 186 175 99 22 56 88 105 9 129 143 58 145 242 1 68 184 145 53 165 17 91 13 72 118 1 91 1 125 3 129 3 75 32 75 49 ";
 		BoardState bs;
 
 		size_t pos = gameCode.find("|");
@@ -242,6 +249,7 @@ int main() {
 				bs.copyBoard(&(displayBoard[0]));
 				InvalidateRect(globalHwnd, NULL, NULL);
 				currentMove++;
+				Utils::print(bs.dumpPos(), true);
 			}
 			else if (switchMove == -1) {
 				switchMove = 0;
@@ -250,6 +258,7 @@ int main() {
 				bs.copyBoard(&(displayBoard[0]));
 				InvalidateRect(globalHwnd, NULL, NULL);
 				currentMove--;
+				Utils::print(bs.dumpPos(), true);
 			}
 			else if (switchMove == -99999) {
 				switchMove = 0;
@@ -259,6 +268,7 @@ int main() {
 				}
 				bs.copyBoard(&(displayBoard[0]));
 				InvalidateRect(globalHwnd, NULL, NULL);
+				Utils::print(bs.dumpPos(), true);
 			}
 			else {
 				switchMove = 0;
@@ -271,13 +281,15 @@ int main() {
 		Player* p1 = new 
 			//TheFirst(2);
 			//Deepchad(3);
-			Hydra(3, 4);
+			Hydra(3, 14);
 			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		Player* p2 = new Deepchad(3);
+		Player* p2 = new Hydra(3, 14);
 
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
 		
+		//gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");
+		//gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW50607 bB50610 -W30712 rW20808 b-11200 b-11212 11111111100111111111");
 		//gameMaster->loadPos("-W10006 -B11206 11010100001100111111");
 		//gameMaster.loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		//gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");

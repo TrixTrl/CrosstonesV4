@@ -534,6 +534,9 @@ int BoardState::makeMove(uint8_t(*newState)[13][13], bool isWhiteTurn)
 			forceDebugPrint("\n");
 
 			gameRecord.emplace_back(std::to_string(i) + " ");
+
+			dumpGame();
+
 			return i == 0 ? 0 : 1;
 		}
 	}

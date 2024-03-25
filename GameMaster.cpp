@@ -42,7 +42,10 @@ void GameMaster::play(HWND globalHwnd) {
 			print("Caught exception: ");
 			print(e.what());
 		}
-
+		print("\n");
+		print("Time taken: ");
+		print(std::to_string((Time::millis() - timeEnd) + timeControl));
+		print("\n");
 		if (timeEnforcement[isWhiteTurn ? 0 : 1] && timeEnd < Time::millis()) {
 			ended = true;
 			print("\n");

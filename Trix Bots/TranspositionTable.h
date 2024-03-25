@@ -26,7 +26,7 @@ public:
 		float value;
 		int best;
 	};
-	static const int sizeMB = 5;
+	static const int sizeMB = 200;
 	static const uint64_t count = (uint64_t)((sizeMB * 1024 * 1024) / sizeof(Entry));
 	static std::array<Entry, count> table_alwaysReplace;
 	static std::array<Entry, count> table_maximizeDepth;
