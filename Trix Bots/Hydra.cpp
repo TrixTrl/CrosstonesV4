@@ -9,7 +9,8 @@
 
 void Hydra::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
 {
-	int bestMove = Utils::getBestMoveThreaded(isWhite, board, depth, threadCount);
+	Utils::TrixSearcher searcher(board, isWhite, Utils::felixEvalWrapper, threadCount);
+	int bestMove = searcher.fullSearch(depth);//Utils::getBestMoveThreaded(isWhite, board, depth, threadCount);
 	std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
 	moves = BasicGenerator::getMoves(isWhite, board);
 	for (int i = 0; i < ((*moves)[bestMove]).size(); i++) {

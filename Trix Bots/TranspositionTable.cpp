@@ -10,7 +10,7 @@ bool ZobristHasher::initialized = false;
 void ZobristHasher::fillValues()
 {
 	if (initialized) return;
-	std::mt19937_64 rnd;
+	std::mt19937_64 rnd(0);
 	for (int i = 0; i < 169; i++) {
 		for (int j = 0; j < 0b111111; j++) {
 			if (j == 0) { piecesData[i][j] = 0; continue; }
@@ -32,8 +32,8 @@ uint64_t ZobristHasher::zobristKey(uint8_t(*board)[13][13], bool isWhite)
 	for (int i = 0; i < 13; i++) {
 		for (int j = 0; j < 13; j++) {
 			output ^= piecesData[13 * i + j][(*board)[i][j] & 0b111111];
-			if (Piece::turnPieceIndices[13 * i + j] == 0) continue;
-			output ^= (((*board)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * i + j] - 1] : 0;
+			if (Piece::turnPieceIndices[13 * j + i] == 0) continue;
+			output ^= (((*board)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * j + i] - 1] : 0;
 		}
 	}
 	return output;
@@ -45,10 +45,10 @@ uint64_t ZobristHasher::zobristKey(uint8_t(*board)[13][13], uint8_t(*changedBoar
 		int i = (*move)[I].i;
 		int j = (*move)[I].j;
 		hash ^= piecesData[13 * i + j][(*board)[i][j] & 0b111111];
-		if (Piece::turnPieceIndices[13 * i + j] != 0) hash ^= (((*board)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * i + j] - 1] : 0;
+		if (Piece::turnPieceIndices[13 * j + i] != 0) hash ^= (((*board)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * j + i] - 1] : 0;
 
 		hash ^= piecesData[13 * i + j][(*changedBoard)[i][j] & 0b111111];
-		if (Piece::turnPieceIndices[13 * i + j] != 0) hash ^= (((*changedBoard)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * i + j] - 1] : 0;
+		if (Piece::turnPieceIndices[13 * j + i] != 0) hash ^= (((*changedBoard)[i][j]) & 0b01000000) ? turnPiecesData[Piece::turnPieceIndices[13 * j + i] - 1] : 0;
 	}
 	hash ^= isWhiteData;
 	return hash;

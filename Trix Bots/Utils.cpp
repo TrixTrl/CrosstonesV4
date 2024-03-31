@@ -1,4 +1,4 @@
-#include <cmath>
+﻿#include <cmath>
 #include <memory>
 #include <vector>
 #include <string>
@@ -16,7 +16,8 @@
 #include "../Felix Bots/Evaluation.h"
 #include "../Felix Bots/Board.h"
 
-#define MAXEVAL 9999
+
+#define MAXEVAL 99999
 #define BITSETINDEX (i+(j*13))
 
 void Utils::print(std::string str, bool newLine) {
@@ -312,8 +313,8 @@ float Utils::improvedPosEval(bool isWhite, uint8_t(*pieces)[13][13])
 {
 	extraBoardData data = generateMetadata(pieces);
 	winValue win = gameOver(isWhite, data);
-	if (win == winValue::black) return -9999;
-	if (win == winValue::white) return 9999;
+	if (win == winValue::black) return -MAXEVAL;
+	if (win == winValue::white) return MAXEVAL;
 
 	float eval = 0;
 	for (int i = 0; i < 13; i++) {
@@ -337,7 +338,7 @@ float Utils::felixEvalWrapper(bool isWhite, uint8_t(*pieces)[13][13])
 	board.initialize(pieces, isWhite);
 	board.updateWinValue();
 	dc::Evaluation evaluator;
-	return float(evaluator.evaluate(board))/(isWhite?100:-100);
+	return float(evaluator.evaluate(board)) / (isWhite ? -100 : -100);
 }
 
 int Utils::getBestMoveBasic(bool isWhite, uint8_t(*pieces)[13][13], int depth)
@@ -519,8 +520,8 @@ int Utils::getBestMoveThreaded(bool isWhite, uint8_t(*pieces)[13][13], int depth
 			boardCopy[((*moves)[bestMoves[j]])[i].i][((*moves)[bestMoves[j]])[i].j] ^= ((*moves)[bestMoves[j]])[i].delta;
 		}
 
-		float eval = improvedPosEval(isWhite, &boardCopy)*isWhite?1:-1;
-		
+		float eval = improvedPosEval(isWhite, &boardCopy) * isWhite ? 1 : -1;
+
 		print(bestMoves[j]);
 		print(": ");
 		print(eval, true);
@@ -961,4 +962,245 @@ float Utils::alphaBeta_wTable(uint8_t(*pieces)[13][13], int depth, float alpha, 
 		TranspositionTable::recordHash(zobristKey, depth, hashfBETA, value, -1);
 		return value;
 	}
+}
+
+
+
+void Utils::TrixSearcher::getOrder(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*pieces)[13][13], std::vector<int>* order, int tableValue, bool isWhite, debugContainer* debug)
+{
+	//add stored best value from table
+	if (tableValue != -1) {
+		if (tableValue >= moves->size()) {
+			if (debug != nullptr) debug->caughtHashErrors++;
+		}
+		else {
+			if (debug != nullptr) debug->bestMoveFromTable++;
+			order->emplace_back(tableValue);
+		}
+	}
+
+	//initialize all remaining indices
+	std::vector<int> indices;
+	for (int i = 1; i < moves->size(); i++) {	//CHANGE THIS TO CHECK PASSING
+		if (i == tableValue) continue;
+		indices.emplace_back(i);
+	}
+
+	//add captures
+	for (int i = indices.size() - 1; i << indices.size() > -1; i--) {
+		bool isCapture = false;
+		for (int j = 0; j < (*moves)[indices[i]].size() && !isCapture; j++) {
+			isCapture = Piece::isTower((*pieces)[(*moves)[indices[i]][j].i][(*moves)[indices[i]][j].j]) && (Piece::isWhiteTower((*pieces)[(*moves)[indices[i]][j].i][(*moves)[indices[i]][j].j]) != isWhite);
+		}
+		if (!isCapture) continue;
+		order->emplace_back(indices[i]);
+		indices.erase(indices.begin() + i);
+	}
+
+	//add all remaining moves
+	for (int i = 0; i < indices.size(); i++) {
+		order->emplace_back(indices[i]);
+	}
+}
+
+void Utils::TrixSearcher::searchThread(int depth, debugContainer& debug)
+{
+	int I = nextMove++;
+
+	while (I < currentMoves->size()) {
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, startingPos, sizeof(boardCopy));
+
+		for (int i = 0; i < ((*currentMoves)[I]).size(); i++) {
+			boardCopy[((*currentMoves)[I])[i].i][((*currentMoves)[I])[i].j] ^= ((*currentMoves)[I])[i].delta;
+		}
+
+		//STILL WRONG, WE NEED TO KEEP TRACK OF PASSING HAPPENING IN THE GAME
+		float posEval = negamax_wTable(&boardCopy, false, false, depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), !isWhitePlayer, ZobristHasher::zobristKey(&boardCopy, !isWhitePlayer), &debug);
+		evaluations[I] = posEval;
+
+		I = nextMove++;
+	}
+}
+
+int Utils::TrixSearcher::fullSearch(int depth)
+{
+	debugContainer debug;
+
+	//std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves;
+	currentMoves = BasicGenerator::getMoves(isWhitePlayer, startingPos);
+
+	for (int currentDepth = 0; currentDepth <= depth; currentDepth++) {
+		std::vector<std::thread> threads = std::vector<std::thread>();
+		evaluations.clear();
+		for (int i = 0; i < currentMoves->size(); i++) evaluations.emplace_back(0);
+		nextMove = 0;
+
+		for (int i = 0; i < threadCount; i++) {
+			threads.emplace_back(std::thread(&Utils::TrixSearcher::searchThread, this, currentDepth, std::ref(debug)));
+		}
+		for (int i = 0; i < threadCount; i++) {
+			threads[i].join();
+		}
+		//searchThread(currentDepth, &debug);
+
+		print("\ngetBestMoveFullSearch: ", true);
+		print("Playing as ");
+		print((isWhitePlayer ? "White" : "Black"), true);
+		print("Nodes searched: ", debug.n, true);
+		print("Table hits (exact): ", debug.exact, true);
+		print("Table hits (alpha): ", debug.alpha, true);
+		print("Table hits (beta): ", debug.beta, true);
+		print("Alpha cutoffs: ", debug.alphaCutoff, true);
+		print("Best moves from table: ", debug.bestMoveFromTable, true);
+		print("Correct best moves from table: ", debug.trueBestMoveFromTable, true);
+		print("Hash collision errors caught: ", debug.caughtHashErrors, true);
+	}
+
+	std::vector<int> bestMoves;
+	bestMoves.emplace_back(0);
+	float bestEval = -99999;
+
+	float newBestThreshold = 0;
+	float bestMoveLeniency = 0;
+
+	for (int i = 1; i < evaluations.size(); i++) {	//skip the null move TO BE CHANGED
+		float posEval = evaluations[i];
+		if (posEval > (bestEval + newBestThreshold)) {
+			bestMoves.clear();
+			bestMoves.emplace_back(i);
+			bestEval = posEval;
+		}
+		else if (posEval >= bestEval - bestMoveLeniency) {
+			bestMoves.emplace_back(i);
+		}
+	}
+
+	print("\ngetBestMoveFullSearch: ", true);
+	print("Playing as ");
+	print((isWhitePlayer ? "White" : "Black"), true);
+	print("Nodes searched: ", debug.n, true);
+	print("Table hits (exact): ", debug.exact, true);
+	print("Table hits (alpha): ", debug.alpha, true);
+	print("Table hits (beta): ", debug.beta, true);
+	print("Alpha cutoffs: ", debug.alphaCutoff, true);
+	print("Best moves from table: ", debug.bestMoveFromTable, true);
+	print("Correct best moves from table: ", debug.trueBestMoveFromTable, true);
+	print("Hash collision errors caught: ", debug.caughtHashErrors, true);
+	print("Best eval: ", bestEval, true);
+	print("Number of equivilant best moves: ", bestMoves.size(), true);
+
+	return bestMoves[std::rand() % bestMoves.size()];
+}
+
+float Utils::TrixSearcher::negamax_wTable(uint8_t(*pieces)[13][13], bool selfPassed, bool opponentPassed, int depth, float alpha, float beta, bool isWhite, uint64_t zobristKey, debugContainer* debug)
+{
+	if (debug != nullptr) debug->n++;
+	if (debug != nullptr) debug->depthCounts[depth]++;
+
+	//if (ZobristHasher::zobristKey(pieces, isWhite) != zobristKey) print("shit fuck ");
+
+	float alphaOrigin = alpha;
+
+	TranspositionTable::Entry entry = TranspositionTable::probeHash(zobristKey);
+	if (entry.key == zobristKey && entry.depth >= depth) {
+		if (entry.flags == hashfEXACT) {
+			if (debug != nullptr) debug->exact++;
+			return entry.value;
+		}
+		if (entry.flags == hashfALPHA) {
+			alpha = max(alpha, entry.value);
+			if (debug != nullptr) debug->alpha++;
+		}
+		if (entry.flags == hashfBETA) {
+			beta = min(beta, entry.value);
+			if (debug != nullptr) debug->beta++;
+		}
+
+		if (alpha >= beta) return entry.value;
+	}
+
+	if (depth == 0) {
+		float eval = evalFunc(isWhite, pieces);
+		TranspositionTable::recordHash(zobristKey, depth, hashfEXACT, eval, -1);
+		return eval;
+	}
+
+	extraBoardData data = generateMetadata(pieces);
+	if (Utils::gameOver(isWhite, data) != winValue::none) {
+		float eval = evalFunc(isWhite, pieces);
+		TranspositionTable::recordHash(zobristKey, depth, hashfEXACT, eval, -1);
+		return eval;
+	}
+
+	std::shared_ptr<std::vector<std::vector<Utils::xMove>>> moves;
+	moves = Utils::getMoves_halfSplit_noPush(isWhite, pieces);
+
+	/*if (zobristKey == 15767243409454211754) {
+		print("\nKey hit\nMove number: ", moves->size(), true);
+		BoardState bs;
+		std::memcpy(&bs.pieces, pieces, sizeof(*pieces));
+		print(bs.dumpPos(), true);
+	}*/
+
+	std::vector<int> order;
+	getOrder(moves, pieces, &order, (entry.key == zobristKey) ? entry.best : -1, isWhite, debug);
+
+	if (debug != nullptr && debug->caughtHashErrors > 0) {
+		print("\n\nZobrist key: ", zobristKey, true);
+		print("\nKey: ", entry.key, true);
+		print("Depth: ", entry.depth, true);
+		print("Flag: ");
+		print(entry.flags == hashfALPHA ? ("alpha") : (entry.flags == hashfBETA ? "beta" : "exact"), true);
+		print("Value: ", entry.value, true);
+		print("Best move index: ", entry.best, true);
+
+		print("\n\nAvailable moves: ", moves->size(), true);
+		print("");
+
+		if (ZobristHasher::zobristKey(pieces, isWhite) != zobristKey) print("shit fuck ");
+	}
+
+	float value = -std::numeric_limits<float>::infinity();
+	int bestMove = 0;
+
+	for (int i = 0; i < order.size(); i++) {
+		int I = order[i];
+
+		if (I == 0) {
+			if (opponentPassed) {
+				if (0 > value) { bestMove = I; }
+				value = max(value, 0);
+				continue;
+			}
+			else if (selfPassed) {
+				if (-MAXEVAL > value) { bestMove = I; }
+				value = max(value, -MAXEVAL);
+				continue;
+			}
+		}
+
+		uint8_t boardCopy[13][13];
+		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
+		for (int j = 0; j < ((*moves)[I]).size(); j++) {
+			boardCopy[((*moves)[I])[j].i][((*moves)[I])[j].j] ^= ((*moves)[I])[j].delta;
+		}
+
+		float negaMaxEval = -negamax_wTable(&boardCopy, opponentPassed, I == 0, depth - 1, -beta, -alpha, !isWhite, ZobristHasher::zobristKey(pieces, &boardCopy, &((*moves)[I]), zobristKey), debug);
+
+		if (negaMaxEval > value) { bestMove = I; }
+
+		value = max(value, negaMaxEval);
+		alpha = max(alpha, value);
+
+		if (alpha >= beta) {
+			if (debug != nullptr) debug->alphaCutoff++;
+			break;
+		}
+	}
+
+	if (debug != nullptr) { if (entry.key == zobristKey && bestMove == entry.best) debug->trueBestMoveFromTable++; }
+	TranspositionTable::recordHash(zobristKey, depth, value <= alphaOrigin ? hashfBETA : (value >= beta ? hashfALPHA : hashfEXACT), value, (alpha >= beta) ? -1 : bestMove);
+
+	return value;
 }

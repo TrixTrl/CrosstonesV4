@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <atomic>
 
 #include "../Test Bots/BasicGenerator.h"
 
@@ -46,6 +47,9 @@ public:
 		int sanityCheck = 0;
 		int alphaCutoff = 0;
 		int betaCutoff = 0;
+		int bestMoveFromTable = 0;
+		int trueBestMoveFromTable = 0;
+		int caughtHashErrors = 0;
 	};
 
 	struct xMove {
@@ -95,5 +99,30 @@ public:
 
 	static float alphaBeta(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), debugContainer* debug = nullptr);
 	static float alphaBeta_wTable(uint8_t(*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]), uint64_t zobristKey, debugContainer* debug = nullptr);
+
+	class TrixSearcher {
+	public:
+		TrixSearcher(uint8_t(*pieces)[13][13], bool isWhite, float (*evalFunc_)(bool isWhite, uint8_t(*pieces)[13][13]), int threads) {
+			startingPos = pieces;
+			isWhitePlayer = isWhite;
+			evalFunc = evalFunc_;
+			threadCount = threads;
+		}
+
+		void searchThread(int depth, debugContainer& debug);
+
+		int fullSearch(int depth);
+		float negamax_wTable(uint8_t(*pieces)[13][13], bool selfPassed, bool opponentPassed, int depth, float alpha, float beta, bool isWhite, uint64_t zobristKey, debugContainer* debug = nullptr);
+		void getOrder(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*pieces)[13][13], std::vector<int> *order, int tableValue, bool isWhite, debugContainer* debug = nullptr);
+
+		uint8_t(*startingPos)[13][13];
+		float (*evalFunc)(bool isWhite, uint8_t(*pieces)[13][13]);
+		bool isWhitePlayer;
+		int threadCount = 1;
+
+		std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> currentMoves;
+		std::atomic_int nextMove;
+		std::vector<float> evaluations;
+	};
 };
 
