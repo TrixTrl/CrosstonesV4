@@ -1,0 +1,9 @@
+Package: jsoncpp
+Version: 1.9.5
+Port-Version: 4
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 6e1bf024ead7a781b73bee64694396e028ef1d769eb3cb0074e6900ef4372aee
+Description: JsonCpp is a C++ library that allows manipulating JSON values, including serialization and deserialization to and from strings. It can also preserve existing comment in unserialization/serialization steps, making it a convenient format to store user input files.
+Status: purge ok not-installed

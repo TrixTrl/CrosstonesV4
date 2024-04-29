@@ -4,6 +4,10 @@
 #include "Utility.h"
 #include "../Globals/Piece.h"
 
+#include <fstream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 using namespace dc;
 
 const int Evaluation::positionMap[13][13] =
@@ -32,6 +36,17 @@ const int Evaluation::pieceValue[22] =
 	0, 0, 0,
 	0, 45, 63, 67, 76 //red towrs
 };
+
+void dc::Evaluation::initialize(std::string jsonConfigPath)
+{
+	std::ifstream evalConfigFile(jsonConfigPath);
+	json evalConfig = json::parse(evalConfigFile);
+
+	std::string a = evalConfig.dump(4);
+	Utility::print(a, true);
+
+	config = Config();
+}
 
 
 // The score that's returned is given from the perspective of whoever's turn it is to move.
@@ -102,3 +117,4 @@ int Evaluation::getEffectivePieceWorth(const Board& board, const uint8_t piece, 
 
 		+ pieceVal * positionVal * positionWeight;
 }
+

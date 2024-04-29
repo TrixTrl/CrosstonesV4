@@ -48,7 +48,7 @@ namespace dc
 	private:
 		// References
 		Board& board;
-		TranspositionTable<100/*MB*/> transpositionTable;
+		TranspositionTable<10/*MB*/> transpositionTable;
 		Evaluation evaluation;
 		MoveOrdering moveOrdering;
 		MoveGenerator moveGenerator;
@@ -70,7 +70,7 @@ namespace dc
 
 	public:
 
-		Searcher(Board& _board, int _maxDepth) : board(_board), transpositionTable(_board), moveOrdering(evaluation), maxDepth(_maxDepth)
+		Searcher(Board& _board, int _maxDepth) : evaluation(), board(_board), transpositionTable(_board), moveOrdering(evaluation), maxDepth(_maxDepth)
 		{}
 
 		void startSearch();

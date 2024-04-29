@@ -29,6 +29,7 @@
 
 #pragma comment(linker, "/STACK:200000000000")
 #pragma comment(linker, "/HEAP:200000000")
+//#pragma comment(lib, "jsoncpp.lib")
 
 #define KEYBOARDCONTROLL 1
 #define EXPLOREMOVEGENERATION 0
@@ -285,15 +286,15 @@ int main() {
 	else {
 		Player* p2 = new 
 			//TheFirst(2);
-			Deepchad(4);
+			Deepchad(5);
 			//Hydra(4, 14);
 			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
 		Player* p1 = new
 			//TheFirst(2);
-			Hydra(4, 14);
-			//Deepchad(5);
+			//Hydra(2, 6);
+			Deepchad(5);
 
-		std::bitset<3> gamemode(0b111);
+		std::bitset<3> gamemode(0b000); //Gates, Bases, Ports
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
 		
 		//gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");
