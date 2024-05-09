@@ -1,6 +1,7 @@
 #include "GameMaster.h"
 #include <Windows.h>
 #include <WinUser.h>
+#include <thread>
 
 void print(std::string str) {
 	std::wstring temp = std::wstring(str.begin(), str.end());

@@ -285,13 +285,13 @@ int main() {
 	else {
 		Player* p2 = new 
 			//TheFirst(2);
-			Deepchad(4);
+			Deepchad(3);
 			//Hydra(4, 14);
 			//ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
 		Player* p1 = new
 			//TheFirst(2);
-			Hydra(4, 14);
-			//Deepchad(5);
+			//Hydra(4, 14);
+			Deepchad(3);
 
 		std::bitset<3> gamemode(0b111);
 		gameMaster = new GameMaster(gamemode, p1, p2, 3000, 0, &displayBoard[0]);
