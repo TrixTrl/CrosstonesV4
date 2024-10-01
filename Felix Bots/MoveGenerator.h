@@ -10,33 +10,6 @@ namespace dc
 	class MoveGenerator
 	{
 	public:
-		struct MovesContainer
-		{
-		public:
-			std::vector<dc::Move> captures;
-			std::vector<dc::Move> claims;
-			std::vector<dc::Move> others;
-
-			MovesContainer() : captures(), claims(), others() {}
-
-			std::vector<dc::Move> getFullList() const
-			{
-				std::vector<dc::Move> out;
-				out.reserve(captures.size() + claims.size() + others.size());
-
-				out.insert(out.end(),
-					std::make_move_iterator(captures.begin()),
-					std::make_move_iterator(captures.end()));
-				out.insert(out.end(),
-					std::make_move_iterator(claims.begin()),
-					std::make_move_iterator(claims.end()));
-				out.insert(out.end(),
-					std::make_move_iterator(others.begin()),
-					std::make_move_iterator(others.end()));
-				return out;
-			}
-		};
-
 		const uint8_t hasTurnPiece = 128;
 		const uint8_t setTurnPiece = 64;
 
@@ -48,7 +21,7 @@ namespace dc
 			const int startX, const int startY,
 			int remainingSteps, 
 			bool turned, bool isWhite, 
-			bool onlyClaimsAndCaptures);
+			bool onlyClaimsAndCaptures, bool leftBehindAddon, bool leftRed);
 		void captureGenerator(
 			int originX, int originY, 
 			int x, int y, 

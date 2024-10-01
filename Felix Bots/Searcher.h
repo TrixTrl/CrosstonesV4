@@ -48,7 +48,7 @@ namespace dc
 	private:
 		// References
 		Board& board;
-		TranspositionTable<100/*MB*/> transpositionTable;
+		TranspositionTable<10/*MB*/> transpositionTable;
 		Evaluation evaluation;
 		MoveOrdering moveOrdering;
 		MoveGenerator moveGenerator;
@@ -89,7 +89,7 @@ namespace dc
 	private:
 		void runIterativeDeepeningSearch();
 		int search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int beta);
-		int quiescenceSearch(int alpha, int beta);
+		int quiescenceSearch(int alpha, int beta, bool madeQMove = false);
 
 
 		void sortMoves(std::shared_ptr<std::vector<Move>> moves);

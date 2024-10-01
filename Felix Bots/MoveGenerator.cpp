@@ -25,7 +25,7 @@ void MoveGenerator::getMoves(std::vector<dc::Move>* targetList, const uint8_t(*b
 			if (Piece::isWhite(piece) == !isWhite) continue;
 
 			visited[i][j] = true;
-			basicGenerator(i, j, i, j, Piece::maxSteps(piece), false, isWhite, onlyClaimsAndCaptures);
+			basicGenerator(i, j, i, j, Piece::maxSteps(piece), false, isWhite, onlyClaimsAndCaptures, false, false);
 			visited[i][j] = false;
 		}
 	}
@@ -36,7 +36,7 @@ void MoveGenerator::basicGenerator(
 	int x, int y, 
 	const int startX, const int startY, 
 	int remainingSteps,
-	bool turned, bool isWhite, bool onlyClaimsAndCaptures
+	bool turned, bool isWhite, bool onlyClaimsAndCaptures, bool leftBehindAddon, bool leftRed)
 )
 {
 	// Save move if start Tower has moved
@@ -61,7 +61,7 @@ void MoveGenerator::basicGenerator(
 	// Try to turn if possible and not happened yet
 	if (!turned && ((currentSquares[x][y] & hasTurnPiece) != 0)) {		
 		currentSquares[x][y] ^= setTurnPiece;
-		basicGenerator(x, y, startX, startY, remainingSteps, true, isWhite, onlyClaimsAndCaptures);
+		basicGenerator(x, y, startX, startY, remainingSteps, true, isWhite, onlyClaimsAndCaptures, leftBehindAddon, leftRed);
 		currentSquares[x][y] ^= setTurnPiece;
 	}
 
@@ -129,9 +129,12 @@ void MoveGenerator::basicGenerator(
 					currentSquares[i][j] |= (uint8_t)((piece) & 0b00011000);		//addons, only if  we're moving the whole tower
 				}
 
+				const bool leavingAddon = leftBehindAddon || Piece::isAddOn(currentSquares[x][y]);
+				const bool newLeftRed = leftRed || (leavingAddOn && Piece::isRed(currentSquares[x][y]));
+
 				visited[i][j] = true;
 
-				basicGenerator(i, j, startX, startY, remainingSteps - 1, false, isWhite, onlyClaimsAndCaptures);
+				basicGenerator(i, j, startX, startY, remainingSteps - 1, false, isWhite, onlyClaimsAndCaptures, leavingAddon, newLeftRed);
 				
 				visited[i][j] = false;
 				currentSquares[x][y] = prevStartSquare;
@@ -145,7 +148,14 @@ void MoveGenerator::basicGenerator(
 				for (int splitOff = 1; (splitOff <= Piece::height(piece)) && (splitOff <= 5 - Piece::height(dest)); splitOff++) {
 					if (splitOff == Piece::height(piece) && Piece::hasAddOn(piece)) continue;
 
-					const bool isClaim = Piece::isAddOn(dest);
+					const uint8_t origPiece = origSquares[startX][startY];
+
+					const bool leavingAddon = leftBehindAddon || (Piece::hasAddOn(piece) && splittOf == Piece::height(piece) - 1);
+					const bool newLeftRed = leftRed || (leavingAddOn && Piece::isRed(piece));
+					// The claim is favorable if we don't lose an AddOn, 
+					// or if we leave a blue one in favor of a red one
+					const bool isNonQuietClaim = Piece::isAddOn(dest)
+						&& (!leavingAddon || (Piece::isRed(dest) && !newLeftRed));
 
 					if (splitOff == Piece::height(piece)) {
 						currentSquares[x][y] &= 0b11000000;
@@ -161,10 +171,10 @@ void MoveGenerator::basicGenerator(
 					if (splitOff == Piece::height(piece)) {
 						currentSquares[i][j] |= (uint8_t)((piece) & 0b00011000);		//addons, only if  we're moving the whole tower
 					}
-
+					
 					visited[i][j] = true;
 
-					basicGenerator(i, j, startX, startY, 0, false, isWhite, onlyClaimsAndCaptures && !isClaim);
+					basicGenerator(i, j, startX, startY, 0, false, isWhite, onlyClaimsAndCaptures && !isNonQuietClaim, leavingAddon);
 
 					visited[i][j] = false;
 					currentSquares[x][y] = prevStartSquare;

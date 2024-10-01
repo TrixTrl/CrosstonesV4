@@ -19,11 +19,12 @@ GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player
 	displayBoardPointer = displayBoard;
 }
 
-void GameMaster::play(HWND globalHwnd) {
+void GameMaster::play(HWND globalHwnd, bool whiteToStart) {
 	bs.copyBoard(displayBoardPointer);
 	InvalidateRect(globalHwnd, NULL, NULL);
 	bs.gameRecord.emplace_back(bs.dumpPos() + " | ");
 
+	isWhiteTurn = whiteToStart;
 	bool ended = false;
 	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
 	while (bs.gameOver(!isWhiteTurn) == BoardState::winValue::none && !ended) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value

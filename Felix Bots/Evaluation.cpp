@@ -30,7 +30,7 @@ const int Evaluation::pieceValue[22] =
 	0, 0, 0,
 	0, 30, 40, 45, 55, //blue towers
 	0, 0, 0,
-	0, 45, 63, 67, 76 //red towrs
+	0, 43, 66, 70, 80 //red towrs
 };
 
 
@@ -54,6 +54,7 @@ int Evaluation::evaluate(const Board& board)
 
 	int materialPoints[2] = { 0, 0 }; // 0: points for black; 1: points for white
 	int positionalPoints[2] = { 0, 0 };
+	int weightedMatPoints[2] = { 0, 0 };
 
 	for (int x = 0; x < 13; x++)
 	{
@@ -69,13 +70,15 @@ int Evaluation::evaluate(const Board& board)
 					+ (Piece::isBlue(content) ? 1 : 0)
 					+ (Piece::isRed(content) ? 3 : 0));
 
-				materialPoints[blackWhiteIndex] += pieceVal * materialWeight;
+				materialPoints[blackWhiteIndex] += pieceVal;
+				weightedMatPoints[blackWhiteIndex] += pieceValue[content & 0b00011111];
 
-				positionalPoints[blackWhiteIndex] += pieceValue[content & 0b00011111]
-					* positionMap[(1 - blackWhiteIndex) * 12 + pieceColorFactor * y][x] * positionWeight;
+				positionalPoints[blackWhiteIndex] += (pieceValue[content & 0b00011111] + pieceVal)
+					* positionMap[(1 - blackWhiteIndex) * 12 + pieceColorFactor * y][x];
 			}
 		}
 	}
+
 	int relativeMatStrength = ((materialPoints[1] > materialPoints[0])
 			? (materialPoints[1] + 1) * 100 / (materialPoints[0] + 1)
 			: -(materialPoints[0] + 1)  * 100 / (materialPoints[1] + 1));
@@ -84,21 +87,33 @@ int Evaluation::evaluate(const Board& board)
 		relativeMatStrength = relativeMatStrength * abs(relativeMatStrength) / 100; //make quadratic
 	relativeMatStrength = relativeMatStrength * relativeWeight / 100;
 
-	return (materialPoints[1] + positionalPoints[1] - materialPoints[0] - positionalPoints[0] + relativeMatStrength) * color;
+	for (int i = 0; i <= 1; i++)
+	{
+		materialPoints[i] *= materialWeight;
+		weightedMatPoints[i] *= weightedMatWeight;
+		positionalPoints[i] *= positionWeight;
+	}
+
+	return (materialPoints[1] + weightedMatPoints[1] + positionalPoints[1]
+		- materialPoints[0] - weightedMatPoints[0] - positionalPoints[0]
+		+ relativeMatStrength) * color;
 	//return rand() % 100;
 }
 
 int Evaluation::getEffectivePieceWorth(const Board& board, const uint8_t piece, const int x, const int y) const
 {
-	const int pieceVal = pieceValue[piece & 0b00011111];
+	const int pieceVal = (Piece::height(piece)
+		+ Piece::isBlue(piece)
+		+ 3 * Piece::isRed(piece));
+
+	const int weightedPieceVal = pieceValue[piece & 0b00011111];
 	const int blackWhiteIndex = Piece::isWhite(piece);
 	const int pieceColorFactor = 2 * blackWhiteIndex - 1;
 
 	const int positionVal = positionMap[(1 - blackWhiteIndex) * 12 + pieceColorFactor * y][x];
 
-	return (Piece::height(piece) 
-		+ Piece::isBlue(piece) 
-		+ 3 * Piece::isRed(piece) ) * materialWeight
+	return pieceVal * materialWeight
 
-		+ pieceVal * positionVal * positionWeight;
+		+ weightedPieceVal * weightedMatWeight
+		+ (pieceVal + weightedPieceVal) * positionVal * positionWeight;
 }

@@ -195,11 +195,31 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 }
 
 // Search capture moves until a 'quiet' position is reached.
-int Searcher::quiescenceSearch(int alpha, int beta)
+int Searcher::quiescenceSearch(int alpha, int beta, bool madeQMove)
 {
 	// A player isn't forced to make a capture (typically), so see what the evaluation is without capturing anything.
 	int eval = evaluation.evaluate(board);
 	searchDiagnostics.numPositionsEvaluated++;
+
+	if (board.gameResult != GameResult::InProgress)
+	{
+		if (eval >= beta)
+		{
+			searchDiagnostics.numCutOffs++;
+			return beta;
+		}
+		return max(alpha, eval);
+	}
+
+	 // Continue until position is quiet for both players
+	//if (!madeQMove) {
+	//	Move move = Utility::createNullMove();
+
+	//	board.makeMove(move);
+	//	eval = -quiescenceSearch(-beta, -alpha, /*madeQMove: */true);
+	//	board.unmakeMove(move);
+	//}
+	
 	if (eval >= beta)
 	{
 		searchDiagnostics.numCutOffs++;
@@ -208,10 +228,6 @@ int Searcher::quiescenceSearch(int alpha, int beta)
 	if (eval > alpha)
 	{
 		alpha = eval;
-	}
-	if (board.gameResult != GameResult::InProgress)
-	{
-		return alpha;
 	}
 
 	std::vector<Move> moves;
@@ -224,7 +240,7 @@ int Searcher::quiescenceSearch(int alpha, int beta)
 		Move* move = &(moves[i]);
 
 		board.makeMove(*move);
-		eval = -quiescenceSearch(-beta, -alpha);
+		eval = -quiescenceSearch(-beta, -alpha, madeQMove);
 		board.unmakeMove(*move);
 
 		if (eval >= beta)
@@ -237,13 +253,13 @@ int Searcher::quiescenceSearch(int alpha, int beta)
 			alpha = eval;
 		}
 	}
-
+	
 	return alpha;
 }
 
 std::pair<Move, int> Searcher::getSearchResult()
 {
-	return std::pair(bestMove, bestEval);
+	return std::pair<Move, int>(bestMove, bestEval);
 }
 
 
