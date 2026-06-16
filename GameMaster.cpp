@@ -4,8 +4,8 @@
 #include <thread>
 
 void print(std::string str) {
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 

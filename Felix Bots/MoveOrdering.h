@@ -2,7 +2,7 @@
 #include <vector>
 #include "Utility.h"
 #include "TranspositionTable.h"
-#include "Evaluation.h";
+#include "Evaluation.h"
 
 namespace dc
 {

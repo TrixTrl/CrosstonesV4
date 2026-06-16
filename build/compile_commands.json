@@ -1,0 +1,122 @@
+[
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Main.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Main.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Main.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Main.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\DCTestSuite.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\DCTestSuite.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\DCTestSuite.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\DCTestSuite.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\BoardState.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\BoardState.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\BoardState.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\BoardState.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Globals\\Piece.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Globals\\Piece.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Globals\\Piece.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Globals\\Piece.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\GameMaster.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\GameMaster.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\GameMaster.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\GameMaster.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\ManualPlayer.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\ManualPlayer.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\ManualPlayer.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\ManualPlayer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Test_Bots\\TestBotRnd.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Test Bots\\TestBotRnd.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Test Bots\\TestBotRnd.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Test_Bots\\TestBotRnd.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Deepchad.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Deepchad.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Deepchad.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Deepchad.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\TheFirst.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\TheFirst.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\TheFirst.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\TheFirst.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\Utils.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\Utils.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\Utils.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\Utils.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\DemoKnight.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\DemoKnight.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\DemoKnight.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\DemoKnight.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\Hydra.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\Hydra.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Trix Bots\\Hydra.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Trix_Bots\\Hydra.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\UI.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\UI.cpp",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\UI.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\UI.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Board.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Board.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Board.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Board.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Evaluation.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Evaluation.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Evaluation.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Evaluation.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\DebugPrinting.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\DebugPrinting.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\DebugPrinting.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\DebugPrinting.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\MoveGenerator.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\MoveGenerator.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\MoveGenerator.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\MoveGenerator.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\MoveOrdering.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\MoveOrdering.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\MoveOrdering.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\MoveOrdering.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Utility.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Utility.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Utility.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Utility.cpp.obj"
+},
+{
+  "directory": "C:/Users/Trix/source/repos/CrosstonesV4/build",
+  "command": "C:\\PROGRA~1\\MICROS~1\\18\\COMMUN~1\\VC\\Tools\\MSVC\\1450~1.357\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Zobrist.cpp.obj /FdCMakeFiles\\Crosstones_V4.dir\\ /FS -c \"C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Zobrist.cpp\"",
+  "file": "C:\\Users\\Trix\\source\\repos\\CrosstonesV4\\Felix Bots\\Zobrist.cpp",
+  "output": "CMakeFiles\\Crosstones_V4.dir\\Felix_Bots\\Zobrist.cpp.obj"
+}
+]

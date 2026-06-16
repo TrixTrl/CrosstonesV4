@@ -9,8 +9,8 @@ using namespace dc;
 
 void Utility::print(std::string str, bool newLine = false) {
 	if (newLine) str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
@@ -22,24 +22,24 @@ void Utility::print(char* chars, bool newLine = false) {
 void Utility::print(float f, bool newLine = false) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
 void Utility::print(int f, bool newLine = false) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
 void Utility::print(size_t f, bool newLine = false) {
 	std::string str = std::to_string(f);
 	if (newLine) str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
@@ -51,7 +51,7 @@ void Utility::print(BasicGenerator::xMove f, bool newLine = false) {
 	std::bitset<8> x(f.delta);
 	str += x.to_string();
 	if (newLine) str += "\n";
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }

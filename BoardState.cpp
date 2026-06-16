@@ -156,14 +156,14 @@ void BoardState::copyBoard(uint8_t(*dest)[13][13]) const
 
 void debugPrint(std::string str) {
 	if (!DEBUG_PRINTING) return;
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
 void forceDebugPrint(std::string str) {
-	std::wstring temp = std::wstring(str.begin(), str.end());
-	LPCWSTR wideString = temp.c_str();
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 

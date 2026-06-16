@@ -180,8 +180,8 @@ void UI::paint(HWND hwnd, bool drawBackground, uint8_t board[2][13][13])
 
 
 				std::string str = std::to_string(Piece::height(piece));
-				std::wstring temp = std::wstring(str.begin(), str.end());
-				LPCWSTR wideString = temp.c_str();
+				std::string temp = std::string(str.begin(), str.end());
+				LPCSTR wideString = temp.c_str();
 				DrawText(hdc, wideString, -1, &rect, DT_CENTER);
 
 			}

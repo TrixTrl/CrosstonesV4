@@ -1,0 +1,17 @@
+================================================================================
+Linker Errors
+Generated: 2026-06-16T11:52:11.404Z
+Total Errors: 4
+================================================================================
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: static class std::shared_ptr<class std::vector<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> >,class std::allocator<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> > > > > __cdecl BasicGenerator::getMoves(bool,unsigned char const (*)[13][13])" (?getMoves@BasicGenerator@@SA?AV?$shared_ptr@V?$vector@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@V?$allocator@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@@2@@std@@@std@@_NPEAY1N@N@$$CBE@Z)
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: static class std::shared_ptr<class std::vector<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> >,class std::allocator<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> > > > > __cdecl BasicGenerator::getMoves(bool,unsigned char const (*)[13][13])" (?getMoves@BasicGenerator@@SA?AV?$shared_ptr@V?$vector@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@V?$allocator@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@@2@@std@@@std@@_NPEAY1N@N@$$CBE@Z)
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: static class std::shared_ptr<class std::vector<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> >,class std::allocator<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> > > > > __cdecl BasicGenerator::getMoves(bool,unsigned char const (*)[13][13])" (?getMoves@BasicGenerator@@SA?AV?$shared_ptr@V?$vector@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@V?$allocator@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@@2@@std@@@std@@_NPEAY1N@N@$$CBE@Z)
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: static class std::shared_ptr<class std::vector<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> >,class std::allocator<class std::vector<struct BasicGenerator::xMove,class std::allocator<struct BasicGenerator::xMove> > > > > __cdecl BasicGenerator::getMoves(bool,unsigned char const (*)[13][13])" (?getMoves@BasicGenerator@@SA?AV?$shared_ptr@V?$vector@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@V?$allocator@V?$vector@UxMove@BasicGenerator@@V?$allocator@UxMove@BasicGenerator@@@std@@@std@@@2@@std@@@std@@_NPEAY1N@N@$$CBE@Z)
