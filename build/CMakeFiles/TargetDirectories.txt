@@ -1,3 +1,0 @@
-C:/Users/Trix/source/repos/CrosstonesV4/build/CMakeFiles/Crosstones_V4.dir
-C:/Users/Trix/source/repos/CrosstonesV4/build/CMakeFiles/edit_cache.dir
-C:/Users/Trix/source/repos/CrosstonesV4/build/CMakeFiles/rebuild_cache.dir
