@@ -16,7 +16,7 @@ void simulate(BoardState boardState, bool isWhite, map<string, Node> *tree)
 {
     simTreeResult treeResult = simTree(boardState, isWhite, tree);
     bool z = simDefault(boardState, isWhite, treeResult.whiteToPlay);
-    backup(treeResult.states, z);
+    backup(treeResult.states, treeResult.actions, z, tree);
 }
 
 simTreeResult simTree(BoardState boardState, bool isWhite, map<string, Node> *tree)
@@ -26,7 +26,7 @@ simTreeResult simTree(BoardState boardState, bool isWhite, map<string, Node> *tr
     result.whiteToPlay = isWhite;
     while (boardState.gameOver(result.whiteToPlay) == BoardState::winValue::none)
     {
-        string state = boardState.dumpPos() + (isWhite ? 'w' : 'b');
+        string state = boardState.dumpPos() + (result.whiteToPlay ? 'w' : 'b');
         result.states.emplace_back(state);
         if (tree->find(state) == tree->end())
         {
@@ -81,26 +81,55 @@ vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool e
     return bestMove;
 }
 
-void backup(vector<string> states, float z, map<string, Node> *tree)
+void backup(vector<string> states, vector<string> actions, float z, map<string, Node> *tree)
 {
     for (int i = 0; i < states.size(); i++)
     {
         std::map<std::string, Node>::iterator it = tree->find(states[i]);
         Node node = it->second;
         node.N++;
-        std::map<std::string, float>::iterator qIt = node.Qmap.find(stringify(legalMoves->at(i)));
-        std::map<std::string, float>::iterator nIt = node.Nmap.find(stringify(legalMoves->at(i)));
+        std::map<std::string, float>::iterator qIt = node.Qmap.find(actions[i]);
+        std::map<std::string, float>::iterator nIt = node.Nmap.find(actions[i]);
+        float qValue = 0;
+        float nValue = 0;
         if (qIt != node.Qmap.end())
         {
-            evaluation += qIt->second;
+            qValue = qIt->second;
+        }
+        else
+        {
+            node.Qmap.emplace(actions[i], 0);
         }
         if (nIt != node.Qmap.end())
         {
-            evaluation += c * sqrt(log(node.N) / nIt->second);
+            nValue = nIt->second;
         }
+        else
+        {
+            node.Nmap.emplace(actions[i], 0);
+        }
+        node.Nmap.at(actions[i]) += 1;
+        node.Qmap.at(actions[i]) += (z - node.Qmap.at(actions[i])) / node.Nmap.at(actions[i]);
     }
 }
 
-void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree);
-vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay);
-string stringify(vector<BoardState::xMove>);
+void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree)
+{
+    tree->emplace(boardState.dumpPos() + (whiteToPlay ? 'w' : 'b'), Node());
+}
+
+vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay)
+{
+    std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> legalMoves = boardState.getMoves(whiteToPlay);
+    return legalMoves->at(rand() % legalMoves->size());
+}
+
+string stringify(vector<BoardState::xMove> move)
+{
+    string output = "";
+    for (int i = 0; i < move.size(); i++)
+    {
+        output += to_string(move[i].delta) + "|" + to_string(move[i].i) + "|" + to_string(move[i].j);
+    }
+    return output;
+}
