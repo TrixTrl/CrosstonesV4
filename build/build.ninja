@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: CROSSTONES_V4
-# Configurations: Debug
+# Configurations: Release
 # =============================================================================
 
 #############################################
@@ -24,7 +24,7 @@ ninja_required_version = 1.5
 #############################################
 # Set configuration variable for custom commands.
 
-CONFIGURATION = Debug
+CONFIGURATION = Release
 # =============================================================================
 # Include auxiliary files.
 
@@ -49,185 +49,185 @@ cmake_ninja_workdir = C$:\Users\Trix\source\repos\CrosstonesV4\build\
 
 build cmake_object_order_depends_target_Crosstones_V4: phony || .
 
-build CMakeFiles\Crosstones_V4.dir\Main.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Main.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Main.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Main.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\DCTestSuite.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\DCTestSuite.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\DCTestSuite.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\DCTestSuite.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\BoardState.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\BoardState.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\BoardState.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\BoardState.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Globals\Piece.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Globals\Piece.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Globals\Piece.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Globals\Piece.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Globals
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\GameMaster.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\GameMaster.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\GameMaster.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\GameMaster.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\ManualPlayer.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\ManualPlayer.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\ManualPlayer.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\ManualPlayer.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Test_Bots\TestBotRnd.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Test$ Bots\TestBotRnd.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Test_Bots\TestBotRnd.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Test$ Bots\TestBotRnd.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Test_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Deepchad.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Deepchad.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Deepchad.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Deepchad.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Trix_Bots\TheFirst.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\TheFirst.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Trix_Bots\TheFirst.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\TheFirst.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Trix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Trix_Bots\Utils.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\Utils.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Trix_Bots\Utils.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\Utils.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Trix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Trix_Bots\DemoKnight.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\DemoKnight.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Trix_Bots\DemoKnight.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\DemoKnight.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Trix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Trix_Bots\Hydra.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\Hydra.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Trix_Bots\Hydra.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\Hydra.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Trix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\UI.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\UI.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\UI.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\UI.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Board.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Board.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Board.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Board.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Evaluation.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Evaluation.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Evaluation.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Evaluation.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\DebugPrinting.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\DebugPrinting.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\DebugPrinting.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\DebugPrinting.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveGenerator.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\MoveGenerator.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveGenerator.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\MoveGenerator.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveOrdering.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\MoveOrdering.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveOrdering.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\MoveOrdering.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Utility.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Utility.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Utility.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Utility.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Zobrist.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Zobrist.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Zobrist.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Zobrist.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Searcher.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Searcher.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Felix_Bots\Searcher.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Felix$ Bots\Searcher.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Felix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Trix_Bots\TranspositionTable.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\TranspositionTable.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Trix_Bots\TranspositionTable.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Trix$ Bots\TranspositionTable.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Trix_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
   TARGET_PDB = Crosstones_V4.pdb
 
-build CMakeFiles\Crosstones_V4.dir\Test_Bots\BasicGenerator.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Debug C$:\Users\Trix\source\repos\CrosstonesV4\Test$ Bots\BasicGenerator.cpp || cmake_object_order_depends_target_Crosstones_V4
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+build CMakeFiles\Crosstones_V4.dir\Test_Bots\BasicGenerator.cpp.obj: CXX_COMPILER__Crosstones_V4_unscanned_Release C$:\Users\Trix\source\repos\CrosstonesV4\Test$ Bots\BasicGenerator.cpp || cmake_object_order_depends_target_Crosstones_V4
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MD
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   OBJECT_FILE_DIR = CMakeFiles\Crosstones_V4.dir\Test_Bots
   TARGET_COMPILE_PDB = CMakeFiles\Crosstones_V4.dir\
@@ -241,10 +241,10 @@ build CMakeFiles\Crosstones_V4.dir\Test_Bots\BasicGenerator.cpp.obj: CXX_COMPILE
 #############################################
 # Link the executable Crosstones_V4.exe
 
-build Crosstones_V4.exe: CXX_EXECUTABLE_LINKER__Crosstones_V4_Debug CMakeFiles\Crosstones_V4.dir\Main.cpp.obj CMakeFiles\Crosstones_V4.dir\DCTestSuite.cpp.obj CMakeFiles\Crosstones_V4.dir\BoardState.cpp.obj CMakeFiles\Crosstones_V4.dir\Globals\Piece.cpp.obj CMakeFiles\Crosstones_V4.dir\GameMaster.cpp.obj CMakeFiles\Crosstones_V4.dir\ManualPlayer.cpp.obj CMakeFiles\Crosstones_V4.dir\Test_Bots\TestBotRnd.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Deepchad.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\TheFirst.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\Utils.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\DemoKnight.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\Hydra.cpp.obj CMakeFiles\Crosstones_V4.dir\UI.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Board.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Evaluation.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\DebugPrinting.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveGenerator.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveOrdering.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Utility.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Zobrist.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Searcher.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\TranspositionTable.cpp.obj CMakeFiles\Crosstones_V4.dir\Test_Bots\BasicGenerator.cpp.obj
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+build Crosstones_V4.exe: CXX_EXECUTABLE_LINKER__Crosstones_V4_Release CMakeFiles\Crosstones_V4.dir\Main.cpp.obj CMakeFiles\Crosstones_V4.dir\DCTestSuite.cpp.obj CMakeFiles\Crosstones_V4.dir\BoardState.cpp.obj CMakeFiles\Crosstones_V4.dir\Globals\Piece.cpp.obj CMakeFiles\Crosstones_V4.dir\GameMaster.cpp.obj CMakeFiles\Crosstones_V4.dir\ManualPlayer.cpp.obj CMakeFiles\Crosstones_V4.dir\Test_Bots\TestBotRnd.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Deepchad.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\TheFirst.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\Utils.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\DemoKnight.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\Hydra.cpp.obj CMakeFiles\Crosstones_V4.dir\UI.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Board.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Evaluation.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\DebugPrinting.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveGenerator.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\MoveOrdering.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Utility.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Zobrist.cpp.obj CMakeFiles\Crosstones_V4.dir\Felix_Bots\Searcher.cpp.obj CMakeFiles\Crosstones_V4.dir\Trix_Bots\TranspositionTable.cpp.obj CMakeFiles\Crosstones_V4.dir\Test_Bots\BasicGenerator.cpp.obj
+  CONFIG = Release
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -MD
+  LINK_FLAGS = /machine:x64 /INCREMENTAL:NO /subsystem:console
   LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\Crosstones_V4.dir
   POST_BUILD = cd .
