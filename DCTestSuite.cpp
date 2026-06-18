@@ -3,7 +3,7 @@
 #include "Felix Bots/Utility.h"
 #include "DCTestSuite.h"
 
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <string>
 #include <chrono>

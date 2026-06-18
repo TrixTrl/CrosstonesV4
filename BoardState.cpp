@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 
 #define BACKGROUND "\x1b[43m\x1b[38;5;52m"

@@ -1,5 +1,5 @@
 #include "GameMaster.h"
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <thread>
 

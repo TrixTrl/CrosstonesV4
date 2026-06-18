@@ -1,7 +1,7 @@
 #include "Utility.h"
 #include "../Globals/Piece.h"
 
-#include <Windows.h>
+#include "../fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <bitset>
 

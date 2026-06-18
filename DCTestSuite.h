@@ -3,7 +3,7 @@
 #include "BoardState.h"
 #include "Felix Bots/Board.h"
 #include "Felix Bots/Utility.h"
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <vector>
 #include <functional>

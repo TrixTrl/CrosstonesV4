@@ -1,6 +1,6 @@
 #include "UI.h"
 
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <string>
 #include "BoardState.h"
 #include "Globals/Piece.h"
@@ -182,7 +182,7 @@ void UI::paint(HWND hwnd, bool drawBackground, uint8_t board[2][13][13])
 				std::string str = std::to_string(Piece::height(piece));
 				std::string temp = std::string(str.begin(), str.end());
 				LPCSTR wideString = temp.c_str();
-				DrawText(hdc, wideString, -1, &rect, DT_CENTER);
+				//DrawText(hdc, wideString, -1, &rect, DT_CENTER);
 
 			}
 

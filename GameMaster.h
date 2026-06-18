@@ -5,7 +5,7 @@
 #include <chrono>
 #include "Globals/Player.h"
 #include "Globals/PlayerInputKey.h"
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 
 

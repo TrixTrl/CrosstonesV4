@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <Windows.h>
+#include "../fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <bitset>
 #include <limits>

@@ -1,6 +1,6 @@
 #pragma once
 #include "Globals/Player.h"
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <stack>
 #include "UI.h"

@@ -2,10 +2,12 @@
 #define UNICODE
 #endif
 
-#include <Windows.h>
+#include "fix_win32_compatibility.h"
 #include <WinUser.h>
 #include <wchar.h>
 #include <windowsx.h>
+
+#include "NewUI.h"
 
 #include "DCTestSuite.h"
 #include "BoardState.h"
@@ -26,7 +28,7 @@
 #include <thread>
 #include <string>
 #include <chrono>
-#include "UI.h"
+//#include "UI.h"
 
 #pragma comment(linker, "/STACK:200000000")
 #pragma comment(linker, "/HEAP:200000000")
@@ -322,6 +324,9 @@ int main()
 		// gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30408 -B30500 -B30502 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
 		// std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);
+
+		RaylibUI::init();
+		thread renderThread(&RaylibUI::draw);
 
 		gameMaster->play(globalHwnd, /*whiteToStart: */ false);
 		// while(true) {}
