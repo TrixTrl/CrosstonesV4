@@ -3,8 +3,10 @@
 #include <cstdint>
 #include <string>
 #include <atomic>
+#include <iomanip>
 
 #include "../Test Bots/BasicGenerator.h"
+#include "../BoardState.h"
 
 class Utils
 {
@@ -74,11 +76,14 @@ public:
 
 	static void evaluatePositionsThread(bool isWhite, uint8_t(*pieces)[13][13], std::shared_ptr<std::vector<std::vector<BasicGenerator::xMove>>> moves, std::vector<float>& evaluations, int depth, int threadIndex, int threadCount, debugContainer& debug);
 
+	static std::string convertToPosString(uint8_t(*pieces)[13][13]);
+
 	static void print(std::string s, bool newLine = false);
 	static void print(int s, bool newLine = false);
 	static void print(size_t s, bool newLine = false);
 	static void print(float s, bool newLine = false);
 	static void print(BasicGenerator::xMove, bool newLine = false);
+	static void print(BoardState::xMove, bool newLine = false);
 	static void print(extraBoardData, bool formatted = true);
 	static void print(std::string s, int n, bool newLine = false);
 	static void print(std::string s, float n, bool newLine = false);

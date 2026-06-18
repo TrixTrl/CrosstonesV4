@@ -73,6 +73,21 @@ void Utils::print(BasicGenerator::xMove f, bool newLine)
 	OutputDebugString(wideString);
 }
 
+void Utils::print(BoardState::xMove f, bool newLine)
+{
+	std::string str = std::to_string(f.i);
+	str += " | ";
+	str += std::to_string(f.j);
+	str += " | ";
+	std::bitset<8> x(f.delta);
+	str += x.to_string();
+	if (newLine)
+		str += "\n";
+	std::string temp = std::string(str.begin(), str.end());
+	LPCSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
 void Utils::print(extraBoardData data, bool formatted)
 {
 	std::string str;
@@ -1436,4 +1451,41 @@ float Utils::TrixSearcher::negamax_wTable(uint8_t (*pieces)[13][13], bool selfPa
 	TranspositionTable::recordHash(zobristKey, depth, value <= alphaOrigin ? hashfBETA : (value >= beta ? hashfALPHA : hashfEXACT), value, (alpha >= beta) ? -1 : bestMove);
 
 	return value;
+}
+
+std::string Utils::convertToPosString(uint8_t (*pieces)[13][13])
+{
+
+	std::string turnPieceStr = "";
+	std::string str = "";
+
+	for (int i = 0; i < 13; i++)
+	{
+		for (int j = 0; j < 13; j++)
+		{
+			uint8_t piece = (*pieces)[i][j];
+
+			if (!((piece & hasTurnPiece) == 0))
+			{
+				turnPieceStr += ((piece & setTurnPiece) == 0) ? "0" : "1";
+			}
+
+			if (Piece::height(piece) == 0)
+				continue;
+			str += (Piece::hasAddOn(piece) ? (Piece::isRed(piece) ? "r" : "b") : "-");
+			str += Piece::isAddOn(piece) ? "-" : (Piece::isWhiteTower(piece) ? "W" : "B");
+			str += std::to_string(Piece::height(piece));
+
+			std::ostringstream ss1;
+			ss1 << std::setw(2) << std::setfill('0') << i;
+			std::ostringstream ss2;
+			ss2 << std::setw(2) << std::setfill('0') << j;
+
+			str += ss1.str();
+			str += ss2.str();
+
+			str += " ";
+		}
+	}
+	return str + turnPieceStr;
 }

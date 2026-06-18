@@ -5,6 +5,8 @@
 #include <map>
 #include <time.h>
 #include <string>
+#include "Utils.h"
+#include <algorithm>
 
 using namespace ::std;
 
@@ -28,5 +30,5 @@ float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay);
 vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree);
 void backup(vector<string> states, vector<string> actions, float z, map<string, Node> *tree);
 void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree);
-vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay);
+vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay, simTreeResult* result = nullptr);
 string stringify(vector<BoardState::xMove>);
