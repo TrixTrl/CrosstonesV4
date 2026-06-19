@@ -28,7 +28,7 @@
 #include <thread>
 #include <string>
 #include <chrono>
-//#include "UI.h"
+#include "UI.h"
 
 #pragma comment(linker, "/STACK:200000000")
 #pragma comment(linker, "/HEAP:200000000")
@@ -323,13 +323,13 @@ int main()
 		// gameMaster->loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		// gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30408 -B30500 -B30502 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
-		// std::thread gm_thread(&GameMaster::play, &gameMaster, globalHwnd);
-
 		RaylibUI::init();
-		thread renderThread(&RaylibUI::draw);
+		std::thread gm_thread(&GameMaster::play, gameMaster, globalHwnd, true);
 
-		gameMaster->play(globalHwnd, /*whiteToStart: */ false);
-		// while(true) {}
+		RaylibUI::draw(&displayBoard[0]);
+
+		//gameMaster->play(globalHwnd, /*whiteToStart: */ false);
+		//  while(true) {}
 	}
 	return 0;
 }
