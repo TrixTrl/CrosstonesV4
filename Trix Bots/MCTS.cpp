@@ -16,35 +16,35 @@ vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime, bool
 
 void simulate(BoardState boardState, bool isWhite, map<string, Node> *tree)
 {
-    simTreeResult treeResult = simTree(boardState, isWhite, tree);
+    simTreeResult treeResult = simTree(&boardState, isWhite, tree);
     bool z = simDefault(boardState, isWhite, treeResult.whiteToPlay);
     backup(treeResult.states, treeResult.actions, z, tree);
 }
 
-simTreeResult simTree(BoardState boardState, bool isWhite, map<string, Node> *tree)
+simTreeResult simTree(BoardState *boardState, bool isWhite, map<string, Node> *tree)
 {
     float c = 0.8;
     simTreeResult result = simTreeResult();
     result.whiteToPlay = isWhite;
     bool passed = false;
     // Utils::print(".");
-    while (boardState.gameOver(!result.whiteToPlay) == BoardState::winValue::none)
+    while (boardState->gameOver(!result.whiteToPlay) == BoardState::winValue::none)
     {
         // Utils::print("!");
-        string state = boardState.dumpPos() + (result.whiteToPlay ? 'w' : 'b');
+        string state = boardState->dumpPos() + (result.whiteToPlay ? 'w' : 'b');
         result.states.emplace_back(state);
         if (tree->find(state) == tree->end())
         {
-            newNode(boardState, result.whiteToPlay, tree);
-            vector<BoardState::xMove> a = defaultPolicy(boardState, result.whiteToPlay, &result);
-            boardState.makeMove(&a, result.whiteToPlay);
+            newNode(*boardState, result.whiteToPlay, tree);
+            vector<BoardState::xMove> a = defaultPolicy(*boardState, result.whiteToPlay);
+            boardState->makeMove(&a, result.whiteToPlay);
             result.actions.emplace_back(stringify(a));
             result.whiteToPlay = !result.whiteToPlay;
             return result;
         }
-        vector<BoardState::xMove> a = selectMove(boardState, isWhite, isWhite != result.whiteToPlay, c, tree);
+        vector<BoardState::xMove> a = selectMove(*boardState, isWhite, isWhite != result.whiteToPlay, c, tree, &result);
         result.actions.emplace_back(stringify(a));
-        boardState.makeMove(&a, result.whiteToPlay);
+        boardState->makeMove(&a, result.whiteToPlay);
         result.whiteToPlay = !result.whiteToPlay;
     }
     // Utils::print(to_string((int)boardState.gameOver(result.whiteToPlay)), true);
@@ -62,13 +62,13 @@ float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay)
         whiteToPlay = !whiteToPlay;
     }
     BoardState::winValue winValue = boardState.gameOver(!whiteToPlay);
-    float gameResult = winValue == BoardState::winValue::draw ? 0.5 : winValue == (isWhite ? BoardState::winValue::black : BoardState::winValue::white);
+    float gameResult = winValue == BoardState::winValue::draw ? 0.5 : (winValue == (isWhite ? BoardState::winValue::white : BoardState::winValue::black));
     // Utils::print(to_string(n), false);
     // Utils::print(" | " + to_string(gameResult), true);
     return gameResult;
 }
 
-vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree)
+vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree, simTreeResult *result)
 {
     std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> legalMoves = boardState.getMoves(enemyMove ? !isWhite : isWhite);
     float aStar = -INFINITY;
@@ -84,7 +84,7 @@ vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool e
         std::map<std::string, float>::iterator nIt = node.Nmap.find(stringify(legalMoves->at(i)));
         if (qIt != node.Qmap.end())
         {
-            evaluation += qIt->second;
+            evaluation += qIt->second * (enemyMove ? -1 : 1);
         }
         if (nIt != node.Nmap.end())
         {
@@ -94,13 +94,15 @@ vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool e
         {
             evaluation += c * sqrt(log(node.N + 1));
         }
-        if (evaluation > aStar)
+        string move = stringify(legalMoves->at(i));
+        if (evaluation > aStar && (result == nullptr || legalMoves->at(i).size() == 0 || find(result->actions.begin(), result->actions.end(), move) == result->actions.end()))
         {
             aStar = evaluation;
             bestMove = legalMoves->at(i);
         }
     }
-    // Utils::print(to_string(aStar), true);
+    if (c == 0)
+        Utils::print(to_string(aStar), true);
     return bestMove;
 }
 
@@ -141,13 +143,13 @@ void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree)
     tree->emplace(boardState.dumpPos() + (whiteToPlay ? 'w' : 'b'), Node());
 }
 
-vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay, simTreeResult *result)
+vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay /*, simTreeResult *result*/)
 {
     std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> legalMoves = boardState.getMoves(whiteToPlay);
-    if (result == nullptr)
-    {
-        return legalMoves->at(rand() % legalMoves->size());
-    }
+    /*if (result == nullptr)
+    {*/
+    return legalMoves->at(rand() % legalMoves->size());
+    /*}
     {
         vector<vector<BoardState::xMove> *> moves = vector<vector<BoardState::xMove> *>();
         for (int i = 0; i < legalMoves->size(); i++)
@@ -159,7 +161,7 @@ vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay,
             }
         }
         return *(moves.at(rand() % moves.size()));
-    }
+    }*/
 }
 
 string stringify(vector<BoardState::xMove> move)

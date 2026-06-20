@@ -25,10 +25,10 @@ struct Node
 
 vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime, bool isWhite, map<string, Node> *tree);
 void simulate(BoardState boardState, bool isWhite, map<string, Node> *tree);
-simTreeResult simTree(BoardState boardState, bool isWhite, map<string, Node> *tree);
+simTreeResult simTree(BoardState *boardState, bool isWhite, map<string, Node> *tree);
 float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay);
-vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree);
+vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree, simTreeResult *result = nullptr);
 void backup(vector<string> states, vector<string> actions, float z, map<string, Node> *tree);
 void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree);
-vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay, simTreeResult* result = nullptr);
+vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay /*, simTreeResult* result = nullptr*/);
 string stringify(vector<BoardState::xMove>);

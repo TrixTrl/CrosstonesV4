@@ -305,9 +305,10 @@ int main()
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			Deepchad(4);
-		// Hydra(4, 14);
-		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+			// Deepchad(4);
+			// Hydra(4, 14);
+			// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+			AlphaCruncher(30);
 		Player *p2 = new
 			// TheFirst(2);
 			// Hydra(4, 14);
@@ -323,13 +324,16 @@ int main()
 		// gameMaster->loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		// gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30408 -B30500 -B30502 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
+		// gameMaster->loadPos("b-10000 r-10006 b-10012 -B10500 -B10502 -W10510 -W10512 b-10606 -B10700 -B10702 -W10710 -W10712 b-11200 r-11206 b-11212 11111111111111111111");
+		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W10409 -B10502 bW20603 -W20710 -B10803 -B10900 b-11200 r-11206 b-11212 11111111111111111111");
+		// gameMaster->loadPos("-B10500 -W10602 11111111111111111111");
 		RaylibUI::init();
 		std::thread gm_thread(&GameMaster::play, gameMaster, globalHwnd, true);
 
 		RaylibUI::draw(&displayBoard[0]);
 
-		//gameMaster->play(globalHwnd, /*whiteToStart: */ false);
-		//  while(true) {}
+		// gameMaster->play(globalHwnd, /*whiteToStart: */ false);
+		//   while(true) {}
 	}
 	return 0;
 }
