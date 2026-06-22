@@ -183,6 +183,21 @@ void Utils::print(std::string s, size_t n, bool newLine)
 	OutputDebugString(wideString);
 }
 
+void Utils::printNode(Node n)
+{
+	std::string s = "";
+	s += std::to_string(n.N) + "\n";
+	for (const auto pair : n.Nmap)
+	{
+		// s += pair.first + '\n';
+		s += pair.first + " : " + std::to_string(pair.second) + " | " + std::to_string(n.Qmap.at(pair.first)) + "\n";
+	}
+	// THIS IS WHERE I WAS WORKING
+	std::string temp = std::string(s.begin(), s.end());
+	LPCSTR wideString = temp.c_str();
+	OutputDebugString(wideString);
+}
+
 Utils::winValue Utils::gameOver(bool isWhite, extraBoardData metaData)
 {
 	bool whiteNoPieces = !(metaData.colorBitboards[0][0] | metaData.colorBitboards[0][1] | metaData.colorBitboards[0][2]);

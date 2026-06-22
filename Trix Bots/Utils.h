@@ -7,6 +7,7 @@
 
 #include "../Test Bots/BasicGenerator.h"
 #include "../BoardState.h"
+#include "MCTS_Structs.h"
 
 class Utils
 {
@@ -88,6 +89,7 @@ public:
 	static void print(std::string s, int n, bool newLine = false);
 	static void print(std::string s, float n, bool newLine = false);
 	static void print(std::string s, size_t n, bool newLine = false);
+	static void printNode(Node n);
 
 	static std::shared_ptr<std::vector<std::vector<xMove>>> getMoves_halfSplit_noPush(bool isWhite, uint8_t(*pieces)[13][13]);
 	static void basicGenerator_halfSplit_noPush(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t(*pieces)[13][13]);

@@ -14,5 +14,5 @@ public:
 		return false;
 	}
     int thinkingTime = 10;
-    map<string, Node> tree = map<string, Node>();
+    std::map<std::string, Node> tree = std::map<std::string, Node>();
 };

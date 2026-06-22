@@ -7,28 +7,16 @@
 #include <string>
 #include "Utils.h"
 #include <algorithm>
+#include "MCTS_Structs.h"
 
-using namespace ::std;
+// using namespace ::std;
 
-struct simTreeResult
-{
-    vector<string> states = vector<string>();
-    vector<string> actions = vector<string>();
-    bool whiteToPlay = false;
-};
-struct Node
-{
-    int N = 0;
-    map<string, float> Nmap = map<string, float>();
-    map<string, float> Qmap = map<string, float>();
-};
-
-vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime, bool isWhite, map<string, Node> *tree);
-void simulate(BoardState boardState, bool isWhite, map<string, Node> *tree);
-simTreeResult simTree(BoardState *boardState, bool isWhite, map<string, Node> *tree);
+std::vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime, bool isWhite, std::map<std::string, Node> *tree);
+void simulate(BoardState boardState, bool isWhite, std::map<std::string, Node> *tree);
+simTreeResult simTree(BoardState *boardState, bool isWhite, std::map<std::string, Node> *tree);
 float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay);
-vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, map<string, Node> *tree, simTreeResult *result = nullptr);
-void backup(vector<string> states, vector<string> actions, float z, map<string, Node> *tree);
-void newNode(BoardState boardState, bool whiteToPlay, map<string, Node> *tree);
-vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay /*, simTreeResult* result = nullptr*/);
-string stringify(vector<BoardState::xMove>);
+std::vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, std::map<std::string, Node> *tree, simTreeResult *result = nullptr);
+void backup(std::vector<std::string> states, std::vector<std::string> actions, float z, std::map<std::string, Node> *tree);
+void newNode(BoardState boardState, bool whiteToPlay, std::map<std::string, Node> *tree);
+std::vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay);
+std::string stringify(std::vector<BoardState::xMove>);
