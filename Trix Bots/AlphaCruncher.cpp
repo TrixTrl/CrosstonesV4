@@ -13,5 +13,5 @@ void AlphaCruncher::getMoveToPlay(uint8_t (*board)[13][13], bool isWhite, int en
     {
         (*board)[bestMove[i].i][bestMove[i].j] ^= bestMove[i].delta;
     }
-    Utils::printNode(tree.at(Utils::convertToPosString(board) + (isWhite ? 'b' : 'w')));
+    // Utils::printNode(tree.at(Utils::convertToPosString(board) + (isWhite ? 'b' : 'w')));
 }
