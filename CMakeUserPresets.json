@@ -14,7 +14,7 @@
             "inherits": "vcpkg",
             "environment": {
                 "VCPKG_ROOT": "C:/Users/Trix/Documents/vcpkg",
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         }
     ]

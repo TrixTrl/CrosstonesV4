@@ -1,13 +1,4 @@
-#include "BoardState.h"
-#include <iostream>
-#include <string>
-#include "Globals/Piece.h"
-#include <cstdint>
-#include <sstream>
-#include <iomanip>
-
-#include "fix_win32_compatibility.h"
-#include <WinUser.h>
+#include "TrixBoardState.h"
 
 #define BACKGROUND "\x1b[43m\x1b[38;5;52m"
 #define RESET "\x1b[m"
@@ -18,7 +9,7 @@
 
 #define DEBUG_PRINTING false
 
-BoardState::BoardState()
+BoardState_T::BoardState_T()
 {
 	for (int i = 0; i < 13; i++)
 	{
@@ -62,7 +53,7 @@ BoardState::BoardState()
 	pieces[10][6] = hasTurnPiece;
 }
 
-void BoardState::rst(std::bitset<3> &tps)
+void BoardState_T::rst(std::bitset<3> &tps)
 {
 	uint8_t turnPieceMask = 0b10111111;
 	uint8_t resetMask = 0b11000000;
@@ -142,7 +133,7 @@ void BoardState::rst(std::bitset<3> &tps)
 	pieces[6][3] |= 3 | Piece::White;*/
 }
 
-void BoardState::wipe()
+void BoardState_T::wipe()
 {
 	for (int i = 0; i < 13; i++)
 	{
@@ -153,12 +144,12 @@ void BoardState::wipe()
 	}
 }
 
-void BoardState::copyBoard(uint8_t (*dest)[13][13]) const
+void BoardState_T::copyBoard(uint8_t (*dest)[13][13]) const
 {
 	std::memcpy(dest, &pieces, sizeof(pieces));
 }
 
-void debugPrint(std::string str)
+void debugPrint_T(std::string str)
 {
 	if (!DEBUG_PRINTING)
 		return;
@@ -167,14 +158,14 @@ void debugPrint(std::string str)
 	OutputDebugString(wideString);
 }
 
-void forceDebugPrint(std::string str)
+void forcedebugPrint_T(std::string str)
 {
 	std::string temp = std::string(str.begin(), str.end());
 	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
 }
 
-std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) const
+std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::getMoves(bool isWhite) const
 {
 	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
 	moves->reserve(700);
@@ -195,7 +186,7 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 			memset(visited, false, sizeof(visited));
 			visited[i][j] = true;
 			if (DEBUG_PRINTING)
-				debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+				debugPrint_T("X : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false, isWhite);
 		}
 	}
@@ -203,9 +194,9 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 	return moves;
 }
 
-void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void BoardState_T::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
-	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
+	std::vector<BoardState_T::xMove> move = std::vector<BoardState_T::xMove>();
 	move.reserve(10);
 	for (int i = 0; i < 13; i++)
 	{
@@ -229,7 +220,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 		bool visitedCopy[13][13];
 		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 		if (DEBUG_PRINTING)
-			debugPrint("T : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
+			debugPrint_T("T : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
 		basicGenerator(moves, &boardCopy, x, y, &visitedCopy, remainingSteps, true, isWhite);
 	}
 
@@ -303,7 +294,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
 				if (DEBUG_PRINTING)
-					debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+					debugPrint_T("O : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 			}
 		}
@@ -337,7 +328,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
 				if (DEBUG_PRINTING)
-					debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+					debugPrint_T("M : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
 			}
 		}
@@ -422,7 +413,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
 			if (DEBUG_PRINTING)
-				debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+				debugPrint_T("P : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 
@@ -441,13 +432,13 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
 			if (DEBUG_PRINTING)
-				debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+				debugPrint_T("C : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
 }
 
-void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void BoardState_T::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
 	/*
 		0
@@ -464,7 +455,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 		bool visitedCopy[13][13];
 		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 		if (DEBUG_PRINTING)
-			debugPrint("CT : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
+			debugPrint_T("CT : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
 		captureGenerator(moves, &boardCopy, originX, originY, x, y, &visitedCopy, remainingSteps, true, isWhite);
 	}
 
@@ -536,7 +527,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 				visitedCopy[i][j] = true;
 				if (DEBUG_PRINTING)
-					debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+					debugPrint_T("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite); // do last move
 																						  // TODO: Wrong ruleset bug, verify this change is correct
 																						  //  //if dest is empty, continue the move if possible
@@ -553,13 +544,13 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 			bool visitedCopy[13][13];
 			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
 			visitedCopy[i][j] = true;
-			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
+			debugPrint_T("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
 			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite); // only decrement moves if the capturing piece doesn't have a blue addon
 		}
 	}
 }
 
-void BoardState::unsafeMakeMove(std::vector<xMove> *move)
+void BoardState_T::unsafeMakeMove(std::vector<xMove> *move)
 {
 	for (int i = 0; i < move->size(); i++)
 	{
@@ -567,9 +558,9 @@ void BoardState::unsafeMakeMove(std::vector<xMove> *move)
 	}
 }
 
-int BoardState::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
+int BoardState_T::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> moves;
 	moves = getMoves(isWhiteTurn);
 	uint8_t boardCopy1[13][13];
 	uint8_t boardCopy2[13][13];
@@ -594,9 +585,9 @@ int BoardState::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 	return -1;
 }
 
-int BoardState::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
+int BoardState_T::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> moves;
 	moves = getMoves(isWhiteTurn);
 	uint8_t boardCopy[13][13];
 	for (int i = 0; i < moves->size(); i++)
@@ -610,8 +601,8 @@ int BoardState::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 		{
 			std::memcpy(&pieces, newState, sizeof(pieces));
 
-			forceDebugPrint(dumpPos());
-			forceDebugPrint("\n");
+			forcedebugPrint_T(dumpPos());
+			forcedebugPrint_T("\n");
 
 			gameRecord.emplace_back(std::to_string(i) + " ");
 
@@ -622,7 +613,7 @@ int BoardState::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 	}
 	return -1;
 }
-BoardState::winValue BoardState::gameOver(bool isWhite) // last player to make a move
+BoardState_T::winValue BoardState_T::gameOver(bool isWhite) // last player to make a move
 {
 	// Check for full eliminations, if yes, that player wins
 	// Check for base wins
@@ -743,7 +734,7 @@ BoardState::winValue BoardState::gameOver(bool isWhite) // last player to make a
 	return isWhite ? winValue::white : winValue::black;
 }
 
-std::string BoardState::dumpPos()
+std::string BoardState_T::dumpPos()
 {
 	std::string turnPieceStr = "";
 	std::string str = "";
@@ -779,7 +770,7 @@ std::string BoardState::dumpPos()
 	return str + turnPieceStr;
 }
 
-void BoardState::loadPos(std::string str)
+void BoardState_T::loadPos(std::string str)
 {
 	wipe();
 
@@ -818,13 +809,14 @@ void BoardState::loadPos(std::string str)
 	}
 }
 
-void BoardState::dumpGame()
+void BoardState_T::dumpGame()
 {
 
-	forceDebugPrint("\nGame record:\n\n");
+	forcedebugPrint_T("\nGame record:\n\n");
 	for (int i = 0; i < gameRecord.size(); i++)
 	{
-		forceDebugPrint(gameRecord[i]);
+		forcedebugPrint_T(gameRecord[i]);
 	}
-	forceDebugPrint("\n\n");
+	forcedebugPrint_T("\n\n");
 }
+

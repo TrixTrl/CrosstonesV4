@@ -3,10 +3,10 @@
 
 void AlphaCruncher::getMoveToPlay(uint8_t (*board)[13][13], bool isWhite, int endTime)
 {
-    BoardState boardState = BoardState();
+    BoardState_T boardState = BoardState_T();
     boardState.loadPos(Utils::convertToPosString(board));
 
-    std::vector<BoardState::xMove> bestMove = UCT_Search(boardState, thinkingTime, isWhite, &tree);
+    std::vector<BoardState_T::xMove> bestMove = UCT_Search(boardState, thinkingTime, isWhite, &tree);
     Utils::print(stringify(bestMove), true);
     Utils::print(std::to_string(tree.size()));
     for (int i = 0; i < bestMove.size(); i++)

@@ -1,6 +1,6 @@
 #include "MCTS.h"
 
-std::vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime, bool isWhite, std::map<std::string, Node> *tree)
+std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchTime, bool isWhite, std::map<std::string, Node> *tree)
 {
     int endTime = time(0) + searchTime;
     std::vector<std::thread *> threads = std::vector<std::thread *>();
@@ -19,7 +19,7 @@ std::vector<BoardState::xMove> UCT_Search(BoardState boardState, int searchTime,
     return selectMove(boardState, isWhite, false, 0, 0.9, tree);
 }
 
-void simulatorLoop(int endTime, BoardState boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
+void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
 {
     // Utils::print("Starting thread loop", true);
     while (time(0) < endTime)
@@ -29,7 +29,7 @@ void simulatorLoop(int endTime, BoardState boardState, bool isWhite, std::map<st
     return;
 }
 
-void simulate(BoardState boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
+void simulate(BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
 {
     simTreeResult treeResult = simTree(&boardState, isWhite, tree, treeLock);
     bool z = simDefault(boardState, isWhite, treeResult.whiteToPlay);
@@ -39,7 +39,7 @@ void simulate(BoardState boardState, bool isWhite, std::map<std::string, Node> *
     treeLock->unlock();
 }
 
-simTreeResult simTree(BoardState *boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
+simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
 {
     float c = 0.7;
     float b = 0.9;
@@ -47,7 +47,7 @@ simTreeResult simTree(BoardState *boardState, bool isWhite, std::map<std::string
     result.whiteToPlay = isWhite;
     bool passed = false;
     // Utils::print(".");
-    while (boardState->gameOver(!result.whiteToPlay) == BoardState::winValue::none)
+    while (boardState->gameOver(!result.whiteToPlay) == BoardState_T::winValue::none)
     {
         // Utils::print("!");
         std::string state = boardState->dumpPos() + (result.whiteToPlay ? 'w' : 'b');
@@ -59,49 +59,50 @@ simTreeResult simTree(BoardState *boardState, bool isWhite, std::map<std::string
             newNode(*boardState, result.whiteToPlay, isWhite, tree);
             treeLock->unlock();
             // Utils::print("Created new node", true);
-            std::vector<BoardState::xMove> a = defaultPolicy(*boardState, result.whiteToPlay);
-            boardState->makeMove(&a, result.whiteToPlay);
+            std::vector<BoardState_T::xMove> a = defaultPolicy(*boardState, result.whiteToPlay);
+            boardState->unsafeMakeMove(&a);
             result.actions.emplace_back(stringify(a));
             result.whiteToPlay = !result.whiteToPlay;
             // result.heuristic = staticHeuristic(boardState) * (isWhite ? 1 : -1);
-            result.heuristic = stolenHeuristic(*boardState, std::vector<BoardState::xMove>(), /*result.whiteToPlay*/ isWhite);
+            result.heuristic = stolenHeuristic(*boardState, std::vector<BoardState_T::xMove>(), /*result.whiteToPlay*/ isWhite);
             return result;
         }
-        std::vector<BoardState::xMove> a = selectMove(*boardState, isWhite, isWhite != result.whiteToPlay, c, b, tree, &result);
+        std::vector<BoardState_T::xMove> a = selectMove(*boardState, isWhite, isWhite != result.whiteToPlay, c, b, tree, &result);
         treeLock->unlock();
         // Utils::print("Unlocked", true);
         result.actions.emplace_back(stringify(a));
-        boardState->makeMove(&a, result.whiteToPlay);
+        boardState->unsafeMakeMove(&a);
         result.whiteToPlay = !result.whiteToPlay;
     }
     // Utils::print(to_string((int)boardState.gameOver(result.whiteToPlay)), true);
     // result.heuristic = staticHeuristic(boardState) * (isWhite ? 1 : -1);
-    result.heuristic = stolenHeuristic(*boardState, std::vector<BoardState::xMove>(), /*result.whiteToPlay*/ isWhite);
+    result.heuristic = stolenHeuristic(*boardState, std::vector<BoardState_T::xMove>(), /*result.whiteToPlay*/ isWhite);
     return result;
 }
 
-float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay)
+float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
 {
     int n = 0;
-    while (boardState.gameOver(!whiteToPlay) == BoardState::winValue::none)
+    while (boardState.gameOver(!whiteToPlay) == BoardState_T::winValue::none)
     {
         n++;
-        std::vector<BoardState::xMove> a = defaultPolicy(boardState, whiteToPlay);
-        boardState.makeMove(&a, whiteToPlay);
+        std::vector<BoardState_T::xMove> a = defaultPolicy(boardState, whiteToPlay);
+        // std::vector<BoardState_T::xMove> a = defaultPolicy_halfSplitGenerator(boardState, whiteToPlay);
+        boardState.unsafeMakeMove(&a);
         whiteToPlay = !whiteToPlay;
     }
-    BoardState::winValue winValue = boardState.gameOver(!whiteToPlay);
-    float gameResult = winValue == BoardState::winValue::draw ? 0.5 : (winValue == (isWhite ? BoardState::winValue::white : BoardState::winValue::black));
+    BoardState_T::winValue winValue = boardState.gameOver(!whiteToPlay);
+    float gameResult = winValue == BoardState_T::winValue::draw ? 0.5 : (winValue == (isWhite ? BoardState_T::winValue::white : BoardState_T::winValue::black));
     // Utils::print(to_string(n), false);
     // Utils::print(" | " + to_string(gameResult), true);
     return gameResult;
 }
 
-std::vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result)
+std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result)
 {
-    std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> legalMoves = boardState.getMoves(enemyMove ? !isWhite : isWhite);
+    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(enemyMove ? !isWhite : isWhite);
     float aStar = -INFINITY;
-    std::vector<BoardState::xMove> bestMove;
+    std::vector<BoardState_T::xMove> bestMove;
     std::map<std::string, Node>::iterator it = tree->find(boardState.dumpPos() + ((isWhite != enemyMove) ? 'w' : 'b'));
     Node *node = &(it->second);
     for (int i = 0; i < legalMoves->size(); i++)
@@ -139,7 +140,7 @@ std::vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, b
         }
         if (qsIt != node->Qsquigglemap.end() && nsIt != node->Nsquigglemap.end())
         {
-            b = 0.9;
+            b = 0.6;
             evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log(nsIt->second + 1) + 1) * (enemyMove ? -1 : 1);
         }
         std::string move = stringify(legalMoves->at(i));
@@ -198,16 +199,17 @@ void backup(std::vector<std::string> states, std::vector<std::string> actions, f
     // Utils::print("Ended backup", true);
 }
 
-void newNode(BoardState boardState, bool whiteToPlay, bool isWhite, std::map<std::string, Node> *tree)
+void newNode(BoardState_T boardState, bool whiteToPlay, bool isWhite, std::map<std::string, Node> *tree)
 {
     std::string posIndex = boardState.dumpPos() + (whiteToPlay ? 'w' : 'b');
     tree->emplace(posIndex, Node());
-    tree->at(posIndex).nodeQsquiggle = stolenHeuristic(boardState, std::vector<BoardState::xMove>(), isWhite);
+    tree->at(posIndex).nodeQsquiggle = stolenHeuristic(boardState, std::vector<BoardState_T::xMove>(), isWhite);
 }
 
-std::vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay)
+std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay)
 {
-    std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> legalMoves = boardState.getMoves(whiteToPlay);
+    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(whiteToPlay);
+    return legalMoves->at(rand() % legalMoves->size());
     std::vector<int> indices = std::vector<int>();
     for (int i = 0; i < legalMoves->size(); i++)
     {
@@ -216,15 +218,42 @@ std::vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteTo
     std::shuffle(indices.begin(), indices.end(), std::random_device());
     for (int i = 0; i < legalMoves->size(); i++)
     {
-        if (!isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i])))
+        if (true || !isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i])))
         {
             return legalMoves->at(indices[i]);
         }
     }
-    return std::vector<BoardState::xMove>();
+    return std::vector<BoardState_T::xMove>();
 }
 
-std::string stringify(std::vector<BoardState::xMove> move)
+std::vector<BoardState_T::xMove> defaultPolicy_halfSplitGenerator(BoardState_T boardState, bool whiteToPlay)
+{
+    uint8_t board[13][13];
+    boardState.copyBoard(&board);
+    std::shared_ptr<std::vector<std::vector<Utils::xMove>>> legalMoves = Utils::getMoves_halfSplit_noPush(whiteToPlay, &board);
+    std::vector<int> indices = std::vector<int>();
+    for (int i = 0; i < legalMoves->size(); i++)
+    {
+        indices.emplace_back(i);
+    }
+    std::shuffle(indices.begin(), indices.end(), std::random_device());
+    for (int i = 0; i < legalMoves->size(); i++)
+    {
+        std::vector<BoardState_T::xMove> move = std::vector<BoardState_T::xMove>();
+
+        for (int j = 0; j < legalMoves->at(indices[i]).size(); j++)
+        {
+            move.emplace_back(BoardState_T::xMove(legalMoves->at(indices[i]).at(j).i, legalMoves->at(indices[i]).at(j).j, legalMoves->at(indices[i]).at(j).delta));
+        }
+        if (!isLoosing(boardState, whiteToPlay, move))
+        {
+            return move;
+        }
+    }
+    return std::vector<BoardState_T::xMove>();
+}
+
+std::string stringify(std::vector<BoardState_T::xMove> move)
 {
     std::string output = "";
     for (int i = 0; i < move.size(); i++)
@@ -234,14 +263,14 @@ std::string stringify(std::vector<BoardState::xMove> move)
     return output;
 }
 
-bool isLoosing(BoardState boardState, bool whiteToPlay, std::vector<BoardState::xMove> move)
+bool isLoosing(BoardState_T boardState, bool whiteToPlay, std::vector<BoardState_T::xMove> move)
 {
     boardState.unsafeMakeMove(&move);
-    BoardState::winValue winState = boardState.gameOver(whiteToPlay);
-    return winState == (whiteToPlay ? BoardState::winValue::black : BoardState::winValue::white);
+    BoardState_T::winValue winState = boardState.gameOver(whiteToPlay);
+    return winState == (whiteToPlay ? BoardState_T::winValue::black : BoardState_T::winValue::white);
 }
 
-float heuristic(BoardState boardState, std::vector<BoardState::xMove> move)
+float heuristic(BoardState_T boardState, std::vector<BoardState_T::xMove> move)
 {
     boardState.unsafeMakeMove(&move);
     uint8_t board[13][13];
@@ -269,7 +298,7 @@ float heuristic(BoardState boardState, std::vector<BoardState::xMove> move)
     return float(whiteScore) / float(whiteScore + blackScore);
 }
 
-float simpleCaptureHeuristic(std::vector<BoardState::xMove> move)
+float simpleCaptureHeuristic(std::vector<BoardState_T::xMove> move)
 {
     bool whitePartOfMove = false;
     bool blackPartOfMove = false;
@@ -291,7 +320,7 @@ float simpleCaptureHeuristic(std::vector<BoardState::xMove> move)
     return (whitePartOfMove && blackPartOfMove) ? 0.5 + captureDeveation : 0.5 - captureDeveation;
 }
 
-float staticHeuristic(BoardState *boardState)
+float staticHeuristic(BoardState_T *boardState)
 {
     uint8_t board[13][13];
     boardState->copyBoard(&board);
@@ -318,7 +347,7 @@ float staticHeuristic(BoardState *boardState)
     return log(abs(whiteScore - blackScore) + 1) * (whiteScore > blackScore ? 1 : -1);
 }
 
-float stolenHeuristic(BoardState boardState, std::vector<BoardState::xMove> move, bool isWhiteTurn)
+float stolenHeuristic(BoardState_T boardState, std::vector<BoardState_T::xMove> move, bool isWhiteTurn)
 {
     boardState.unsafeMakeMove(&move);
     uint8_t pieces[13][13];

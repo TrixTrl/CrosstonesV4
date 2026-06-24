@@ -2,7 +2,7 @@
 
 #include "../Globals/Player.h"
 #include <memory>
-#include "../BoardState.h"
+#include "TrixBoardState.h"
 #include "MCTS.h"
 
 class AlphaCruncher : public Player

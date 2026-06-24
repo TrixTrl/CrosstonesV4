@@ -106,7 +106,7 @@ public:
 
                     if (Piece::tower(piece))
                     {
-                        float piecePadding = 0.15;
+                        float piecePadding = 0.2;
                         float pieceBorder = 0.1;
                         float textScale = 0.7;
                         raylib::Color colors[4][2] = {{color(15, 15, 15), color(250, 250, 250)}, {color(250, 250, 250), color(15, 15, 15)}, {color(224, 36, 36), color(230, 37, 37)}, {color(31, 20, 250), color(44, 35, 219)}};
