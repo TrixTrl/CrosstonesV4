@@ -18,4 +18,5 @@ struct Node
     std::map<std::string, float> Qmap = std::map<std::string, float>();
     std::map<std::string, float> Qsquigglemap = std::map<std::string, float>();
     std::map<std::string, float> Nsquigglemap = std::map<std::string, float>();
+    float nodeQsquiggle = 0;
 };

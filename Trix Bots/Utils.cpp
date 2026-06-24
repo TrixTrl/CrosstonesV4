@@ -185,14 +185,25 @@ void Utils::print(std::string s, size_t n, bool newLine)
 
 void Utils::printNode(Node n)
 {
-	std::string s = "";
-	s += std::to_string(n.N) + "\n";
 	for (const auto pair : n.Nmap)
 	{
-		// s += pair.first + '\n';
-		s += pair.first + " : " + std::to_string(pair.second) + " | " + std::to_string(n.Qmap.at(pair.first)) + "\n";
+		std::string s = "";
+		std::string nString = std::to_string((int)pair.second);
+		nString = std::string(max(10 - nString.length(), 0), ' ') + nString;
+		std::string qString = std::to_string(n.Qmap.at(pair.first));
+		qString = std::string(max(20 - qString.length(), 0), ' ') + qString;
+		std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
+		nsString = std::string(max(10 - nsString.length(), 0), ' ') + nsString;
+		std::string qsString = std::to_string((n.Qsquigglemap.contains(pair.first) ? n.Qsquigglemap.at(pair.first) : 0));
+		qsString = std::string(max(20 - qsString.length(), 0), ' ') + qsString;
+		s += pair.first + std::string(max(40 - pair.first.length(), 0), ' ') + " : " + nString + " | " + qString + " | " + nsString + " | " + qsString + "\n";
+		std::string temp = std::string(s.begin(), s.end());
+		LPCSTR wideString = temp.c_str();
+		OutputDebugString(wideString);
 	}
-	// THIS IS WHERE I WAS WORKING
+	std::string s = "";
+	s += "Node N: " + std::to_string(n.N) + "\n";
+	s += "Node Q~: " + std::to_string(n.nodeQsquiggle) + "\n";
 	std::string temp = std::string(s.begin(), s.end());
 	LPCSTR wideString = temp.c_str();
 	OutputDebugString(wideString);
@@ -433,9 +444,8 @@ float Utils::felixEvalWrapper(bool isWhite, uint8_t (*pieces)[13][13])
 {
 	dc::Board board;
 	board.initialize(pieces, isWhite);
-	board.updateWinValue();
 	dc::Evaluation evaluator;
-	return float(evaluator.evaluate(board)) / (isWhite ? -100 : -100);
+	return evaluator.evaluate(board);
 }
 
 int Utils::getBestMoveBasic(bool isWhite, uint8_t (*pieces)[13][13], int depth)

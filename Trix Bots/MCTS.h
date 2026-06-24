@@ -23,10 +23,11 @@ simTreeResult simTree(BoardState *boardState, bool isWhite, std::map<std::string
 float simDefault(BoardState boardState, bool isWhite, bool whiteToPlay);
 std::vector<BoardState::xMove> selectMove(BoardState boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result = nullptr);
 void backup(std::vector<std::string> states, std::vector<std::string> actions, float z, float m, std::map<std::string, Node> *tree);
-void newNode(BoardState boardState, bool whiteToPlay, std::map<std::string, Node> *tree);
+void newNode(BoardState boardState, bool whiteToPlay, bool iswhite, std::map<std::string, Node> *tree);
 std::vector<BoardState::xMove> defaultPolicy(BoardState boardState, bool whiteToPlay);
 bool isLoosing(BoardState boardState, bool whiteToPlay, std::vector<BoardState::xMove> move);
 std::string stringify(std::vector<BoardState::xMove>);
 float heuristic(BoardState boardState, std::vector<BoardState::xMove> move);
 float simpleCaptureHeuristic(std::vector<BoardState::xMove> move);
-float staticHeuristic(BoardState* boardState);
+float staticHeuristic(BoardState *boardState);
+float stolenHeuristic(BoardState boardState, std::vector<BoardState::xMove> move, bool isWhiteTurn);
