@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <sstream>
 #include <iomanip>
+#include "Utils.h"
 
 class BoardState_T
 {
@@ -29,9 +30,9 @@ public:
         xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
     };
 
-    std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite) const;
-    void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
-    void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
+    std::shared_ptr<std::vector<std::vector<xMove>>> getMoves(bool isWhite, bool fullMovesOnly) const;
+    void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite, bool fullMovesOnly) const;
+    void captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite, bool fullMovesOnly) const;
 
     void unsafeMakeMove(std::vector<xMove> *move);
     int makeMove(std::vector<xMove> *move, bool isWhiteTurn); // return -1 for invalid, 0 for passing, and 1 for any other valid move

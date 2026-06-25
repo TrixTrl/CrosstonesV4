@@ -59,7 +59,7 @@ simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::stri
             newNode(*boardState, result.whiteToPlay, isWhite, tree);
             treeLock->unlock();
             // Utils::print("Created new node", true);
-            std::vector<BoardState_T::xMove> a = defaultPolicy(*boardState, result.whiteToPlay);
+            std::vector<BoardState_T::xMove> a = defaultPolicy(*boardState, result.whiteToPlay, false);
             boardState->unsafeMakeMove(&a);
             result.actions.emplace_back(stringify(a));
             result.whiteToPlay = !result.whiteToPlay;
@@ -86,7 +86,7 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
     while (boardState.gameOver(!whiteToPlay) == BoardState_T::winValue::none)
     {
         n++;
-        std::vector<BoardState_T::xMove> a = defaultPolicy(boardState, whiteToPlay);
+        std::vector<BoardState_T::xMove> a = defaultPolicy(boardState, whiteToPlay, true);
         // std::vector<BoardState_T::xMove> a = defaultPolicy_halfSplitGenerator(boardState, whiteToPlay);
         boardState.unsafeMakeMove(&a);
         whiteToPlay = !whiteToPlay;
@@ -100,7 +100,7 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
 
 std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result)
 {
-    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(enemyMove ? !isWhite : isWhite);
+    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(enemyMove ? !isWhite : isWhite, false);
     float aStar = -INFINITY;
     std::vector<BoardState_T::xMove> bestMove;
     std::map<std::string, Node>::iterator it = tree->find(boardState.dumpPos() + ((isWhite != enemyMove) ? 'w' : 'b'));
@@ -206,9 +206,9 @@ void newNode(BoardState_T boardState, bool whiteToPlay, bool isWhite, std::map<s
     tree->at(posIndex).nodeQsquiggle = stolenHeuristic(boardState, std::vector<BoardState_T::xMove>(), isWhite);
 }
 
-std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay)
+std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay, bool simpleMoveGeneration)
 {
-    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(whiteToPlay);
+    std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> legalMoves = boardState.getMoves(whiteToPlay, simpleMoveGeneration);
     return legalMoves->at(rand() % legalMoves->size());
     std::vector<int> indices = std::vector<int>();
     for (int i = 0; i < legalMoves->size(); i++)

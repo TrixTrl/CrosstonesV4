@@ -187,19 +187,26 @@ void Utils::printNode(Node n)
 {
 	for (const auto pair : n.Nmap)
 	{
-		std::string s = "";
+		// std::string s = "";
 		std::string nString = std::to_string((int)pair.second);
-		nString = std::string(max(10 - nString.length(), 0), ' ') + nString;
+		nString = std::string(max(7 - nString.length(), 1), ' ') + nString;
 		std::string qString = std::to_string(n.Qmap.at(pair.first));
-		qString = std::string(max(20 - qString.length(), 0), ' ') + qString;
+		qString = std::string(max(10 - qString.length(), 1), ' ') + qString;
 		std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
-		nsString = std::string(max(10 - nsString.length(), 0), ' ') + nsString;
+		nsString = std::string(max(7 - nsString.length(), 1), ' ') + nsString;
 		std::string qsString = std::to_string((n.Qsquigglemap.contains(pair.first) ? n.Qsquigglemap.at(pair.first) : 0));
-		qsString = std::string(max(20 - qsString.length(), 0), ' ') + qsString;
-		s += pair.first + std::string(max(40 - pair.first.length(), 0), ' ') + " : " + nString + " | " + qString + " | " + nsString + " | " + qsString + "\n";
-		std::string temp = std::string(s.begin(), s.end());
-		LPCSTR wideString = temp.c_str();
-		OutputDebugString(wideString);
+		qsString = std::string(max(10 - qsString.length(), 1), ' ') + qsString;
+		print(pair.first, false);
+		print(pair.first.length(), false);
+		print(std::string(max(40 - (int)pair.first.length(), 1), ' ') + " : ", false);
+		print(nString + " | ", false);
+		print(qString + " | ", false);
+		print(nsString + " | ", false);
+		print(qsString, true);
+		// s += std::string(max(30 - pair.first.length(), 0), ' ') + " : " + nString + " | " + qString + " | " + nsString + " | " + qsString + "\n";
+		// std::string temp = std::string(s.begin(), s.end());
+		// LPCSTR wideString = temp.c_str();
+		// OutputDebugString(wideString);
 	}
 	std::string s = "";
 	s += "Node N: " + std::to_string(n.N) + "\n";

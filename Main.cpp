@@ -305,7 +305,7 @@ int main()
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			Deepchad(3);
+			Deepchad(4);
 		// Hydra(4, 14);
 		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
 		// AlphaCruncher(10);
@@ -313,7 +313,7 @@ int main()
 			// TheFirst(2);
 			// Hydra(4, 14);
 			// Deepchad(4);
-			AlphaCruncher(60);
+			AlphaCruncher(60*5);
 
 		std::bitset<3> gamemode(0b111); /*Gates, Bases, Ports*/
 		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, &displayBoard[0]);

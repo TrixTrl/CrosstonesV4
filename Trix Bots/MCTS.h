@@ -24,7 +24,7 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay);
 std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result = nullptr);
 void backup(std::vector<std::string> states, std::vector<std::string> actions, float z, float m, std::map<std::string, Node> *tree);
 void newNode(BoardState_T boardState, bool whiteToPlay, bool iswhite, std::map<std::string, Node> *tree);
-std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay);
+std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay, bool simpleMoveGeneration);
 std::vector<BoardState_T::xMove> defaultPolicy_halfSplitGenerator(BoardState_T boardState, bool whiteToPlay);
 bool isLoosing(BoardState_T boardState, bool whiteToPlay, std::vector<BoardState_T::xMove> move);
 std::string stringify(std::vector<BoardState_T::xMove>);
