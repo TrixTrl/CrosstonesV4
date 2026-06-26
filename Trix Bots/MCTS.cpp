@@ -121,8 +121,10 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
         float evaluation = 0;
         std::map<std::string, float>::iterator qIt = node->Qmap.find(stringify(legalMoves->at(i)));
         std::map<std::string, float>::iterator nIt = node->Nmap.find(stringify(legalMoves->at(i)));
+#ifdef BOARD_HEURISTIC_ACTIVATED
         std::map<std::string, float>::iterator qsIt = node->Qsquigglemap.find(stringify(legalMoves->at(i)));
         std::map<std::string, float>::iterator nsIt = node->Nsquigglemap.find(stringify(legalMoves->at(i)));
+#endif
         if (qIt != node->Qmap.end())
         {
             evaluation += qIt->second * (enemyMove ? -1 : 1);
@@ -145,7 +147,6 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             evaluation += c * (1000 + rand() % 100);
         }
 #ifdef BOARD_HEURISTIC_ACTIVATED
-
         if (qsIt != node->Qsquigglemap.end() && nsIt != node->Nsquigglemap.end())
         {
             float b = 0.6;
@@ -183,8 +184,10 @@ void backup(std::vector<std::string> states, std::vector<std::string> actions, f
         node->recentlyVisited = true;
         std::map<std::string, float>::iterator qIt = node->Qmap.find(actions[i]);
         std::map<std::string, float>::iterator nIt = node->Nmap.find(actions[i]);
+#ifdef BOARD_HEURISTIC_ACTIVATED
         std::map<std::string, float>::iterator qsIt = node->Qsquigglemap.find(actions[i]);
         std::map<std::string, float>::iterator nsIt = node->Nsquigglemap.find(actions[i]);
+#endif
         if (qIt == node->Qmap.end())
         {
             node->Qmap.emplace(actions[i], 0);
