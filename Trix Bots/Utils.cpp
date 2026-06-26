@@ -193,8 +193,8 @@ void Utils::printNode(Node n)
 		std::string qString = std::to_string(n.Qmap.at(pair.first));
 		qString = std::string(max(15 - (int)qString.length(), 1), ' ') + qString;
 #ifdef BOARD_HEURISTIC_ACTIVATED
-		std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
-		nsString = std::string(max(15 - (int)nsString.length(), 1), ' ') + nsString;
+		// std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
+		// nsString = std::string(max(15 - (int)nsString.length(), 1), ' ') + nsString;
 		std::string qsString = std::to_string((n.Qsquigglemap.contains(pair.first) ? n.Qsquigglemap.at(pair.first) : 0));
 		qsString = std::string(max(15 - (int)qsString.length(), 1), ' ') + qsString;
 #endif
@@ -203,7 +203,7 @@ void Utils::printNode(Node n)
 #ifdef BOARD_HEURISTIC_ACTIVATED
 		print(nString + " | ", false);
 		print(qString + " | ", false);
-		print(nsString + " | ", false);
+		// print(nsString + " | ", false);
 		print(qsString, true);
 #else
 		print(nString + " | ", false);
