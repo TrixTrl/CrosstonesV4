@@ -8,6 +8,7 @@
 #include "../Test Bots/BasicGenerator.h"
 #include "../BoardState.h"
 #include "MCTS_Structs.h"
+#include "Toggles.h"
 
 class Utils
 {

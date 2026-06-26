@@ -192,17 +192,24 @@ void Utils::printNode(Node n)
 		nString = std::string(max(7 - nString.length(), 1), ' ') + nString;
 		std::string qString = std::to_string(n.Qmap.at(pair.first));
 		qString = std::string(max(10 - qString.length(), 1), ' ') + qString;
+#ifdef BOARD_HEURISTIC_ACTIVATED
 		std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
 		nsString = std::string(max(7 - nsString.length(), 1), ' ') + nsString;
 		std::string qsString = std::to_string((n.Qsquigglemap.contains(pair.first) ? n.Qsquigglemap.at(pair.first) : 0));
 		qsString = std::string(max(10 - qsString.length(), 1), ' ') + qsString;
+#endif
 		print(pair.first, false);
-		print(pair.first.length(), false);
-		print(std::string(max(40 - (int)pair.first.length(), 1), ' ') + " : ", false);
+		print(std::string(max(50 - (int)pair.first.length(), 1), ' ') + " : ", false);
+#ifdef BOARD_HEURISTIC_ACTIVATED
 		print(nString + " | ", false);
 		print(qString + " | ", false);
 		print(nsString + " | ", false);
 		print(qsString, true);
+#else
+		print(nString + " | ", false);
+		print(qString, true);
+
+#endif
 		// s += std::string(max(30 - pair.first.length(), 0), ' ') + " : " + nString + " | " + qString + " | " + nsString + " | " + qsString + "\n";
 		// std::string temp = std::string(s.begin(), s.end());
 		// LPCSTR wideString = temp.c_str();

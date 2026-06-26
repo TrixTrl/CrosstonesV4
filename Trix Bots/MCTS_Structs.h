@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "Toggles.h"
 
 struct simTreeResult
 {
@@ -16,7 +17,10 @@ struct Node
     int N = 0;
     std::map<std::string, float> Nmap = std::map<std::string, float>();
     std::map<std::string, float> Qmap = std::map<std::string, float>();
+#ifdef BOARD_HEURISTIC_ACTIVATED
     std::map<std::string, float> Qsquigglemap = std::map<std::string, float>();
     std::map<std::string, float> Nsquigglemap = std::map<std::string, float>();
+#endif
     float nodeQsquiggle = 0;
+    bool recentlyVisited = true;
 };

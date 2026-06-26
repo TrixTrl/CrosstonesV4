@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Toggles.h"
 #include "TrixBoardState.h"
 #include <vector>
 #include <map>
@@ -21,7 +22,7 @@ void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<
 void simulate(BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock);
 simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock);
 float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay);
-std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, float b, std::map<std::string, Node> *tree, simTreeResult *result = nullptr);
+std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, std::map<std::string, Node> *tree, simTreeResult *result = nullptr, std::mutex *treeLock = nullptr);
 void backup(std::vector<std::string> states, std::vector<std::string> actions, float z, float m, std::map<std::string, Node> *tree);
 void newNode(BoardState_T boardState, bool whiteToPlay, bool iswhite, std::map<std::string, Node> *tree);
 std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whiteToPlay, bool simpleMoveGeneration);

@@ -165,10 +165,40 @@ void forcedebugPrint_T(std::string str)
     OutputDebugString(wideString);
 }
 
-std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::getMoves(bool isWhite, bool fullMovesOnly) const
+std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::getMoves(bool isWhite, bool fullMovesOnly, bool singleTowerExploration) const
 {
     std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
-    moves->reserve(700);
+    moves->reserve(singleTowerExploration ? 50 : 700);
+
+    if (singleTowerExploration)
+    {
+        std::vector<std::pair<int, int>> towers = std::vector<std::pair<int, int>>();
+        for (int i = 0; i < 13; i++)
+        {
+            for (int j = 0; j < 13; j++)
+            {
+                uint8_t piece = pieces[i][j];
+                if (Piece::isTower(piece) && Piece::isWhiteTower(piece) == isWhite)
+                {
+                    towers.emplace_back(std::pair<int, int>(i, j));
+                }
+            }
+        }
+        if (towers.size() == 0)
+        {
+            moves->emplace_back(std::vector<BoardState_T::xMove>());
+            return moves;
+        }
+        std::pair<int, int> tower = towers[rand() % towers.size()];
+        uint8_t piece = pieces[tower.first][tower.second];
+        uint8_t boardCopy[13][13];
+        copyBoard(&boardCopy);
+        bool visited[13][13];
+        memset(visited, false, sizeof(visited));
+        visited[tower.first][tower.second] = true;
+        basicGenerator(moves, &boardCopy, tower.first, tower.second, &visited, Piece::maxSteps(piece), false, isWhite, fullMovesOnly);
+        return moves;
+    }
 
     Utils::Unroller<13>::Execute([this, moves, isWhite, fullMovesOnly](int I)
                                  { Utils::Unroller<13>::Execute([this, I, moves, isWhite, fullMovesOnly](int J)
@@ -274,7 +304,7 @@ void BoardState_T::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>
             { // number of moved pieces
                 if (splitOff > Piece::height(piece))
                     continue;
-                if (fullMovesOnly && splitOff < Piece::height(piece)-1)
+                if (fullMovesOnly && splitOff < Piece::height(piece) - 1)
                     continue;
                 uint8_t boardCopy[13][13];
                 std::memcpy(&boardCopy, state, sizeof(boardCopy));
@@ -566,7 +596,7 @@ void BoardState_T::unsafeMakeMove(std::vector<xMove> *move)
 int BoardState_T::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 {
     std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> moves;
-    moves = getMoves(isWhiteTurn, false);
+    moves = getMoves(isWhiteTurn, false, false);
     uint8_t boardCopy1[13][13];
     uint8_t boardCopy2[13][13];
     std::memcpy(&boardCopy1, pieces, sizeof(boardCopy1));
@@ -593,7 +623,7 @@ int BoardState_T::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 int BoardState_T::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 {
     std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> moves;
-    moves = getMoves(isWhiteTurn, false);
+    moves = getMoves(isWhiteTurn, false, false);
     uint8_t boardCopy[13][13];
     for (int i = 0; i < moves->size(); i++)
     {
