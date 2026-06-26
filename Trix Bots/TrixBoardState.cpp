@@ -168,11 +168,44 @@ void forcedebugPrint_T(std::string str)
 std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::getMoves(bool isWhite, bool fullMovesOnly, bool singleTowerExploration) const
 {
     std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
-    moves->reserve(singleTowerExploration ? 50 : 700);
+    moves->reserve(singleTowerExploration ? 70 : 700);
 
     if (singleTowerExploration)
     {
+
+        bool bases[2][2] = {{false, false}, {false, false}}; //[0] white   [1] black   [x][0] white base   [x][1] black base
+        for (int i = 5; i < 8; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (Piece::isTower(pieces[i][j]))
+                {
+                    if (Piece::isWhite(pieces[i][j]))
+                    {
+                        bases[0][1] = true; // black base white piece
+                    }
+                    else
+                    {
+                        bases[1][1] = true; // black base black piece
+                    }
+                }
+
+                if (Piece::isTower(pieces[i][12 - j]))
+                {
+                    if (Piece::isWhite(pieces[i][12 - j]))
+                    {
+                        bases[0][0] = true; // white base white piece
+                    }
+                    else
+                    {
+                        bases[1][0] = true; // white base black piece
+                    }
+                }
+            }
+        }
+
         std::vector<std::pair<int, int>> towers = std::vector<std::pair<int, int>>();
+        std::vector<std::pair<int, int>> baseTowers = std::vector<std::pair<int, int>>();
         for (int i = 0; i < 13; i++)
         {
             for (int j = 0; j < 13; j++)
@@ -180,14 +213,23 @@ std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::get
                 uint8_t piece = pieces[i][j];
                 if (Piece::isTower(piece) && Piece::isWhiteTower(piece) == isWhite)
                 {
+                    if (bases[isWhite][!isWhite] && i > 4 && i < 8 && (isWhite ? j > 8 : j < 4))
+                    {
+                        baseTowers.emplace_back(std::pair<int, int>(i, j));
+                        continue;
+                    }
                     towers.emplace_back(std::pair<int, int>(i, j));
                 }
             }
         }
-        if (towers.size() == 0)
+        if (towers.size() == 0 && baseTowers.size() == 0)
         {
             moves->emplace_back(std::vector<BoardState_T::xMove>());
             return moves;
+        }
+        else if (towers.size() == 0)
+        {
+            towers = baseTowers;
         }
         std::pair<int, int> tower = towers[rand() % towers.size()];
         uint8_t piece = pieces[tower.first][tower.second];

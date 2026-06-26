@@ -4,6 +4,7 @@
 #include <memory>
 #include "TrixBoardState.h"
 #include "MCTS.h"
+#include "Toggles.h"
 
 class AlphaCruncher : public Player
 {

@@ -5,7 +5,7 @@ std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchT
     int endTime = time(0) + searchTime;
     std::vector<std::thread *> threads = std::vector<std::thread *>();
     std::mutex treeLock = std::mutex();
-    int threadCount = 14;
+    int threadCount = 16;
     for (int i = 0; i < threadCount; i++)
     {
         threads.emplace_back(new std::thread(simulatorLoop, endTime, boardState, isWhite, tree, &treeLock));
@@ -81,13 +81,39 @@ simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::stri
 float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
 {
     int n = 0;
+    std::pair<bool, bool> passes = std::pair<bool, bool>(false, false);
     while (boardState.gameOver(!whiteToPlay) == BoardState_T::winValue::none)
     {
         n++;
         std::vector<BoardState_T::xMove> a = defaultPolicy(boardState, whiteToPlay, true);
-        // std::vector<BoardState_T::xMove> a = defaultPolicy_halfSplitGenerator(boardState, whiteToPlay);
         boardState.unsafeMakeMove(&a);
         whiteToPlay = !whiteToPlay;
+        if (a.size() == 0)
+        {
+            if (whiteToPlay)
+            {
+                if (passes.first)
+                    return isWhite ? 0 : 1;
+                passes.first = true;
+            }
+            else
+            {
+                if (passes.second)
+                    return isWhite ? 1 : 0;
+                passes.second = true;
+            }
+        }
+        else
+        {
+            if (whiteToPlay)
+            {
+                passes.first = false;
+            }
+            else
+            {
+                passes.second = false;
+            }
+        }
     }
     BoardState_T::winValue winValue = boardState.gameOver(!whiteToPlay);
     float gameResult = winValue == BoardState_T::winValue::draw ? 0.5 : (winValue == (isWhite ? BoardState_T::winValue::white : BoardState_T::winValue::black));
@@ -142,16 +168,11 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             evaluation += c * sqrt(log(node->N + 1) / (nIt->second + 1));
 #endif
         }
-        else
-        {
-            evaluation += c * (1000 + rand() % 100);
-        }
 #ifdef BOARD_HEURISTIC_ACTIVATED
         if (qsIt != node->Qsquigglemap.end() && nsIt != node->Nsquigglemap.end())
         {
-            float b = 0.6;
+            float b = 0.2;
             evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log(nsIt->second + 1) + 1) * (enemyMove ? -1 : 1);
-            // evaluation += b * (qsIt->second - node->nodeQsquiggle) * (enemyMove ? -1 : 1);
         }
 #endif
         std::string move = stringify(legalMoves->at(i));
@@ -238,7 +259,8 @@ std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whi
     std::shuffle(indices.begin(), indices.end(), std::random_device());
     for (int i = 0; i < legalMoves->size(); i++)
     {
-        if (true || !isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i])))
+        /*!isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i]))*/
+        if (legalMoves->at(indices[i]).size() > 0)
         {
             return legalMoves->at(indices[i]);
         }
@@ -373,5 +395,5 @@ float stolenHeuristic(BoardState_T boardState, std::vector<BoardState_T::xMove> 
     uint8_t pieces[13][13];
     boardState.copyBoard(&pieces);
     int eval = Utils::felixEvalWrapper(isWhiteTurn, &pieces);
-    return log(log(abs(eval) + 1) + 10) * (eval < 0 ? -1 : 1);
+    return log(abs(eval) + 1) * (eval < 0 ? -1 : 1);
 }
