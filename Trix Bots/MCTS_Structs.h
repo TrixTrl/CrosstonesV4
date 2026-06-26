@@ -20,7 +20,7 @@ struct Node
 #ifdef BOARD_HEURISTIC_ACTIVATED
     std::map<std::string, float> Qsquigglemap = std::map<std::string, float>();
     std::map<std::string, float> Nsquigglemap = std::map<std::string, float>();
-#endif
     float nodeQsquiggle = 0;
+#endif
     bool recentlyVisited = true;
 };

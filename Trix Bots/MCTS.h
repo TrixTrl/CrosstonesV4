@@ -33,3 +33,4 @@ float heuristic(BoardState_T boardState, std::vector<BoardState_T::xMove> move);
 float simpleCaptureHeuristic(std::vector<BoardState_T::xMove> move);
 float staticHeuristic(BoardState_T *boardState);
 float stolenHeuristic(BoardState_T boardState, std::vector<BoardState_T::xMove> move, bool isWhiteTurn);
+float simpleHeuristic(BoardState_T *boardState, bool isWhite);
