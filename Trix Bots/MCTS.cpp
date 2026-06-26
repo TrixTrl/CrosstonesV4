@@ -32,7 +32,7 @@ void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<
 void simulate(BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
 {
     simTreeResult treeResult = simTree(&boardState, isWhite, tree, treeLock);
-    bool z = simDefault(boardState, isWhite, treeResult.whiteToPlay);
+    float z = simDefault(boardState, isWhite, treeResult.whiteToPlay);
     // Utils::print("Finished default sim", true);
     treeLock->lock();
     backup(treeResult.states, treeResult.actions, z, treeResult.heuristic, tree);
@@ -41,7 +41,7 @@ void simulate(BoardState_T boardState, bool isWhite, std::map<std::string, Node>
 
 simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::string, Node> *tree, std::mutex *treeLock)
 {
-    float c = 3;
+    float c = 2;
     simTreeResult result = simTreeResult();
     result.whiteToPlay = isWhite;
     bool passed = false;
@@ -93,19 +93,18 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
         n++;
         std::vector<BoardState_T::xMove> a = defaultPolicy(boardState, whiteToPlay, true);
         boardState.unsafeMakeMove(&a);
-        whiteToPlay = !whiteToPlay;
         if (a.size() == 0)
         {
             if (whiteToPlay)
             {
                 if (passes.first)
-                    return isWhite ? 0 : 1;
+                    return isWhite ? -1 : 1;
                 passes.first = true;
             }
             else
             {
                 if (passes.second)
-                    return isWhite ? 1 : 0;
+                    return isWhite ? 1 : -1;
                 passes.second = true;
             }
         }
@@ -120,11 +119,12 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
                 passes.second = false;
             }
         }
+        whiteToPlay = !whiteToPlay;
     }
     BoardState_T::winValue winValue = boardState.gameOver(!whiteToPlay);
-    float gameResult = winValue == BoardState_T::winValue::draw ? 0 : ((winValue == (isWhite ? BoardState_T::winValue::white : BoardState_T::winValue::black)) ? 1 : -1);
+    float gameResult = (winValue == BoardState_T::winValue::draw) ? 0 : ((winValue == (isWhite ? BoardState_T::winValue::white : BoardState_T::winValue::black)) ? 1 : -1);
     // Utils::print(to_string(n), false);
-    // Utils::print(" | " + to_string(gameResult), true);
+    // Utils::print("Game Result: " + std::to_string(gameResult), true);
     return gameResult;
 }
 
@@ -177,8 +177,9 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
 #ifdef BOARD_HEURISTIC_ACTIVATED
         if (qsIt != node->Qsquigglemap.end() && nsIt != node->Nsquigglemap.end())
         {
-            float b = 0.3;
+            float b = 2 / sqrt(node->N + 1);
             evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log(nsIt->second + 1) + 1) * (enemyMove ? -1 : 1);
+            // evaluation += b * (qsIt->second - node->nodeQsquiggle) * (enemyMove ? -1 : 1);
         }
 #endif
         std::string move = stringify(legalMoves->at(i));
@@ -235,6 +236,7 @@ void backup(std::vector<std::string> states, std::vector<std::string> actions, f
 #endif
         node->Nmap.at(actions[i]) += 1;
         node->Qmap.at(actions[i]) += (z - node->Qmap.at(actions[i])) / node->Nmap.at(actions[i]);
+        // Utils::print(std::to_string(node->Qmap.at(actions[i])) + " | " + std::to_string(z), true);
 #ifdef BOARD_HEURISTIC_ACTIVATED
         node->Nsquigglemap.at(actions[i]) += 1;
         // node->Qsquigglemap.at(actions[i]) += (m - node->Qsquigglemap.at(actions[i])) / node->Nsquigglemap.at(actions[i]);
@@ -267,7 +269,7 @@ std::vector<BoardState_T::xMove> defaultPolicy(BoardState_T boardState, bool whi
     for (int i = 0; i < legalMoves->size(); i++)
     {
         /*!isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i]))*/
-        if (legalMoves->at(indices[i]).size() > 0)
+        if (legalMoves->at(indices[i]).size() > 0 && !isLoosing(boardState, whiteToPlay, legalMoves->at(indices[i])))
         {
             return legalMoves->at(indices[i]);
         }
