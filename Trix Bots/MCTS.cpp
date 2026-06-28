@@ -166,16 +166,16 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
         int heuristicStrength = 5;
         if (node->N == 0)
         {
-            if (node->Qmap.find(move) == node->Qmap.end())
-            {
-                // node->Qmap.emplace(move, heuristic(boardState, legalMoves->at(i)) * (isWhite ? 1 : -1));
-                // node->Qmap.emplace(move, stolenHeuristic(boardState, legalMoves->at(i), enemyMove ? !isWhite : isWhite) * (enemyMove ? -1 : 1));
-                BoardState_T boardStateCopy = BoardState_T();
-                boardStateCopy.loadPos(boardState.dumpPos());
-                boardStateCopy.unsafeMakeMove(&legalMoves->at(i));
-                node->Qmap.emplace(move, simpleHeuristic(&boardStateCopy, isWhite) * 0.01);
-                node->Nmap.emplace(move, heuristicStrength);
-            }
+            // if (node->Qmap.find(move) == node->Qmap.end())
+            //{
+            //  node->Qmap.emplace(move, heuristic(boardState, legalMoves->at(i)) * (isWhite ? 1 : -1));
+            //  node->Qmap.emplace(move, stolenHeuristic(boardState, legalMoves->at(i), enemyMove ? !isWhite : isWhite) * (enemyMove ? -1 : 1));
+            BoardState_T boardStateCopy = BoardState_T();
+            boardStateCopy.loadPos(boardState.dumpPos());
+            boardStateCopy.unsafeMakeMove(&legalMoves->at(i));
+            node->Qmap.emplace(move, simpleHeuristic(&boardStateCopy, isWhite) * 0.01);
+            node->Nmap.emplace(move, heuristicStrength);
+            //}
         }
 #endif
         float evaluation = 0;
@@ -200,7 +200,11 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             {
                 // float b = c > 0 ? 2 / sqrt(nIt->second) : 0.5;
                 float b = 0.5;
+#ifdef MOVE_HEURISTIC_ACTIVATED
+                evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log((nIt->second - heuristicStrength) + 1) + 1) * (enemyMove ? -1 : 1);
+#else
                 evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log(nIt->second + 1) + 1) * (enemyMove ? -1 : 1);
+#endif
             }
 #endif
             totalEvaluation += evaluation;
