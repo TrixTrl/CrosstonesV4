@@ -143,6 +143,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
     std::map<std::string, Node>::iterator it = tree->find(position);
     Node *node = &(it->second);
 #ifdef MOVE_HEURISTIC_ACTIVATED
+    bool locked = false;
     if (node->N == 0)
     {
         if (treeLock != nullptr)
@@ -151,6 +152,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             treeLock->lock();
             std::map<std::string, Node>::iterator n2it = tree->find(position);
             node = &(n2it->second);
+            locked = true;
         }
     }
 #endif
@@ -241,12 +243,9 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
     }
 #endif
 #ifdef MOVE_HEURISTIC_ACTIVATED
-    if (node->N == 0)
+    if (locked)
     {
-        if (treeLock != nullptr)
-        {
-            treeLock->unlock();
-        }
+        treeLock->unlock();
     }
     else
     {
