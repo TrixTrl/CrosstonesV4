@@ -193,23 +193,38 @@ void Utils::printNode(Node n)
 		std::string qString = std::to_string(n.Qmap.at(pair.first));
 		qString = std::string(max(15 - (int)qString.length(), 1), ' ') + qString;
 #ifdef BOARD_HEURISTIC_ACTIVATED
-		// std::string nsString = std::to_string((int)(n.Nsquigglemap.contains(pair.first) ? n.Nsquigglemap.at(pair.first) : 0));
-		// nsString = std::string(max(15 - (int)nsString.length(), 1), ' ') + nsString;
 		std::string qsString = std::to_string((n.Qsquigglemap.contains(pair.first) ? n.Qsquigglemap.at(pair.first) : 0));
 		qsString = std::string(max(15 - (int)qsString.length(), 1), ' ') + qsString;
 #endif
-		print(pair.first, false);
-		print(std::string(max(50 - (int)pair.first.length(), 1), ' ') + " : ", false);
-#ifdef BOARD_HEURISTIC_ACTIVATED
-		print(nString + " | ", false);
-		print(qString + " | ", false);
-		// print(nsString + " | ", false);
-		print(qsString, true);
-#else
-		print(nString + " | ", false);
-		print(qString, true);
-
+#ifdef KILLER_MOVES_ACTIVATED
+		// std::string knString = std::to_string((int)(n.KNmap.contains(pair.first) ? n.KNmap.at(pair.first) : 0));
+		// knString = std::string(max(15 - (int)knString.length(), 1), ' ') + knString;
+		std::string kString = std::to_string((int)(n.Kmap.contains(pair.first) ? n.Kmap.at(pair.first) : 0));
+		kString = std::string(max(15 - (int)kString.length(), 1), ' ') + kString;
 #endif
+		print(pair.first, false);
+		print(std::string(max(80 - (int)pair.first.length(), 1), ' ') + " : ", false);
+
+		/* #ifdef BOARD_HEURISTIC_ACTIVATED
+				print(nString + " | ", false);
+				print(qString + " | ", false);
+				// print(nsString + " | ", false);
+				print(qsString, true);
+		#else
+				print(nString + " | ", false);
+				print(qString, true);
+
+		#endif */
+		print(nString, false);
+		print(" | " + qString, false);
+#ifdef BOARD_HEURISTIC_ACTIVATED
+		print(" | " + qsString, false);
+#endif
+#ifdef KILLER_MOVES_ACTIVATED
+		// print(" | " + knString, false);
+		print(" | " + kString, false);
+#endif
+		print("", true);
 		// s += std::string(max(30 - pair.first.length(), 0), ' ') + " : " + nString + " | " + qString + " | " + nsString + " | " + qsString + "\n";
 		// std::string temp = std::string(s.begin(), s.end());
 		// LPCSTR wideString = temp.c_str();

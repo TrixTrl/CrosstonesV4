@@ -305,17 +305,17 @@ int main()
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			Deepchad(4);
-		// Hydra(4, 14);
-		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		// AlphaCruncher(30);
+			// Deepchad(4);
+			// Hydra(4, 14);
+			// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+			AlphaCruncher(20);
 		Player *p2 = new
 			// TheFirst(2);
 			// Hydra(4, 14);
 			// Deepchad(4);
-			AlphaCruncher(30);
+			AlphaCruncher(60);
 
-		std::bitset<3> gamemode(0b111); /*Gates, Bases, Ports*/
+		std::bitset<3> gamemode(0b000); /*Gates, Bases, Ports*/
 		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, &displayBoard[0]);
 
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");
@@ -330,8 +330,9 @@ int main()
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30510 -B30502 b-10606 -B30702 -W30710 b-11200 r-11206 b-11212 11111111111111111111"); // slaughterhouse
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30609 -B30603 b-11200 r-11206 b-11212 11111111111111111111");
 		// gameMaster->loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+		gameMaster->loadPos("r-10006 bW40112 -B30202 -B20300 -B10302 bB20400 -B10402 -W30411 -W20508 bW20606 -W30610 -B20801 -B20902 b-11200 r-11206 b-11212 00000000000100000000");
 		RaylibUI::init();
-		std::thread gm_thread(&GameMaster::play, gameMaster, globalHwnd, true);
+		std::thread gm_thread(&GameMaster::play, gameMaster, globalHwnd, false);
 
 		RaylibUI::draw(&displayBoard[0]);
 
