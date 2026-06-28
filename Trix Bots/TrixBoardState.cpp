@@ -56,7 +56,11 @@ BoardState_T::BoardState_T()
 BoardState_T::BoardState_T(BoardState_T *boardState)
 {
     boardState->copyBoard(&pieces);
-    
+}
+
+BoardState_T::BoardState_T(uint8_t (*src)[13][13])
+{
+    std::memcpy(&pieces, src, sizeof(pieces));
 }
 
 void BoardState_T::rst(std::bitset<3> &tps)
@@ -901,4 +905,17 @@ void BoardState_T::dumpGame()
         forcedebugPrint_T(gameRecord[i]);
     }
     forcedebugPrint_T("\n\n");
+}
+
+std::string BoardState_T::getKey()
+{
+    std::string key = "";
+    for (int i = 0; i < 13; i++)
+    {
+        for (int j = 0; j < 13; j++)
+        {
+            key += (char)pieces[i][j];
+        }
+    }
+    return key;
 }

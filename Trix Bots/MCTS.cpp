@@ -10,18 +10,20 @@ std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchT
     {
         threads.emplace_back(new std::thread(simulatorLoop, endTime, boardState, isWhite, tree, &treeLock));
     }
-    std::string state = boardState.dumpPos() + (isWhite ? 'w' : 'b');
+    std::string state = boardState.getKey() + (isWhite ? 'w' : 'b');
     int lastN = tree->contains(state) ? tree->at(state).N : 0;
+    Utils::print("Starting Node N: " + std::to_string(lastN), true);
     int sleepTime = 5000;
+    float selectionC = 0;
     while (time(0) < endTime)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
         int currentN = tree->at(state).N;
         std::string simString = std::to_string(currentN);
         std::string rateString = std::to_string(((currentN - lastN) * 1000) / sleepTime);
-        Utils::print("Simulations: " + std::string(max(10 - (int)simString.length(), 1), ' ') + simString + " | Sims per second: " + std::string(max(10 - (int)rateString.length(), 1), ' ') + rateString, true);
+        Utils::print("Simulations: " + std::string(max(10 - (int)simString.length(), 1), ' ') + simString + " | Sims Per Second: " + std::string(max(10 - (int)rateString.length(), 1), ' ') + rateString, true);
         treeLock.lock_shared();
-        Utils::print("Current Best Move: " + stringify(selectMove(boardState, isWhite, false, 0, tree, nullptr, &treeLock)), true);
+        Utils::print("Current Best Move: " + stringify(selectMove(boardState, isWhite, false, selectionC, tree, nullptr, &treeLock)), true);
         lastN = currentN;
     }
     for (int i = 0; i < threadCount; i++)
@@ -30,7 +32,7 @@ std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchT
         delete (threads.at(i));
     }
     // Utils::print("Finished joining threads", true);
-    return selectMove(boardState, isWhite, false, 0, tree);
+    return selectMove(boardState, isWhite, false, selectionC, tree);
 }
 
 void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::shared_mutex *treeLock)
@@ -62,7 +64,7 @@ void simulate(BoardState_T boardState, bool isWhite, std::map<std::string, Node>
 
 simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::string, Node> *tree, std::shared_mutex *treeLock)
 {
-    float c = 1.2;
+    float c = 2.2;
     simTreeResult result = simTreeResult();
     result.whiteToPlay = isWhite;
     bool passed = false;
@@ -70,7 +72,7 @@ simTreeResult simTree(BoardState_T *boardState, bool isWhite, std::map<std::stri
     while (boardState->gameOver(!result.whiteToPlay) == BoardState_T::winValue::none)
     {
         // Utils::print("!");
-        std::string state = boardState->dumpPos() + (result.whiteToPlay ? 'w' : 'b');
+        std::string state = boardState->getKey() + (result.whiteToPlay ? 'w' : 'b');
         result.states.emplace_back(state);
         treeLock->lock_shared();
         // Utils::print("Locked", true);
@@ -117,13 +119,13 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
             if (whiteToPlay)
             {
                 if (passes.first)
-                    return (isWhite ? -1 : 1) / (log(n + 1) + 1);
+                    return (isWhite ? -1 : 1) /* / (log(n + 1) + 1)*/;
                 passes.first = true;
             }
             else
             {
                 if (passes.second)
-                    return (isWhite ? 1 : -1) / (log(n + 1) + 1);
+                    return (isWhite ? 1 : -1) /* / (log(n + 1) + 1)*/;
                 passes.second = true;
             }
         }
@@ -144,7 +146,7 @@ float simDefault(BoardState_T boardState, bool isWhite, bool whiteToPlay)
     float gameResult = (winValue == BoardState_T::winValue::draw) ? 0 : ((winValue == (isWhite ? BoardState_T::winValue::white : BoardState_T::winValue::black)) ? 1 : -1);
     // Utils::print(to_string(n), false);
     // Utils::print("Game Result: " + std::to_string(gameResult), true);
-    return gameResult / (log(n + 1) + 1);
+    return gameResult /* / (log(n + 1) + 1)*/;
 }
 
 std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhite, bool enemyMove, float c, std::map<std::string, Node> *tree, simTreeResult *result, std::shared_mutex *treeLock)
@@ -153,7 +155,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
     float aStar = -INFINITY;
     float aStarClean = 0;
     std::vector<BoardState_T::xMove> bestMove;
-    std::string position = boardState.dumpPos() + ((isWhite != enemyMove) ? 'w' : 'b');
+    std::string position = boardState.getKey() + ((isWhite != enemyMove) ? 'w' : 'b');
     std::map<std::string, Node>::iterator it = tree->find(position);
     Node *node = &(it->second);
 #ifdef MOVE_HEURISTIC_ACTIVATED
@@ -199,22 +201,6 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
         if (legalMoves->size() > 1 && legalMoves->at(i).size() == 0)
             continue;
         std::string move = stringify(legalMoves->at(i));
-        /*#ifdef MOVE_HEURISTIC_ACTIVATED
-                // int heuristicStrength = 5;
-                if (node->N == 0)
-                {
-                    // if (node->Qmap.find(move) == node->Qmap.end())
-                    //{
-                    //  node->Qmap.emplace(move, heuristic(boardState, legalMoves->at(i)) * (isWhite ? 1 : -1));
-                    //  node->Qmap.emplace(move, stolenHeuristic(boardState, legalMoves->at(i), enemyMove ? !isWhite : isWhite) * (enemyMove ? -1 : 1));
-                    BoardState_T boardStateCopy = BoardState_T();
-                    boardStateCopy.loadPos(boardState.dumpPos());
-                    boardStateCopy.unsafeMakeMove(&legalMoves->at(i));
-                    node->Qmap.emplace(move, simpleHeuristic(&boardStateCopy, isWhite) * 0.01);
-                    node->Nmap.emplace(move, heuristicStrength);
-                    //}
-                }
-        #endif*/
         float evaluation = 0;
         float cleanEvaluation = 0;
         std::map<std::string, float>::iterator qIt = node->Qmap.find(move);
@@ -235,7 +221,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             if (qsIt != node->Qsquigglemap.end())
             {
                 // float b = c > 0 ? 2 / sqrt(nIt->second) : 0.5;
-                float b = 0.7;
+                float b = 0.2;
                 // #ifdef MOVE_HEURISTIC_ACTIVATED
                 //                 evaluation += b * (qsIt->second - node->nodeQsquiggle) / (log((nIt->second - heuristicStrength) + 1) + 1) * (enemyMove ? -1 : 1);
                 // #else
@@ -247,7 +233,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
             cleanEvaluation = evaluation;
 #ifdef MOVE_HEURISTIC_ACTIVATED
             evaluation += c * sqrt(log(node->N + 1) / (nIt->second - (heuristicStrength - 1)));
-            if (nIt->second == heuristicStrength)
+            if (nIt->second <= heuristicStrength)
             {
                 evaluation += c * 1000000;
             }
@@ -265,7 +251,7 @@ std::vector<BoardState_T::xMove> selectMove(BoardState_T boardState, bool isWhit
         }
         else
         {
-            evaluation += 10000000; // c * sqrt(log(node->N + 1));
+            evaluation += c * 1000000; // c * sqrt(log(node->N + 1));
         }
         if (evaluation > aStar && (result == nullptr || legalMoves->at(i).size() == 0 || find(result->actions.begin(), result->actions.end(), move) == result->actions.end()))
         {
@@ -357,7 +343,7 @@ void backup(std::vector<std::string> states, std::vector<std::string> actions, f
 
 void newNode(BoardState_T boardState, bool whiteToPlay, bool isWhite, std::map<std::string, Node> *tree, std::shared_mutex *treeLock)
 {
-    std::string posIndex = boardState.dumpPos() + (whiteToPlay ? 'w' : 'b');
+    std::string posIndex = boardState.getKey() + (whiteToPlay ? 'w' : 'b');
     treeLock->lock();
     tree->emplace(posIndex, Node());
 #ifdef BOARD_HEURISTIC_ACTIVATED
@@ -550,7 +536,8 @@ float simpleHeuristic(BoardState_T *boardState, bool isWhite)
             if (Piece::isTower(piece))
             {
                 float towerValues[] = {0, 1, 2.1, 3.2, 4.1, 4.9};
-                float towerValue = towerValues[Piece::height(piece)];
+                // float towerValue = towerValues[Piece::height(piece)] * (2 / (2 + abs(i - 6) + abs(j - 6))) + Piece::addOn(piece);
+                float towerValue = towerValues[Piece::height(piece)] * (2 / (2 + (isWhite ? j : 12 - j))) + Piece::addOn(piece);
                 if (Piece::isWhite(piece))
                 {
                     whiteScore += towerValue;
@@ -563,7 +550,7 @@ float simpleHeuristic(BoardState_T *boardState, bool isWhite)
         }
     }
     float unscaledScore = (whiteScore - blackScore);
-    return log(abs(unscaledScore) + 1) * (unscaledScore < 0 ? -1 : 1) * (isWhite ? 1 : -1) * 100;
+    return log(abs(unscaledScore) + 1) * (unscaledScore < 0 ? -1 : 1) * (isWhite ? 1 : -1) * 10;
 }
 
 #ifdef KILLER_MOVES_ACTIVATED

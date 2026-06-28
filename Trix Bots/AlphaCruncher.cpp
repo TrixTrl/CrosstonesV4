@@ -26,7 +26,7 @@ void AlphaCruncher::getMoveToPlay(uint8_t (*board)[13][13], bool isWhite, int en
     }
     Utils::print("Tree size after pruning: " + std::to_string(tree.size()), true);
     std::vector<BoardState_T::xMove> bestMove = UCT_Search(boardState, thinkingTime, isWhite, &tree);
-    Utils::printNode(tree.at(Utils::convertToPosString(board) + (isWhite ? 'w' : 'b')));
+    Utils::printNode(tree.at(BoardState_T(board).getKey() + (isWhite ? 'w' : 'b')));
     Utils::print("", true);
     Utils::print(stringify(bestMove), true);
     Utils::print(std::to_string(tree.size()));
@@ -35,6 +35,6 @@ void AlphaCruncher::getMoveToPlay(uint8_t (*board)[13][13], bool isWhite, int en
         (*board)[bestMove[i].i][bestMove[i].j] ^= bestMove[i].delta;
     }
 
-    // Utils::print("", true);
-    // Utils::printNode(tree.at(Utils::convertToPosString(board) + (isWhite ? 'b' : 'w')));
+    Utils::print("", true);
+    Utils::printNode(tree.at(BoardState_T(board).getKey() + (isWhite ? 'b' : 'w')));
 }

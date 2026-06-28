@@ -18,6 +18,7 @@ class BoardState_T
 public:
     BoardState_T();
     BoardState_T(BoardState_T *boardState);
+    BoardState_T(uint8_t (*src)[13][13]);
     void rst(std::bitset<3> &tps);
     void wipe();
 
@@ -57,6 +58,8 @@ public:
 
     std::vector<std::string> gameRecord;
     void dumpGame();
+
+    std::string getKey();
 
 private:
     uint8_t pieces[13][13];
