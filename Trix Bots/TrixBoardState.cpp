@@ -53,6 +53,12 @@ BoardState_T::BoardState_T()
     pieces[10][6] = hasTurnPiece;
 }
 
+BoardState_T::BoardState_T(BoardState_T *boardState)
+{
+    boardState->copyBoard(&pieces);
+    
+}
+
 void BoardState_T::rst(std::bitset<3> &tps)
 {
     uint8_t turnPieceMask = 0b10111111;

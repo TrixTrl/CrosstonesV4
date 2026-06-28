@@ -305,17 +305,17 @@ int main()
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			// Deepchad(4);
-			// Hydra(4, 14);
-			// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-			AlphaCruncher(20);
+			Deepchad(4);
+		// Hydra(4, 14);
+		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+		// AlphaCruncher(20);
 		Player *p2 = new
 			// TheFirst(2);
 			// Hydra(4, 14);
 			// Deepchad(4);
-			AlphaCruncher(60);
+			AlphaCruncher(120);
 
-		std::bitset<3> gamemode(0b000); /*Gates, Bases, Ports*/
+		std::bitset<3> gamemode(0b010); /*Gates, Bases, Ports*/
 		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, &displayBoard[0]);
 
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");

@@ -17,6 +17,7 @@ class BoardState_T
 {
 public:
     BoardState_T();
+    BoardState_T(BoardState_T *boardState);
     void rst(std::bitset<3> &tps);
     void wipe();
 
