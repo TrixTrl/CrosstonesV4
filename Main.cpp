@@ -313,7 +313,7 @@ int main()
 			// TheFirst(2);
 			// Hydra(4, 14);
 			// Deepchad(4);
-			AlphaCruncher(120);
+			AlphaCruncher(60);
 
 		std::bitset<3> gamemode(0b010); /*Gates, Bases, Ports*/
 		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, &displayBoard[0]);
