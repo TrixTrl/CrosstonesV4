@@ -11,7 +11,7 @@ namespace dc
 	private:
 		std::vector<int> moveScores;
 
-		const int million = 1000000;
+		const int million = 1000000000;
 		const int hashMoveScore = 100 * million;
 		//const int addOnCaptureBias = 8 * million; //to capture a 3r for example
 		const int redClaimBias = 8 * million;

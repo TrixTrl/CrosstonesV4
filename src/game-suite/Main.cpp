@@ -30,7 +30,7 @@
 #include <chrono>
 #include "UI.h"
 
-#pragma comment(linker, "/STACK:2000000000")
+#pragma comment(linker, "/STACK:200000000")
 #pragma comment(linker, "/HEAP:200000000")
 
 #define KEYBOARDCONTROLL 0

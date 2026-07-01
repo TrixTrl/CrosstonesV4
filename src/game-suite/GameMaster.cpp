@@ -1,7 +1,8 @@
 #include "GameMaster.h"
 #include "fix_win32_compatibility.h"
 #include <WinUser.h>
-#include <thread>
+#include <future>
+#include <algorithm>
 
 void print(std::string str) {
 	std::string temp = std::string(str.begin(), str.end());
@@ -33,7 +34,32 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		int timeEnd = Time::millis() + timeControl;
 		try {
-			(*players[isWhiteTurn ? 0 : 1]).getMoveToPlay(&board, isWhiteTurn, timeEnd);
+			auto promise = std::make_shared<std::promise<void>>();
+			auto future = promise->get_future();
+			auto player = players[isWhiteTurn ? 0 : 1];
+			
+			// launch player move generation
+			std::thread bot_thread([promise, player, &board, this, timeEnd]() {
+				try {
+					player->getMoveToPlay(&board, isWhiteTurn, timeEnd);
+					promise->set_value();
+				} catch (...) {
+					promise->set_exception(std::current_exception());
+				}
+			});
+
+			while (future.wait_for(std::chrono::milliseconds(100)) == std::future_status::timeout) {
+				if (stopToken.stop_requested()) {
+					TerminateThread(bot_thread.native_handle(), 0);
+					bot_thread.detach();
+					return;
+				}
+			}
+			if (bot_thread.joinable()) {
+				bot_thread.join();
+			}
+			// re throw exceptions
+			future.get();
 		}
 		catch (const std::exception& e)
 		{
