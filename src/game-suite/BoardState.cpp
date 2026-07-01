@@ -331,7 +331,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 				boardCopy[i][j] += splitOff;
 				if (splitOff == Piece::height(piece))
 				{
-					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000); // addons, only if  we're moving the whole tower
+					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000); // addons, only if we're moving the whole tower
 				}
 				bool visitedCopy[13][13];
 				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
