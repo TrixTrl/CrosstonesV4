@@ -5,7 +5,7 @@
 std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(uint8_t (*pieces)[13][13], bool isWhite)
 {
     std::vector<move> moves = std::vector<move>();
-    moves.reserve(700);
+    moves.reserve(400);
 
     for (int x = 0; x < 13; x++)
     {
@@ -16,14 +16,15 @@ std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(uint8_t (*piece
                 continue;
             if (Piece::isWhite(piece) != isWhite)
                 continue;
-            generateMoves(pieces, isWhite, std::pair<int, int>(x, y), moves);
+            Utils::print(std::to_string(piece), true);
+            generateMoves(pieces, isWhite, std::pair<int, int>(x, y), &moves);
         }
     }
 
     return moves;
 }
 
-void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> &moves)
+void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> *moves)
 {
     std::vector<moveGenerationState> stack = std::vector<moveGenerationState>();
     stack.reserve(30);
@@ -44,6 +45,11 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
     {
         moveGenerationState currentState = stack.at(stack.size() - 1);
         stack.erase(stack.end() - 1);
+
+        if (currentState.movingAmount > 1)
+        {
+            Utils::print("!", false);
+        }
 
 #ifdef FAST_MOVE_DEBUG_PRINTING
         Utils::print("(" + std::to_string(currentState.position.first) + ", " + std::to_string(currentState.position.second) + ") ", false);
@@ -66,6 +72,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             break;
         }
         Utils::print(std::to_string(currentState.movingAmount) + " ", false);
+        Utils::print(std::to_string(currentState.stepsLeft) + " ", false);
         Utils::print(std::to_string(currentState.depth), true);
 #endif
 
@@ -73,10 +80,12 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             inProgressMoveFragments.erase(inProgressMoveFragments.end() - 1);
 
         int prevMovingAmount = Piece::height(*pieces[start.first][start.second]);
+        // Utils::print(std::to_string(prevMovingAmount) + " ", false);
         for (const auto &fragment : inProgressMoveFragments)
         {
             prevMovingAmount -= fragment.splitAmount;
         }
+        // Utils::print(std::to_string(prevMovingAmount), true);
 
         moveFragment currentFragment = moveFragment();
         currentFragment.dir = currentState.dir;
@@ -98,7 +107,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             {
                 currentMove.isMerge = true;
             }
-            moves.emplace_back(currentMove);
+            moves->emplace_back(currentMove);
         }
 
         if (currentState.stepsLeft == 0 || currentState.stepsLeft == -2)
@@ -144,7 +153,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             {
                 tempComplexMove.moveFragments.emplace_back(fragment);
             }
-            applyMove(&complexMoveCopy, tempComplexMove);
+            // applyMove(&complexMoveCopy, tempComplexMove);
             currentBoardState = &complexMoveCopy;
         }
 
@@ -238,8 +247,6 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
     }
 }
 
-// Gah, being able to tell the difference between trying to push and trying to merge is gonna be fun... and turn pieces... those existing
-
 std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirections(uint8_t (*pieces)[13][13], moveGenerationState currentState)
 {
     std::vector<Direction> result = std::vector<Direction>();
@@ -251,6 +258,7 @@ std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirecti
             result.emplace_back(Direction::NORTH);
         }
     }
+    /*
     if (currentState.dir != Direction::NORTH && currentState.position.second < 12 && currentState.position.first % 2 == 0)
     {
         uint8_t destinationTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second + 1];
@@ -275,14 +283,17 @@ std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirecti
             result.emplace_back(Direction::WEST);
         }
     }
+    */
     return result;
 }
 
-void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], move move)
+void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move)
 {
     uint8_t currentPiece = Piece::towerMask & *pieces[move.start.first][move.start.second];
-    std::pair<int, int> currentPosition = std::pair<int, int>(move.start.first, move.start.second);
+    std::pair<int, int> currentPosition = std::pair<int, int>(move.start);
 
+    if (currentPosition.first < 0 || currentPosition.first > 12 || currentPosition.second < 0 || currentPosition.second > 12)
+        throw;
     *pieces[currentPosition.first][currentPosition.second] &= Piece::turnPieceMask;
 
     for (const auto &fragment : move.moveFragments)
@@ -303,6 +314,7 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], move move)
             fragmentDelta.first--;
             break;
         }
+        // Utils::print(std::to_string(currentPosition.first + fragmentDelta.first) + " " + std::to_string(currentPosition.second + fragmentDelta.second), true);
         uint8_t targetPiece = *pieces[currentPosition.first + fragmentDelta.first][currentPosition.second + fragmentDelta.second];
         if (Piece::isTower(targetPiece) && (currentPiece & Piece::colourMask == targetPiece & Piece::colourMask))
         {
@@ -311,10 +323,13 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], move move)
         std::pair<uint8_t, uint8_t> splitResult = getSplitResult(currentPiece, Piece::height(currentPiece) - fragment.splitAmount);
         currentPosition.first += fragmentDelta.first;
         currentPosition.second += fragmentDelta.second;
+        if (currentPosition.first < 0 || currentPosition.first > 12 || currentPosition.second < 0 || currentPosition.second > 12)
+            throw;
         *pieces[currentPosition.first][currentPosition.second] |= splitResult.first;
         currentPiece = splitResult.second;
     }
-
+    if (currentPosition.first < 0 || currentPosition.first > 12 || currentPosition.second < 0 || currentPosition.second > 12)
+        throw;
     *pieces[currentPosition.first][currentPosition.second] |= currentPiece;
 }
 

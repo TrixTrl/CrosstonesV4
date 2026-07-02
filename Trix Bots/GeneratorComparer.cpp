@@ -6,6 +6,7 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
     std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> correctMoves = boardState.getMoves(true, false, false);
     std::vector<FastMoveGenerator::move> movesToCompare = FastMoveGenerator::getMoves(pieces, isWhite);
 
+    int n = 0;
     for (const auto &move : movesToCompare)
     {
         uint8_t movePieces[13][13];
@@ -13,17 +14,21 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
         FastMoveGenerator::applyMove(&movePieces, move);
         BoardState_T comparisonBoardState = BoardState_T(pieces);
         int moveResult = comparisonBoardState.makeMove(&movePieces, isWhite);
-        Utils::print(moveResult, true);
+        // Utils::print(moveResult, true);
+        // Utils::print(n++, true);
+        // Utils::print(move.moveFragments.size(), true);
     }
 }
 
 void compareGenerators()
 {
     BoardState_T boardState = BoardState_T();
-    boardState.loadPos("-W10006 11010100001100111111");
-    runPosition(boardState.getPiecesReference(), true);
-    runPosition(boardState.getPiecesReference(), false);
-    boardState.loadPos("-W10006 -B11206 11010100001100111111");
-    runPosition(boardState.getPiecesReference(), true);
-    runPosition(boardState.getPiecesReference(), false);
+    boardState.loadPos("-W10006 -B11206 11010100001100111111"); //("-W10006 11010100001100111111");
+    uint8_t pieces[13][13];
+    boardState.copyBoard(&pieces);
+    runPosition(&pieces, true);
+    // runPosition(boardState.getPiecesReference(), false);
+    // boardState.loadPos("-W10006 -B11206 11010100001100111111");
+    // runPosition(boardState.getPiecesReference(), true);
+    // runPosition(boardState.getPiecesReference(), false);
 }

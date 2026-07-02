@@ -693,12 +693,12 @@ int BoardState_T::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
         {
             std::memcpy(&pieces, newState, sizeof(pieces));
 
-            forcedebugPrint_T(dumpPos());
-            forcedebugPrint_T("\n");
+            // forcedebugPrint_T(dumpPos());
+            // forcedebugPrint_T("\n");
 
-            gameRecord.emplace_back(std::to_string(i) + " ");
+            // gameRecord.emplace_back(std::to_string(i) + " ");
 
-            dumpGame();
+            // dumpGame();
 
             return i == 0 ? 0 : 1;
         }
