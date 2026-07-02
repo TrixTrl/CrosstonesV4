@@ -149,7 +149,7 @@ void BoardState_T::wipe()
     {
         for (int j = 0; j < 13; j++)
         {
-            pieces[i][j] &= 0b10000000;
+            pieces[i][j] &= hasTurnPiece;
         }
     }
 }
@@ -700,7 +700,7 @@ int BoardState_T::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 
             // dumpGame();
 
-            return i == 0 ? 0 : 1;
+            return i;
         }
     }
     return -1;

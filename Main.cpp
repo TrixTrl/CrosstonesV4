@@ -311,10 +311,10 @@ int main()
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			Deepchad(4);
-		// Hydra(4, 14);
-		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		// AlphaCruncher(20);
+			// Deepchad(4);
+			// Hydra(4, 14);
+			// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+			AlphaCruncher(60);
 		Player *p2 = new
 			// TheFirst(2);
 			// Hydra(4, 14);
