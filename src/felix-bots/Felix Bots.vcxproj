@@ -149,7 +149,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="BotBoard.cpp" />
     <ClCompile Include="MoveGenerator.cpp" />
     <ClCompile Include="MoveOrdering.cpp" />
     <ClCompile Include="Utility.cpp" />

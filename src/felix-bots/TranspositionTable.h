@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "Board.h"
+#include "BotBoard.h"
 #include <array>
 #include "test-bots/BasicGenerator.h"
 #include "Utility.h"
@@ -34,7 +34,7 @@ namespace dc
 
 		// Amount of entries
 		static const uint64_t count = (uint64_t)((sizeMB * 1024 * 1024) / sizeof(Entry));
-		Board& board;
+		BotBoard& board;
 
 	public:
 
@@ -57,7 +57,7 @@ namespace dc
 
 		bool enabled = true;
 
-		TranspositionTable(Board& _board) : board(_board) {};
+		TranspositionTable(BotBoard& _board) : board(_board) {};
 
 		void clear()
 		{

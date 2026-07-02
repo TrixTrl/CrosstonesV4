@@ -83,7 +83,7 @@ public:
                         break;
                     case 't':
                         col = color(214, 176, 116);
-                        path = (piece & BoardState::setTurnPiece) == 0 ? DrawPath::HORIZONTAL : DrawPath::VERTICAL;
+                        path = (piece & Board::setTurnPiece) == 0 ? DrawPath::HORIZONTAL : DrawPath::VERTICAL;
                         break;
                     default:
                         col = color(255, 0, 0);

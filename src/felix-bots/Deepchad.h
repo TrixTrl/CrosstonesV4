@@ -5,7 +5,7 @@
 #include "test-bots/BasicGenerator.h"
 #include <vector>
 #include "Searcher.h"
-#include "Board.h"
+#include "BotBoard.h"
 
 using namespace dc;
 
@@ -13,7 +13,7 @@ class Deepchad : public Player
 {
 public:
 
-	Board board;
+	BotBoard board;
 	Searcher searcher;
 
 	Deepchad(int maxDepth = 3) : board(), searcher(board, maxDepth) {}

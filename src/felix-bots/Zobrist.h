@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "Board.h"
+#include "BotBoard.h"
 #include "globals/Piece.h"
 #include <random>
 
@@ -25,7 +25,7 @@ namespace dc
 		static uint64_t turnPiecesArray[20];
 		static uint64_t whiteToMove;
 
-		static uint64_t calculateZobristKey(Board& board);
+		static uint64_t calculateZobristKey(BotBoard& board);
 		static uint64_t randomUnsigned64BitNumber();
 
 		static class _init

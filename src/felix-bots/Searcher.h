@@ -1,6 +1,6 @@
 #pragma once
 #include "test-bots/BasicGenerator.h"
-#include "Board.h"
+#include "BotBoard.h"
 #include "Evaluation.h"
 #include "MoveGenerator.h"
 #include "MoveOrdering.h"
@@ -47,7 +47,7 @@ namespace dc
 
 	private:
 		// References
-		Board& board;
+		BotBoard& board;
 		TranspositionTable<10/*MB*/> transpositionTable;
 		Evaluation evaluation;
 		MoveOrdering moveOrdering;
@@ -70,7 +70,7 @@ namespace dc
 
 	public:
 
-		Searcher(Board& _board, int _maxDepth) : board(_board), transpositionTable(_board), moveOrdering(evaluation), maxDepth(_maxDepth)
+		Searcher(BotBoard& _board, int _maxDepth) : board(_board), transpositionTable(_board), moveOrdering(evaluation), maxDepth(_maxDepth)
 		{}
 
 		void startSearch();

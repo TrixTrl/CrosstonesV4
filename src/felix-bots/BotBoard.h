@@ -5,7 +5,7 @@
 
 namespace dc
 { 
-	class Board
+	class BotBoard
 	{
 		// The bots representation of the current state of the game
 
@@ -16,7 +16,7 @@ namespace dc
 		bool isWhiteTurn = false;
 		GameResult gameResult;
 
-		Board() : gameResult(GameResult::NotStarted) {}
+		BotBoard() : gameResult(GameResult::NotStarted) {}
 
 		void initialize(uint8_t(*state)[13][13], bool isWhiteTurn);
 

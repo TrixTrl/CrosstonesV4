@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BoardState.h"
-#include "felix-bots/Board.h"
+#include "Board.h"
+#include "felix-bots/BotBoard.h"
 #include "felix-bots/Utility.h"
 #include "fix_win32_compatibility.h"
 #include <WinUser.h>
@@ -13,6 +13,6 @@ class DCTestSuite {
 public:
 	static bool run(HWND globalHwnd, uint8_t(*display)[13][13]);
 private:
-	static std::vector<dc::Board> loadExampleBoards();
+	static std::vector<dc::BotBoard> loadExampleBoards();
 	static dc::u64 doTimed(std::function<void()> action);
 };

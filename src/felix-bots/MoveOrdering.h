@@ -30,7 +30,7 @@ namespace dc
 			moveScores.reserve(1000);
 		}
 
-		std::vector<int> makeMoveOrdering(const Move& hashMove, const Board& board, const std::vector<Move>& moveList, bool debug = false);
+		std::vector<int> makeMoveOrdering(const Move& hashMove, const BotBoard& board, const std::vector<Move>& moveList, bool debug = false);
 
 	private:
 		void quicksort(std::vector<int>& indices, std::vector<int>& vals, int L, int R);

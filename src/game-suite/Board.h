@@ -8,10 +8,10 @@
 #include <vector>
 #include <memory>
 
-class BoardState
+class Board
 {
 public:
-	BoardState();
+	Board();
 	void rst(std::bitset<3>& tps);
 	void wipe();
 

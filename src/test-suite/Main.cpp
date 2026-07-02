@@ -1,6 +1,6 @@
 #include <iostream>
-#include "game-suite/BoardState.h"
-#include "game-suite/BoardState.cpp"
+#include "game-suite/Board.h"
+#include "game-suite/Board.cpp"
 #include "globals/Piece.h"
 #include "globals/Piece.cpp"
 #include <bitset>
@@ -8,7 +8,7 @@
 
 
 int main() {
-	BoardState bs;
+	Board bs;
 	std::bitset<3> set(5);
 	bs.rst(set);
 

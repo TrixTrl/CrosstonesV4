@@ -14,7 +14,7 @@ Zobrist::_init Zobrist::_initializer;
 // Calculate zobrist key from current board position.
 // NOTE: this function is slow and should only be used when the board is initially set up from a string.
 // During search, the key should be updated incrementally instead.
-uint64_t Zobrist::calculateZobristKey(Board& board)
+uint64_t Zobrist::calculateZobristKey(BotBoard& board)
 {
 	uint64_t zobristKey = 0;
 

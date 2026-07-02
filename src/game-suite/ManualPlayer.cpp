@@ -1,4 +1,4 @@
-#include "BoardState.h"
+#include "Board.h"
 #include "ManualPlayer.h"
 #include "globals/Piece.h"
 #include "trix-bots/Utils.h"

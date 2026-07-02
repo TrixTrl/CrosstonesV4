@@ -14,7 +14,7 @@
 #include "test-bots/BasicGenerator.h"
 #include "TranspositionTable.h"
 #include "felix-bots/Evaluation.h"
-#include "felix-bots/Board.h"
+#include "felix-bots/BotBoard.h"
 
 #define MAXEVAL 99999
 #define BITSETINDEX (i + (j * 13))
@@ -73,7 +73,7 @@ void Utils::print(BasicGenerator::xMove f, bool newLine)
 	OutputDebugString(wideString);
 }
 
-void Utils::print(BoardState::xMove f, bool newLine)
+void Utils::print(Board::xMove f, bool newLine)
 {
 	std::string str = std::to_string(f.i);
 	str += " | ";
@@ -473,7 +473,7 @@ float Utils::improvedPosEval(bool isWhite, uint8_t (*pieces)[13][13])
 
 float Utils::felixEvalWrapper(bool isWhite, uint8_t (*pieces)[13][13])
 {
-	dc::Board board;
+	dc::BotBoard board;
 	board.initialize(pieces, isWhite);
 	dc::Evaluation evaluator;
 	return evaluator.evaluate(board);

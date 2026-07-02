@@ -1,5 +1,5 @@
 #pragma once
-#include "Board.h"
+#include "BotBoard.h"
 
 namespace dc
 {
@@ -16,7 +16,7 @@ namespace dc
 		const int relativeWeight = 100;
 		const int relativeExp = 4; //exp
 
-		int evaluate(const Board& board);
-		int getEffectivePieceWorth(const Board& board, const uint8_t piece, const int x, const int y) const;
+		int evaluate(const BotBoard& board);
+		int getEffectivePieceWorth(const BotBoard& board, const uint8_t piece, const int x, const int y) const;
 	};
 }

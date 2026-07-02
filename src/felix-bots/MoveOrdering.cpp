@@ -4,7 +4,7 @@
 
 using namespace dc;
 
-std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const Board& board, const std::vector<Move>& moveList, bool debug)
+std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const BotBoard& board, const std::vector<Move>& moveList, bool debug)
 {
 	if (moveScores.size() < moveList.size())
 	{

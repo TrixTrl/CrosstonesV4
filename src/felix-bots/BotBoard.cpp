@@ -1,11 +1,11 @@
-#include "Board.h"
+#include "BotBoard.h"
 #include "Utility.h"
 #include "Zobrist.h"
 #include "MoveGenerator.h"
 
 using namespace dc;
 
-void Board::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
+void BotBoard::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
 {
 	std::memcpy(square, state, sizeof(square));
 	this->isWhiteTurn = isWhiteTurn;
@@ -15,7 +15,7 @@ void Board::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
 	updateWinValue();
 }
 
-void Board::updateWinValue()
+void BotBoard::updateWinValue()
 {
 	gameResult = GameResult::InProgress;
 	GameResult result = GameResult::InProgress;
@@ -154,18 +154,18 @@ candidateElimination:
 	}
 }
 
-void Board::makeMove(Move& move)
+void BotBoard::makeMove(Move& move)
 {
 	appyMoveReversible(move);
 	updateWinValue();
 }
-void Board::unmakeMove(Move& move)
+void BotBoard::unmakeMove(Move& move)
 {
 	appyMoveReversible(move);
 	gameResult = GameResult::InProgress;
 }
 
-void Board::appyMoveReversible(Move& move)
+void BotBoard::appyMoveReversible(Move& move)
 {
 	for (int i = 0; i < move.size(); i++) {
 		uint8_t pos = move[i].i + 13 * move[i].j;
@@ -187,7 +187,7 @@ void Board::appyMoveReversible(Move& move)
 }
 
 
-u64 Board::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves)
+u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves)
 {
 
 	int n_moves, i;
@@ -209,7 +209,7 @@ u64 Board::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint
 	return nodes;
 }
 
-std::string Board::moveToString(Move& move)
+std::string BotBoard::moveToString(Move& move)
 {
 	if (move.size() == 0)
 		return "Null move";

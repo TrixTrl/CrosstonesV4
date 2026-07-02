@@ -1,5 +1,5 @@
 #include "felix-bots/Deepchad.h"
-#include "felix-bots/Board.h"
+#include "felix-bots/BotBoard.h"
 #include "felix-bots/Utility.h"
 #include "DCTestSuite.h"
 
@@ -21,7 +21,7 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 
 	gameMaster.play(globalHwnd);*/
 
-	std::vector<dc::Board> boards = loadExampleBoards();
+	std::vector<dc::BotBoard> boards = loadExampleBoards();
 
 	std::memcpy(display, &(boards.at(3).square), sizeof(boards.at(3).square));
 	InvalidateRect(globalHwnd, NULL, NULL);
@@ -33,7 +33,7 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 	auto execTime = doTimed([&]()
 		{
 			//for (auto& board : boards) {
-			dc::Board& board = boards.at(3);
+			dc::BotBoard& board = boards.at(3);
 			uint8_t boardCopy[13][13];
 			std::memcpy(&boardCopy, &(board.square), sizeof(boardCopy));
 
@@ -91,9 +91,9 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 	return true;
 }
 
-std::vector<dc::Board> DCTestSuite::loadExampleBoards() {
-	std::vector<dc::Board> boards;
-	BoardState bsService;
+std::vector<dc::BotBoard> DCTestSuite::loadExampleBoards() {
+	std::vector<dc::BotBoard> boards;
+	Board bsService;
 
 	const std::vector<std::pair<std::string, bool>> positions = {
 		std::pair("b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 -W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 11111111111111111111", true), //Dragon start
@@ -105,7 +105,7 @@ std::vector<dc::Board> DCTestSuite::loadExampleBoards() {
 
 	// convert positions
 	for (int i = 0; i < positions.size(); i++) {
-		dc::Board board;
+		dc::BotBoard board;
 		board.isWhiteTurn = positions[i].second;
 		bsService.loadPos(positions[i].first);
 		bsService.copyBoard(&(board.square));

@@ -36,7 +36,7 @@ const int Evaluation::pieceValue[22] =
 
 // The score that's returned is given from the perspective of whoever's turn it is to move.
 // So a positive score means the player who's turn it is to move has an advantage, while a negative score indicates a disadvantage.
-int Evaluation::evaluate(const Board& board)
+int Evaluation::evaluate(const BotBoard& board)
 {
 	int8_t color = 2 * board.isWhiteTurn - 1;
 
@@ -100,7 +100,7 @@ int Evaluation::evaluate(const Board& board)
 	//return rand() % 100;
 }
 
-int Evaluation::getEffectivePieceWorth(const Board& board, const uint8_t piece, const int x, const int y) const
+int Evaluation::getEffectivePieceWorth(const BotBoard& board, const uint8_t piece, const int x, const int y) const
 {
 	const int pieceVal = (Piece::height(piece)
 		+ Piece::isBlue(piece)

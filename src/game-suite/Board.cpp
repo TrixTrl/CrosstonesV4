@@ -1,4 +1,4 @@
-#include "BoardState.h"
+#include "Board.h"
 #include <iostream>
 #include <string>
 #include "globals/Piece.h"
@@ -18,7 +18,7 @@
 
 #define DEBUG_PRINTING false
 
-BoardState::BoardState()
+Board::Board()
 {
 	for (int i = 0; i < 13; i++)
 	{
@@ -62,7 +62,7 @@ BoardState::BoardState()
 	pieces[10][6] = hasTurnPiece;
 }
 
-void BoardState::rst(std::bitset<3> &tps)
+void Board::rst(std::bitset<3> &tps)
 {
 	uint8_t turnPieceMask = 0b10111111;
 	uint8_t resetMask = 0b11000000;
@@ -142,7 +142,7 @@ void BoardState::rst(std::bitset<3> &tps)
 	pieces[6][3] |= 3 | Piece::White;*/
 }
 
-void BoardState::wipe()
+void Board::wipe()
 {
 	for (int i = 0; i < 13; i++)
 	{
@@ -153,7 +153,7 @@ void BoardState::wipe()
 	}
 }
 
-void BoardState::copyBoard(uint8_t (*dest)[13][13]) const
+void Board::copyBoard(uint8_t (*dest)[13][13]) const
 {
 	std::memcpy(dest, &pieces, sizeof(pieces));
 }
@@ -174,7 +174,7 @@ void forceDebugPrint(std::string str)
 	OutputDebugString(wideString);
 }
 
-std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMoves(bool isWhite) const
+std::shared_ptr<std::vector<std::vector<Board::xMove>>> Board::getMoves(bool isWhite) const
 {
 	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
 	moves->reserve(700);
@@ -203,9 +203,9 @@ std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> BoardState::getMove
 	return moves;
 }
 
-void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
-	std::vector<BoardState::xMove> move = std::vector<BoardState::xMove>();
+	std::vector<Board::xMove> move = std::vector<Board::xMove>();
 	move.reserve(10);
 	for (int i = 0; i < 13; i++)
 	{
@@ -447,7 +447,7 @@ void BoardState::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>>
 	}
 }
 
-void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void Board::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
 {
 	/*
 		0
@@ -559,7 +559,7 @@ void BoardState::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 	}
 }
 
-void BoardState::unsafeMakeMove(std::vector<xMove> *move)
+void Board::unsafeMakeMove(std::vector<xMove> *move)
 {
 	for (int i = 0; i < move->size(); i++)
 	{
@@ -567,9 +567,9 @@ void BoardState::unsafeMakeMove(std::vector<xMove> *move)
 	}
 }
 
-int BoardState::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
+int Board::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
 	moves = getMoves(isWhiteTurn);
 	uint8_t boardCopy1[13][13];
 	uint8_t boardCopy2[13][13];
@@ -594,9 +594,9 @@ int BoardState::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
 	return -1;
 }
 
-int BoardState::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
+int Board::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
 	moves = getMoves(isWhiteTurn);
 	uint8_t boardCopy[13][13];
 	for (int i = 0; i < moves->size(); i++)
@@ -622,7 +622,7 @@ int BoardState::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 	}
 	return -1;
 }
-BoardState::winValue BoardState::gameOver(bool isWhite) // last player to make a move
+Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 {
 	// Check for full eliminations, if yes, that player wins
 	// Check for base wins
@@ -743,7 +743,7 @@ BoardState::winValue BoardState::gameOver(bool isWhite) // last player to make a
 	return isWhite ? winValue::white : winValue::black;
 }
 
-std::string BoardState::dumpPos()
+std::string Board::dumpPos()
 {
 	std::string turnPieceStr = "";
 	std::string str = "";
@@ -779,7 +779,7 @@ std::string BoardState::dumpPos()
 	return str + turnPieceStr;
 }
 
-void BoardState::loadPos(std::string str)
+void Board::loadPos(std::string str)
 {
 	wipe();
 
@@ -818,7 +818,7 @@ void BoardState::loadPos(std::string str)
 	}
 }
 
-void BoardState::dumpGame()
+void Board::dumpGame()
 {
 
 	forceDebugPrint("\nGame record:\n\n");

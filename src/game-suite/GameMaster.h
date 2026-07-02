@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BoardState.h"
+#include "Board.h"
 #include <bitset>
 #include <chrono>
 #include "globals/Player.h"
@@ -11,7 +11,7 @@
 
 class GameMaster {
 private:
-	BoardState bs;
+	Board bs;
 	bool isWhiteTurn = true;
 	Player* players[2];
 	int timeControl;

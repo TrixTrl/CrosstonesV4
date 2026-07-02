@@ -4,7 +4,7 @@
 
 #define PIECEREDUCTIONERROR 0
 
-StateTester::StateTester(BoardState bs)
+StateTester::StateTester(Board bs)
 {
 	bs.copyBoard(&pieces);
 	BS = bs;
@@ -73,7 +73,7 @@ int StateTester::blueCount()
 bool StateTester::checkAllMoves()
 {
 	bool passing = true;
-	std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
 	moves = BS.getMoves(true);
 	int baseCount = pieceCount();
 	int baseBlueCount = blueCount();

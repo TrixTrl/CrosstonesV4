@@ -10,7 +10,7 @@
 #include "NewUI.h"
 
 #include "DCTestSuite.h"
-#include "BoardState.h"
+#include "Board.h"
 #include "globals/Piece.h"
 #include "GameMaster.h"
 #include "ManualPlayer.h"
@@ -59,7 +59,7 @@ int main()
 
 	if (EXPLOREMOVEGENERATION || EVALUATIONTESTING)
 	{
-		BoardState bs;
+		Board bs;
 		std::bitset<3> set(5);
 		bs.rst(set);
 
@@ -82,7 +82,7 @@ int main()
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 
-		std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+		std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
 		moves = bs.getMoves(isWhite);
 
 		std::string str = std::to_string(moves->size());
@@ -109,7 +109,7 @@ int main()
 		return 0;*/
 
 		// Prepare chad move exploration
-		dc::Board chadBoard = dc::Board();
+		dc::BotBoard chadBoard = dc::BotBoard();
 		chadBoard.initialize(&displayBoard[0], isWhite);
 
 		std::vector<dc::Move> chadMoves;
@@ -221,7 +221,7 @@ int main()
 		/*Man vs AI (Longmen Insanity)*/				 // std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b- 11200 r-11206 b-11212 11111111111111111111 | 27 132 12 39 134 176 24 50 26 15 45 154 51 133 114 237 542 491 151 165 19 23 25 184 341 351 451 427 168 429 449 318 464 364 308 30 216 181 177 457 415 574 158 619 66 386 413 364 3 271 24 292 87 278 186 12 258 71 96 83 38 33 93 19 191 211 54 251 209 219 261 263 94 262 79 224 218 289 206 239 184 182 27 2 135 256 86 202 53 241 12 240";
 		/*DC(white) vs v1 of AlphaCruncher*/ std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 20 95 17 151 141 29 37 125 35 175 148 6 29 102 105 163 73 108 105 250 16 127 111 179 29 312 29 103 28 163";
 
-		BoardState bs;
+		Board bs;
 
 		size_t pos = gameCode.find("|");
 		std::string startingPos = gameCode.substr(0, pos - 1);
@@ -232,7 +232,7 @@ int main()
 		gameCode.erase(0, pos + 2);
 
 		size_t pos2 = 0;
-		std::vector<std::vector<BoardState::xMove> *> gameReplay;
+		std::vector<std::vector<Board::xMove> *> gameReplay;
 		// gameReplay = std::vector<std::vector<BoardState::xMove>>();
 
 		while ((pos2 = gameCode.find(" ")) != std::string::npos)
@@ -240,14 +240,14 @@ int main()
 			int moveIndex = std::stoi(gameCode.substr(0, pos2));
 			gameCode.erase(0, pos2 + 1);
 
-			std::shared_ptr<std::vector<std::vector<BoardState::xMove>>> moves;
+			std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
 			moves = bs.getMoves(gameReplay.size() % 2 == 0);
-			std::vector<BoardState::xMove> *pain;
-			pain = new std::vector<BoardState::xMove>();
+			std::vector<Board::xMove> *pain;
+			pain = new std::vector<Board::xMove>();
 
 			for (int i = 0; i < (*moves)[moveIndex].size(); i++)
 			{
-				BoardState::xMove moveCopy = BoardState::xMove((*moves)[moveIndex][i].i, (*moves)[moveIndex][i].j, (*moves)[moveIndex][i].delta);
+				Board::xMove moveCopy = Board::xMove((*moves)[moveIndex][i].i, (*moves)[moveIndex][i].j, (*moves)[moveIndex][i].delta);
 				pain->emplace_back(moveCopy);
 			}
 

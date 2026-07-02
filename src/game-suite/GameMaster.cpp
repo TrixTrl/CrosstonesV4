@@ -28,7 +28,7 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 	isWhiteTurn = whiteToStart;
 	bool ended = false;
 	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
-	while (bs.gameOver(!isWhiteTurn) == BoardState::winValue::none && !ended && !stopToken.stop_requested()) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
+	while (bs.gameOver(!isWhiteTurn) == Board::winValue::none && !ended && !stopToken.stop_requested()) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
 		uint8_t board[13][13];
 		bs.copyBoard(&board);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -113,9 +113,9 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 		isWhiteTurn = !isWhiteTurn;
 	}
 	if (!ended) {
-		BoardState::winValue gameOver = bs.gameOver(isWhiteTurn);
+		Board::winValue gameOver = bs.gameOver(isWhiteTurn);
 		print("\n");
-		print(bs.gameOver(isWhiteTurn) == BoardState::winValue::white ? "White" : "Black");
+		print(bs.gameOver(isWhiteTurn) == Board::winValue::white ? "White" : "Black");
 		print(" has won\n");
 	}
 	bs.dumpGame();

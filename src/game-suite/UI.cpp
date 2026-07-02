@@ -2,7 +2,7 @@
 
 #include "fix_win32_compatibility.h"
 #include <string>
-#include "BoardState.h"
+#include "Board.h"
 #include "globals/Piece.h"
 
 
@@ -100,7 +100,7 @@ void UI::paint(HWND hwnd, bool drawBackground, uint8_t board[2][13][13])
 				break;
 			case 't':
 				col = CreateSolidBrush(RGB(214, 176, 116));
-				path = (piece & BoardState::setTurnPiece) == 0 ? DrawPath::HORIZONTAL : DrawPath::VERTICAL;
+				path = (piece & Board::setTurnPiece) == 0 ? DrawPath::HORIZONTAL : DrawPath::VERTICAL;
 				break;
 			default:
 				col = CreateSolidBrush(RGB(255, 0, 0));
