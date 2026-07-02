@@ -4,4 +4,5 @@
 #include "Utils.h"
 #include "FastMoveGenerator.h"
 
-void compareGenerators(uint8_t (*pieces)[13][13], bool isWhite);
+void runPosition(uint8_t (*pieces)[13][13], bool isWhite);
+void compareGenerators();

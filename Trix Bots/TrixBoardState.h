@@ -23,6 +23,7 @@ public:
     void wipe();
 
     void copyBoard(uint8_t (*dest)[13][13]) const;
+    void loadBoard(uint8_t (*src)[13][13]);
 
     struct xMove
     {
@@ -60,6 +61,8 @@ public:
     void dumpGame();
 
     std::string getKey();
+
+    uint8_t (*getPiecesReference())[13][13];
 
 private:
     uint8_t pieces[13][13];

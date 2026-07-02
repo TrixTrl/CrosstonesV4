@@ -21,6 +21,7 @@
 #include "Trix Bots/DemoKnight.h"
 #include "Trix Bots/Hydra.h"
 #include "Trix Bots/AlphaCruncher.h"
+#include "Trix Bots/GeneratorComparer.h"
 
 #include "Globals/PlayerInputKey.h"
 
@@ -39,6 +40,7 @@
 #define EVALUATIONTESTING 0
 #define DEEPCHADTESTINGSUITE 0
 #define GAMEVIEWER 0
+#define RUNNINGCOMPARISON 1
 
 const int screenWidth = 755;
 const int screenHeight = 755;
@@ -300,6 +302,10 @@ int main()
 				switchMove = 0;
 			}
 		}
+	}
+	else if (RUNNINGCOMPARISON)
+	{
+		compareGenerators();
 	}
 	else
 	{

@@ -16,6 +16,7 @@ std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(uint8_t (*piece
                 continue;
             if (Piece::isWhite(piece) != isWhite)
                 continue;
+            generateMoves(pieces, isWhite, std::pair<int, int>(x, y), moves);
         }
     }
 
@@ -32,6 +33,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
     startingState.dir = Direction::NONE;
     startingState.depth = 0;
     startingState.movingAmount = Piece::height(*pieces[start.first][start.second]);
+    startingState.stepsLeft = -1;
 
     std::vector<moveFragment> inProgressMoveFragments = std::vector<moveFragment>();
     inProgressMoveFragments.reserve(10);
@@ -67,7 +69,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
         Utils::print(std::to_string(currentState.depth), true);
 #endif
 
-        while (currentState.depth > inProgressMoveFragments.size())
+        while (inProgressMoveFragments.size() > currentState.depth)
             inProgressMoveFragments.erase(inProgressMoveFragments.end() - 1);
 
         int prevMovingAmount = Piece::height(*pieces[start.first][start.second]);
@@ -92,8 +94,15 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             {
                 currentMove.moveFragments.emplace_back(fragment);
             }
+            if (Piece::isTower(pieceAtCurrentLocation) && Piece::isWhite(pieceAtCurrentLocation) == isWhite && currentState.stepsLeft == -2)
+            {
+                currentMove.isMerge = true;
+            }
             moves.emplace_back(currentMove);
         }
+
+        if (currentState.stepsLeft == 0 || currentState.stepsLeft == -2)
+            continue;
 
         bool isComplexMove = false;
 
@@ -129,67 +138,139 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
         {
             memcpy(&complexMoveCopy, pieces, sizeof(*pieces));
             move tempComplexMove = move();
-            tempComplexMove.start = start;
-            tempComplexMove.moveFragments = inProgressMoveFragments;
+            tempComplexMove.start = std::pair<int, int>(start);
+            tempComplexMove.moveFragments = std::vector<moveFragment>();
+            for (const auto &fragment : inProgressMoveFragments)
+            {
+                tempComplexMove.moveFragments.emplace_back(fragment);
+            }
             applyMove(&complexMoveCopy, tempComplexMove);
             currentBoardState = &complexMoveCopy;
         }
 
         std::vector<Direction> potentialDirections = getLegalMoveDirections(currentBoardState, currentState);
 
-        for (int i = 1; i <= currentState.movingAmount; i++)
+        uint8_t currentTower = getSplitResult(*pieces[start.first][start.second], currentState.movingAmount).second;
+
+        for (const auto &direction : potentialDirections)
         {
-            for (const auto &direction : potentialDirections)
+            std::pair<int, int> nextPosition = getPositionInDirection(currentState.position, direction);
+            uint8_t nextPiece = *currentBoardState[nextPosition.first][nextPosition.second] & Piece::towerMask;
+
+            // check if movement in that direction is impossible
+            bool canPush = true;
+            bool canCapture = false;
+
+            if (Piece::isTower(nextPiece))
             {
-                moveGenerationState nextState = moveGenerationState();
-                nextState.position = getPositionInDirection(currentState.position, direction);
-                nextState.dir = direction;
-                nextState.depth = currentState.depth + 1;
-                nextState.movingAmount = i;
+                if (Piece::isWhite(nextPiece) == isWhite)
+                {
+                    if (Piece::height(nextPiece) <= Piece::height(currentTower))
+                    {
+                        std::pair<int, int> searchLocation = nextPosition;
+                        uint8_t searchingPiece = *currentBoardState[searchLocation.first][searchLocation.second];
+                        while (Piece::isTower(searchingPiece) && Piece::isWhite(searchingPiece) == isWhite && Piece::height(searchingPiece) <= Piece::height(searchingPiece) &&
+                               (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece : Piece::turnPiece(searchingPiece) == Piece::turnPieceMask)))
+                        {
+                            searchLocation = getPositionInDirection(searchLocation, direction);
+                            if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.first >= 0 && searchLocation.first <= 12))
+                            {
+                                break;
+                            }
+                            searchingPiece = *currentBoardState[searchLocation.first][searchLocation.second];
+                        }
+                        if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.first >= 0 && searchLocation.first <= 12 && (searchingPiece & Piece::towerMask) == 0 &&
+                              (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece : Piece::turnPiece(searchingPiece) == Piece::turnPieceMask))))
+                        {
+                            canPush = false;
+                        }
+                    }
+                    else
+                    {
+                        canPush = false;
+                    }
+                }
+                else
+                {
+                    canPush = false;
+                    if (Piece::height(nextPiece) > Piece::height(currentTower) && Piece::isBlue(currentTower) == 0)
+                    {
+                        canCapture = false;
+                    }
+                    else
+                    {
+                        canCapture = true;
+                    }
+                }
+            }
+
+            for (int i = 1; i <= currentState.movingAmount; i++)
+            {
+                if (canPush || (canCapture && i < currentState.movingAmount && (currentState.stepsLeft > 1 || Piece::isBlue(currentTower))))
+                {
+                    moveGenerationState nextState = moveGenerationState();
+                    nextState.position = nextPosition;
+                    nextState.dir = direction;
+                    nextState.depth = currentState.depth + 1;
+                    nextState.movingAmount = i;
+                    if (currentState.stepsLeft == -1)
+                    {
+                        nextState.stepsLeft = Piece::maxSteps(getSplitResult(*pieces[start.first][start.second], i).second);
+                    }
+                    else
+                    {
+                        nextState.stepsLeft = currentState.stepsLeft - 1;
+                    }
+                    stack.emplace_back(nextState);
+                }
+                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (!Piece::hasAddOn(currentTower) || i < currentState.movingAmount))
+                {
+                    moveGenerationState nextState = moveGenerationState();
+                    nextState.position = nextPosition;
+                    nextState.dir = direction;
+                    nextState.depth = currentState.depth + 1;
+                    nextState.movingAmount = i;
+                    nextState.stepsLeft = -2;
+                    stack.emplace_back(nextState);
+                }
             }
         }
     }
 }
+
+// Gah, being able to tell the difference between trying to push and trying to merge is gonna be fun... and turn pieces... those existing
 
 std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirections(uint8_t (*pieces)[13][13], moveGenerationState currentState)
 {
     std::vector<Direction> result = std::vector<Direction>();
     if (currentState.dir != Direction::SOUTH && currentState.position.second > 0 && currentState.position.first % 2 == 0)
     {
-        uint8_t currentTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second];
         uint8_t destinationTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second - 1];
-        if (((currentTurnPiece | destinationTurnPiece) == 0) ||
-            (currentTurnPiece != 0 && (currentTurnPiece & Piece::setTurnPiece) != 0) || (destinationTurnPiece != 0 && (destinationTurnPiece & Piece::setTurnPiece) != 0))
+        if (destinationTurnPiece == 0 || (destinationTurnPiece & Piece::setTurnPiece) == 0)
         {
             result.emplace_back(Direction::NORTH);
         }
     }
     if (currentState.dir != Direction::NORTH && currentState.position.second < 12 && currentState.position.first % 2 == 0)
     {
-        uint8_t currentTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second];
         uint8_t destinationTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second + 1];
-        if (((currentTurnPiece | destinationTurnPiece) == 0) ||
-            (currentTurnPiece != 0 && (currentTurnPiece & Piece::setTurnPiece) != 0) || (destinationTurnPiece != 0 && (destinationTurnPiece & Piece::setTurnPiece) != 0))
+        if (destinationTurnPiece == 0 || (destinationTurnPiece & Piece::setTurnPiece) == 0)
         {
             result.emplace_back(Direction::SOUTH);
         }
     }
-    if (currentState.dir != Direction::WEST && currentState.position.first < 12 && currentState.position.second % 2 == 0)
+    if (currentState.dir != Direction::WEST && currentState.position.first < 12 && currentState.position.second % 2 == 1)
     {
-        uint8_t currentTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second];
         uint8_t destinationTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first + 1][currentState.position.second];
-        if (((currentTurnPiece | destinationTurnPiece) == 0) ||
-            (currentTurnPiece != 0 && (currentTurnPiece & Piece::setTurnPiece) == 0) || (destinationTurnPiece != 0 && (destinationTurnPiece & Piece::setTurnPiece) == 0))
+        if (destinationTurnPiece == 0 || (destinationTurnPiece & Piece::setTurnPiece) == 0)
         {
             result.emplace_back(Direction::EAST);
         }
     }
-    if (currentState.dir != Direction::EAST && currentState.position.first > 0 && currentState.position.second % 2 == 0)
+    if (currentState.dir != Direction::EAST && currentState.position.first > 0 && currentState.position.second % 2 == 1)
     {
-        uint8_t currentTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first][currentState.position.second];
         uint8_t destinationTurnPiece = Piece::turnPieceMask & *pieces[currentState.position.first - 1][currentState.position.second];
-        if (((currentTurnPiece | destinationTurnPiece) == 0) ||
-            (currentTurnPiece != 0 && (currentTurnPiece & Piece::setTurnPiece) == 0) || (destinationTurnPiece != 0 && (destinationTurnPiece & Piece::setTurnPiece) == 0))
+        if (destinationTurnPiece == 0 || (destinationTurnPiece & Piece::setTurnPiece) == 0)
         {
             result.emplace_back(Direction::WEST);
         }
@@ -262,4 +343,5 @@ std::pair<int, int> FastMoveGenerator::getPositionInDirection(std::pair<int, int
         return std::pair<int, int>(position.first - 1, position.second);
         break;
     }
+    throw;
 }

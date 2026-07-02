@@ -159,6 +159,11 @@ void BoardState_T::copyBoard(uint8_t (*dest)[13][13]) const
     std::memcpy(dest, &pieces, sizeof(pieces));
 }
 
+void BoardState_T::loadBoard(uint8_t (*src)[13][13])
+{
+    std::memcpy(&pieces, src, sizeof(pieces));
+}
+
 void debugPrint_T(std::string str)
 {
     if (!DEBUG_PRINTING)
@@ -918,4 +923,9 @@ std::string BoardState_T::getKey()
         }
     }
     return key;
+}
+
+uint8_t (*BoardState_T::getPiecesReference())[13][13]
+{
+    return &pieces;
 }

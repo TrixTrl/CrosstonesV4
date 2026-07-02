@@ -28,6 +28,7 @@ public:
     {
         std::pair<int, int> start;
         std::vector<moveFragment> moveFragments;
+        bool isMerge = false;
     };
 
     struct moveGenerationState
@@ -36,6 +37,8 @@ public:
         Direction dir;
         int movingAmount;
         int depth;
+        int stepsLeft;
+        bool merging = false;
     };
 
     static std::vector<move> getMoves(uint8_t (*pieces)[13][13], bool isWhite);
