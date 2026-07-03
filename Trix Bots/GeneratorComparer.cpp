@@ -39,6 +39,8 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
             {
                 legalMoves++;
                 foundMoves.at(moveResult) = n;
+                // FastMoveGenerator::printMove(move);
+                // Utils::print(stringify(correctMoves->at(moveResult)), true);
             }
             else
             {
@@ -79,6 +81,7 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
 }
 
 /*
+ *  TO FIX:
  *  Lines of Towers can be pushed at once if each subsequent Tower is equal to or shorter in
  *  Height than the Tower pushing it.
  */
@@ -88,7 +91,6 @@ void compareGenerators()
     int positionNumber = 0;
     BoardState_T boardState = BoardState_T();
 
-    /*
     // Position 0
     boardState.loadPos("-W10006 -B11206 11010100001100111111");
     Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
@@ -102,17 +104,30 @@ void compareGenerators()
     runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     runPosition(boardState.getPiecesReference(), false);
-    */
 
     // Position 2
-    boardState.loadPos("rW30606 -W10607 -B50605 -B50706 -B10506 11111100101101111111");
+    boardState.loadPos("rW30606 -W10607 -B50605 -B50706 -B50506 11111111111111111111"); // 11111100101101111111  0000000000000000000000
     Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
-    //runPosition(boardState.getPiecesReference(), true);
+    runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     runPosition(boardState.getPiecesReference(), false);
 
     // Position 3
     boardState.loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
+
+    // Position 4
+    boardState.loadPos("-W50000 11111111111111111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
+
+    // Position 5
+    boardState.loadPos("-B50000 00000000000000000000");
     Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
     runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);

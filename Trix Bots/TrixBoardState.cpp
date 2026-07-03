@@ -357,7 +357,7 @@ void BoardState_T::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 
         if ((dest & 0b00111111) == 0)
         { // Most basic case : empty target square
-            for (int splitOff = 1; splitOff < 5; splitOff++)
+            for (int splitOff = 1; splitOff <= 5; splitOff++)
             { // number of moved pieces
                 if (splitOff > Piece::height(piece))
                     continue;
