@@ -1,6 +1,6 @@
 #include "felix-bots/Deepchad.h"
-#include "felix-bots/BotBoard.h"
-#include "felix-bots/Utility.h"
+#include "felix-bots/board/BotBoard.h"
+#include "felix-bots/util/Utility.h"
 #include "DCTestSuite.h"
 
 #include "fix_win32_compatibility.h"

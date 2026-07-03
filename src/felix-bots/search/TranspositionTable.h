@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
-#include "BotBoard.h"
+#include "felix-bots/board/BotBoard.h"
 #include <array>
 #include "test-bots/BasicGenerator.h"
-#include "Utility.h"
+#include "felix-bots/util/Utility.h"
 
 
 namespace dc

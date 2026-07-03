@@ -1,7 +1,7 @@
-#include "Evaluation.h"
-#include "Searcher.h"
-#include "GameResult.h"
-#include "Utility.h"
+#include "felix-bots/evaluation/Evaluation.h"
+#include "felix-bots/search/Searcher.h"
+#include "felix-bots/board/GameResult.h"
+#include "felix-bots/util/Utility.h"
 #include "globals/Piece.h"
 
 using namespace dc;

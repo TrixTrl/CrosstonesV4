@@ -1,5 +1,5 @@
 #pragma once
-#include "BotBoard.h"
+#include "felix-bots/board/BotBoard.h"
 
 namespace dc
 {

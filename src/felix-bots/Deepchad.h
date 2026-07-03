@@ -1,11 +1,11 @@
 #pragma once
 
 #include "globals/Player.h"
-#include "Utility.h"
+#include "felix-bots/util/Utility.h"
 #include "test-bots/BasicGenerator.h"
 #include <vector>
-#include "Searcher.h"
-#include "BotBoard.h"
+#include "felix-bots/search/Searcher.h"
+#include "felix-bots/board/BotBoard.h"
 
 using namespace dc;
 

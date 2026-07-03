@@ -1,5 +1,5 @@
-#include "Searcher.h"
-#include "Utility.h"
+#include "felix-bots/search/Searcher.h"
+#include "felix-bots/util/Utility.h"
 #include <algorithm>
 #include <format>
 

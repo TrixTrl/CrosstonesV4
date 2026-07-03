@@ -1,6 +1,6 @@
 #include "MoveOrdering.h"
-#include "Utility.h"
-#include "Evaluation.h"
+#include "felix-bots/util/Utility.h"
+#include "felix-bots/evaluation/Evaluation.h"
 
 using namespace dc;
 

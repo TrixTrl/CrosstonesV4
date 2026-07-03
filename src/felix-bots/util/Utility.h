@@ -2,7 +2,7 @@
 
 #include "test-bots/BasicGenerator.h"
 #include "globals/Piece.h"
-#include "GameResult.h"
+#include "felix-bots/board/GameResult.h"
 
 #include <functional>
 #include <vector>

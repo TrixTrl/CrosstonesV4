@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include "Utility.h"
+#include "felix-bots/util/Utility.h"
 #include "TranspositionTable.h"
-#include "Evaluation.h"
+#include "felix-bots/evaluation/Evaluation.h"
 
 namespace dc
 {

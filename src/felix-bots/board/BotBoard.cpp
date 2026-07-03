@@ -1,7 +1,7 @@
 #include "BotBoard.h"
-#include "Utility.h"
+#include "felix-bots/util/Utility.h"
 #include "Zobrist.h"
-#include "MoveGenerator.h"
+#include "felix-bots/move-gen/MoveGenerator.h"
 
 using namespace dc;
 

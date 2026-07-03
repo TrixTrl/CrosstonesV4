@@ -1,5 +1,5 @@
-#include "MoveGenerator.h"
-#include "Utility.h"
+#include "felix-bots/move-gen/MoveGenerator.h"
+#include "felix-bots/util/Utility.h"
 
 #include "globals/Piece.h"
 using namespace dc;

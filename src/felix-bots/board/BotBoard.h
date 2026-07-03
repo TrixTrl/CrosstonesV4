@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include "Utility.h"
-#include "GameResult.h"
+#include "felix-bots/util/Utility.h"
+#include "felix-bots/board/GameResult.h"
 
 namespace dc
 { 

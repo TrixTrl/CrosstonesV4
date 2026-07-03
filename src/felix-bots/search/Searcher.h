@@ -1,11 +1,11 @@
 #pragma once
 #include "test-bots/BasicGenerator.h"
-#include "BotBoard.h"
-#include "Evaluation.h"
-#include "MoveGenerator.h"
+#include "felix-bots/board/BotBoard.h"
+#include "felix-bots/evaluation/Evaluation.h"
+#include "felix-bots/move-gen/MoveGenerator.h"
 #include "MoveOrdering.h"
 #include "TranspositionTable.h"
-#include "Utility.h"
+#include "felix-bots/util/Utility.h"
 
 #include <cstdint>
 #include <memory>

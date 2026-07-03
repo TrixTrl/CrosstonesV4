@@ -13,8 +13,8 @@
 #include "globals/Piece.h"
 #include "test-bots/BasicGenerator.h"
 #include "TranspositionTable.h"
-#include "felix-bots/Evaluation.h"
-#include "felix-bots/BotBoard.h"
+#include "felix-bots/evaluation/Evaluation.h"
+#include "felix-bots/board/BotBoard.h"
 
 #define MAXEVAL 99999
 #define BITSETINDEX (i + (j * 13))
