@@ -26,6 +26,8 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
             illegalMoves++;
             Utils::print("Illegal: ", false);
             FastMoveGenerator::printMove(move);
+            memcpy(&movePieces, pieces, sizeof(*pieces));
+            FastMoveGenerator::applyMove(&movePieces, move);
         }
         else
         {
@@ -50,6 +52,7 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
     Utils::print("Legal moves: " + std::to_string(legalMoves), true);
     Utils::print("Illegal moves: " + std::to_string(illegalMoves), true);
     Utils::print("Duplicate moves: " + std::to_string(duplicateMoves), true);
+    Utils::print("Missing moves: " + std::to_string(correctMoves->size() - legalMoves), true);
     if (legalMoves != correctMoves->size())
     {
         Utils::print("\nCorrect moves:", true);
@@ -74,10 +77,32 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
 void compareGenerators()
 {
     BoardState_T boardState = BoardState_T();
-    boardState.loadPos("-W10006 -B11206 11010100001100111111"); //("-W10006 11010100001100111111");
-    // runPosition(boardState.getPiecesReference(), true);
-    runPosition(boardState.getPiecesReference(), false);
-    // boardState.loadPos("-W20006 -B21206 11010100001100111111");
+    // boardState.loadPos("-W10006 -B11206 11010100001100111111"); //("-W10006 11010100001100111111");
     // runPosition(boardState.getPiecesReference(), true);
     // runPosition(boardState.getPiecesReference(), false);
+    boardState.loadPos("-W10006 -W10106 -B21206 11010100001100111111");
+    runPosition(boardState.getPiecesReference(), true);
+    // runPosition(boardState.getPiecesReference(), false);
+}
+
+void executionSpeedTest()
+{
+    BoardState_T boardState = BoardState_T();
+    boardState.loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+    int basicLoops = 0;
+    int endTime = Utils::millis() + 10000;
+    while (Utils::millis() < endTime)
+    {
+        boardState.getMoves(basicLoops % 2, false, false);
+        basicLoops++;
+    }
+    Utils::print("Basic move generator loops in 10 seconds: " + std::to_string(basicLoops), true);
+    int advancedLoops = 0;
+    endTime = Utils::millis() + 10000;
+    while (Utils::millis() < endTime)
+    {
+        FastMoveGenerator::getMoves(boardState.getPiecesReference(), advancedLoops % 2);
+        advancedLoops++;
+    }
+    Utils::print("Fast move generator loops in 10 seconds: " + std::to_string(advancedLoops), true);
 }

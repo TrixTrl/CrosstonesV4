@@ -4,6 +4,7 @@
 #include <string>
 #include <atomic>
 #include <iomanip>
+#include <chrono>
 
 #include "../Test Bots/BasicGenerator.h"
 #include "../BoardState.h"
@@ -113,6 +114,8 @@ public:
 
 	static float alphaBeta(uint8_t (*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t (*pieces)[13][13]), debugContainer *debug = nullptr);
 	static float alphaBeta_wTable(uint8_t (*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, float (*evalFunc)(bool isWhite, uint8_t (*pieces)[13][13]), uint64_t zobristKey, debugContainer *debug = nullptr);
+
+	static int millis();
 
 	class TrixSearcher
 	{
