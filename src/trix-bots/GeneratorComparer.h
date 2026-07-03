@@ -5,7 +5,9 @@
 #include "FastMoveGenerator.h"
 #include "MCTS.h"
 #include <chrono>
+#include <string>
 
 void runPosition(uint8_t (*pieces)[13][13], bool isWhite);
 void compareGenerators();
 void executionSpeedTest();
+void tryPosition(std::string position, int positonIndex);
