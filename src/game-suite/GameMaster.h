@@ -3,10 +3,9 @@
 #include "Board.h"
 #include <bitset>
 #include <chrono>
+#include <functional>
 #include "globals/Player.h"
 #include "globals/PlayerInputKey.h"
-#include "fix_win32_compatibility.h"
-#include <WinUser.h>
 #include <thread>
 
 class GameMaster {
@@ -20,10 +19,10 @@ private:
 
 public:
 	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, GamePosition& displayBoard);
-	void play(std::stop_token stopToken, HWND globalHwnd, bool whiteToStart = true);
+	void play(std::stop_token stopToken, std::function<void()> onBoardChanged, bool whiteToStart = true);
 	void loadPos(std::string str);
 	void notifyPlayersKeyDown(PlayerInputKey key);
-	void notifyPlayersClicked(bool isLeft, POINT gridPos);
+	void notifyPlayersClicked(bool isLeft, int gridX, int gridY);
 };
 
 class Time {

@@ -1,18 +1,16 @@
 #include "GameMaster.h"
-#include "fix_win32_compatibility.h"
-#include <WinUser.h>
 #include <future>
 #include <algorithm>
+#include <iostream>
 
 void print(std::string str) {
-	std::string temp = std::string(str.begin(), str.end());
-	LPCSTR wideString = temp.c_str();
-	OutputDebugString(wideString);
+	std::cout << str;
 }
 
 GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player2, int timeControl_, int enforceTime, GamePosition& displayBoard)
 	: displayBoard(displayBoard) {
 	bs.rst(gamemode);
+	bs.copyPositionTo(displayBoard);
 	players[0] = player1;
 	players[1] = player2;
 	timeControl = timeControl_;
@@ -20,15 +18,15 @@ GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player
 	timeEnforcement[1] = (enforceTime & 1) != 0;
 }
 
-void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToStart) {
+void GameMaster::play(std::stop_token stopToken, std::function<void()> onBoardChanged, bool whiteToStart) {
 	bs.copyPositionTo(displayBoard);
-	InvalidateRect(globalHwnd, NULL, NULL);
+	if (onBoardChanged) onBoardChanged();
 	bs.gameRecord.emplace_back(bs.dumpPosition() + " | ");
 
 	isWhiteTurn = whiteToStart;
 	bool ended = false;
-	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
-	while (bs.gameOver(!isWhiteTurn) == Board::winValue::none && !ended && !stopToken.stop_requested()) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
+	bool passed[2] = { false, false };
+	while (bs.gameOver(!isWhiteTurn) == Board::winValue::none && !ended && !stopToken.stop_requested()) {
 		
 		GamePosition board = bs.positionCopy();
 
@@ -39,7 +37,6 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 			auto future = promise->get_future();
 			auto player = players[isWhiteTurn ? 0 : 1];
 			
-			// launch player move generation
 			std::thread bot_thread([promise, player, &board, this, timeEnd]() {
 				try {
 					player->getMoveToPlay(&board.pieces, isWhiteTurn, timeEnd);
@@ -51,7 +48,6 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 
 			while (future.wait_for(std::chrono::milliseconds(100)) == std::future_status::timeout) {
 				if (stopToken.stop_requested()) {
-					TerminateThread(bot_thread.native_handle(), 0);
 					bot_thread.detach();
 					return;
 				}
@@ -59,7 +55,6 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 			if (bot_thread.joinable()) {
 				bot_thread.join();
 			}
-			// re throw exceptions
 			future.get();
 		}
 		catch (const std::exception& e)
@@ -85,7 +80,7 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 			int feedback = bs.makeMove(board, isWhiteTurn);
 			bs.copyPositionTo(displayBoard);
 			
-			InvalidateRect(globalHwnd, NULL, NULL);
+			if (onBoardChanged) onBoardChanged();
 			if (feedback == -1) {
 				ended = true;
 				print("\n");
@@ -125,6 +120,7 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 void GameMaster::loadPos(std::string str)
 {
 	bs.loadPosition(str);
+	bs.copyPositionTo(displayBoard);
 }
 
 void GameMaster::notifyPlayersKeyDown(PlayerInputKey key)
@@ -137,12 +133,13 @@ void GameMaster::notifyPlayersKeyDown(PlayerInputKey key)
 	}
 }
 
-void GameMaster::notifyPlayersClicked(bool isLeft, POINT gridPos)
+void GameMaster::notifyPlayersClicked(bool isLeft, int gridX, int gridY)
 {
 	uint8_t activeIndex = 1 - isWhiteTurn;
 	Player* activePlayer = players[activeIndex];
 	if (activePlayer->listensToKeyInputs())
 	{
+		POINT gridPos = { gridX, gridY };
 		activePlayer->mouseDown(isLeft, gridPos);
 	}
 }

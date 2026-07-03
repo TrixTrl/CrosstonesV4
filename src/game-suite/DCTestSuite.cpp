@@ -3,36 +3,22 @@
 #include "felix-bots/util/Utility.h"
 #include "DCTestSuite.h"
 
-#include "fix_win32_compatibility.h"
-#include <WinUser.h>
 #include <string>
 #include <chrono>
 #include <format>
 #include <functional>
 
-bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
+bool DCTestSuite::run(std::function<void()> onBoardChanged, uint8_t(*display)[13][13])
 {
-	//InvalidateRect(globalHwnd, NULL, NULL);
-
 	Deepchad deepchad = Deepchad(1);
-	/*Player* p2 = new TestBotRnd();
-	std::bitset<3> gamemode(0b111);
-	GameMaster gameMaster(gamemode, p1, p2, 3000, 0, &(displayBoard[0]));
-
-	gameMaster.play(globalHwnd);*/
 
 	std::vector<dc::BotBoard> boards = loadExampleBoards();
 
 	std::memcpy(display, &(boards.at(3).square), sizeof(boards.at(3).square));
-	InvalidateRect(globalHwnd, NULL, NULL);
+	if (onBoardChanged) onBoardChanged();
 
-	/* Display the board
-	std::memcpy(display, &(boards.at(0).data), sizeof(boards.at(0).data));
-	InvalidateRect(globalHwnd, NULL, NULL);
-	*/
 	auto execTime = doTimed([&]()
 		{
-			//for (auto& board : boards) {
 			dc::BotBoard& board = boards.at(3);
 			uint8_t boardCopy[13][13];
 			std::memcpy(&boardCopy, &(board.square), sizeof(boardCopy));
@@ -40,8 +26,7 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 			deepchad.getMoveToPlay(&boardCopy, true, 3000);
 
 			std::memcpy(display, &(boardCopy), sizeof(boardCopy));
-			InvalidateRect(globalHwnd, NULL, NULL);
-			//}
+			if (onBoardChanged) onBoardChanged();
 		});
 	dc::Utility::print(std::format("Deepchad Time: {}\n", execTime), true);
 
@@ -78,16 +63,6 @@ bool DCTestSuite::run(HWND globalHwnd, uint8_t(*display)[13][13])
 			nodes,
 			perftTime
 		), true);
-	/* 
-		BENCHMARK: Perft 4:
-		Perft Nodes: 315404724
-		Perft Time: 113650 ms
-
-		Perft 3 * 10: old
-		Perft Nodes: 2345176
-		Perft Time: 16436 ms
-		New Time: 9006 ms
-	*/
 	return true;
 }
 

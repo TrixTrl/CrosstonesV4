@@ -1,18 +1,14 @@
 #pragma once
 #include "globals/Player.h"
-#include "fix_win32_compatibility.h"
-#include <WinUser.h>
+#include <functional>
 #include <stack>
-#include "UI.h"
 
 class ManualPlayer : public Player
 {
 public:
-	ManualPlayer(UI* _ui, HWND _globalHwnd, uint8_t(*_displayBoard)[13][13]) 
+	ManualPlayer(uint8_t(*_displayBoard)[13][13])
 		: originalDisplayBoardVal(), moveInfo(), prevStates()
 	{
-		ui = _ui;
-		globalHwnd = _globalHwnd;
 		targetBoard = nullptr;
 		displayBoard = _displayBoard;
 	}
@@ -24,6 +20,16 @@ public:
 	bool listensToKeyInputs() override {
 		return true;
 	}
+
+	// Called after display is modified (replaces InvalidateRect)
+	std::function<void()> onDisplayChanged;
+
+	// Highlight state for the UI to render
+	bool cellHighlights[13][13] = { {false} };
+
+	void setHighlight(int x, int y);
+	void clearHighlight(int x, int y);
+	void clearAllHighlights();
 
 private:
 
@@ -51,8 +57,6 @@ private:
 
 	//access to display to show submoves
 	uint8_t(*displayBoard)[13][13];
-	HWND globalHwnd;
-	UI* ui;
 
 	//copy of display before modifying it
 	uint8_t originalDisplayBoardVal[13][13];
