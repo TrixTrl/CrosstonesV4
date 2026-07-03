@@ -39,7 +39,7 @@ public:
         int movingAmount;
         int depth;
         int stepsLeft;
-        bool merging = false;
+        bool capturing = false;
     };
 
     static std::vector<move> getMoves(uint8_t (*pieces)[13][13], bool isWhite);

@@ -70,7 +70,10 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
         }
         Utils::print("moving: " + std::to_string(currentState.movingAmount) + " ", false);
         Utils::print("steps: " + std::to_string(currentState.stepsLeft) + " ", false);
-        Utils::print("depth: " + std::to_string(currentState.depth), true);
+        Utils::print("depth: " + std::to_string(currentState.depth), false);
+        Utils::print(currentState.capturing ? " capturing" : "", false);
+        Utils::print(currentState.stepsLeft == -2 ? " merging" : "", false);
+        Utils::print("", true);
 #endif
 
         while (inProgressMoveFragments.size() > currentState.depth)
@@ -160,7 +163,8 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             {
                 currentMove.isMerge = true;
             }
-            moves->emplace_back(currentMove);
+            if (currentMove.moveFragments.size() > 0 || moves->size() == 0)
+                moves->emplace_back(currentMove);
 
             if (Piece::turnPiece(pieceAtCurrentLocation))
             {
@@ -168,6 +172,9 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                 turnMove.isTurn = true;
                 moves->emplace_back(turnMove);
             }
+
+            if (currentState.capturing)
+                continue;
         }
 
         if (currentState.stepsLeft == 0 || currentState.stepsLeft == -2)
@@ -183,8 +190,10 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             uint8_t nextPiece = (*currentBoardState)[nextPosition.first][nextPosition.second] & Piece::towerMask;
 
             // check if movement in that direction is impossible
-            bool canPush = true;
+
+            bool canMove = true;
             bool canCapture = false;
+            bool pushing = false;
 
             if (Piece::isTower(nextPiece))
             {
@@ -195,29 +204,33 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                         std::pair<int, int> searchLocation = nextPosition;
                         uint8_t searchingPiece = (*currentBoardState)[searchLocation.first][searchLocation.second];
                         while (Piece::isTower(searchingPiece) && Piece::isWhite(searchingPiece) == isWhite && Piece::height(searchingPiece) <= Piece::height(searchingPiece) &&
-                               (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece : Piece::turnPiece(searchingPiece) == Piece::turnPieceMask)))
+                               (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::turnPieceMask : Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece)))
                         {
                             searchLocation = getPositionInDirection(searchLocation, direction);
-                            if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.first >= 0 && searchLocation.first <= 12))
+                            if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.second >= 0 && searchLocation.second <= 12))
                             {
                                 break;
                             }
                             searchingPiece = (*currentBoardState)[searchLocation.first][searchLocation.second];
                         }
-                        if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.first >= 0 && searchLocation.first <= 12 && (searchingPiece & Piece::towerMask) == 0 &&
-                              (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece : Piece::turnPiece(searchingPiece) == Piece::turnPieceMask))))
+                        if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.second >= 0 && searchLocation.second <= 12 && (searchingPiece & Piece::towerMask) == 0 &&
+                              (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::turnPieceMask : Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece))))
                         {
-                            canPush = false;
+                            canMove = false;
+                        }
+                        else
+                        {
+                            pushing = true;
                         }
                     }
                     else
                     {
-                        canPush = false;
+                        canMove = false;
                     }
                 }
                 else
                 {
-                    canPush = false;
+                    canMove = false;
                     if (Piece::height(nextPiece) > Piece::height(currentTower) && Piece::isBlue(currentTower) == 0)
                     {
                         canCapture = false;
@@ -229,9 +242,9 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                 }
             }
 
-            for (int i = 1; i <= currentState.movingAmount; i++)
+            for (int i = currentState.capturing ? currentState.movingAmount : 1; i <= currentState.movingAmount; i++)
             {
-                if (canPush || (canCapture && (i < currentState.movingAmount || currentState.movingAmount == 1) && currentState.stepsLeft > 1))
+                if ((canMove || (canCapture && (i < currentState.movingAmount || currentState.movingAmount == 1 || currentState.capturing) && currentState.stepsLeft > 1)) && (!pushing || i == currentState.movingAmount))
                 {
                     moveGenerationState nextState = moveGenerationState();
                     nextState.position = nextPosition;
@@ -239,9 +252,10 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                     nextState.depth = currentState.depth + 1;
                     nextState.movingAmount = i;
                     nextState.stepsLeft = currentState.stepsLeft - 1;
+                    nextState.capturing = currentState.capturing | canCapture;
                     stack.emplace_back(nextState);
                 }
-                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (!Piece::hasAddOn(currentTower) || i < currentState.movingAmount))
+                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount))
                 {
                     moveGenerationState nextState = moveGenerationState();
                     nextState.position = nextPosition;
@@ -249,6 +263,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                     nextState.depth = currentState.depth + 1;
                     nextState.movingAmount = i;
                     nextState.stepsLeft = -2;
+                    nextState.capturing = currentState.capturing;
                     stack.emplace_back(nextState);
                 }
             }
@@ -334,20 +349,27 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move)
                 (*pieces)[currentPosition.first][currentPosition.second] &= ~Piece::setTurnPiece;
             }
         }
-        uint8_t targetPiece = (*pieces)[currentPosition.first + fragmentDelta.first][currentPosition.second + fragmentDelta.second];
-        if (Piece::isTower(targetPiece) && (currentPiece & Piece::colourMask == targetPiece & Piece::colourMask) && (fragmentIndex < move.moveFragments.size() - 1 || !move.isMerge))
+        uint8_t targetPiece = (*pieces)[currentPosition.first + fragmentDelta.first][currentPosition.second + fragmentDelta.second] & Piece::towerMask;
+        if (Piece::isTower(targetPiece) && ((currentPiece & Piece::colourMask) == (targetPiece & Piece::colourMask)) && (fragmentIndex < move.moveFragments.size() - 1 || !move.isMerge))
         {
-            std::pair<int, int> pushingPosition = std::pair<int, int>(currentPosition.first + fragmentDelta.first, currentPosition.second + fragmentDelta.second);
+            std::pair<int, int> pushingPosition = getPositionInDirection(currentPosition, fragment.dir);
             uint8_t pushingPiece = (*pieces)[pushingPosition.first][pushingPosition.second] & Piece::towerMask;
             uint8_t pushingDestination = (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] & Piece::towerMask;
+            (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
             do
             {
-                (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] &= Piece::turnPieceMask;
-                (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] |= pushingPiece;
-                pushingPosition = std::pair<int, int>(pushingPosition.first + fragmentDelta.first, pushingPosition.second + fragmentDelta.second);
+                pushingPosition = getPositionInDirection(pushingPosition, fragment.dir);
+                (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
+                (*pieces)[pushingPosition.first][pushingPosition.second] |= pushingPiece;
+                // pushingPosition = std::pair<int, int>(pushingPosition.first + fragmentDelta.first, pushingPosition.second + fragmentDelta.second);
                 pushingPiece = pushingDestination;
                 pushingDestination = (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] & Piece::towerMask;
             } while (pushingDestination != 0);
+            (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] |= pushingPiece;
+        }
+        else if (fragmentIndex < move.moveFragments.size() - 1)
+        {
+            (*pieces)[currentPosition.first + fragmentDelta.first][currentPosition.second + fragmentDelta.second] &= Piece::turnPieceMask;
         }
         std::pair<uint8_t, uint8_t> splitResult = getSplitResult(currentPiece, Piece::height(currentPiece) - fragment.splitAmount);
         (*pieces)[currentPosition.first][currentPosition.second] |= splitResult.first;
@@ -361,7 +383,7 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move)
     }
     if (currentPosition.first < 0 || currentPosition.first > 12 || currentPosition.second < 0 || currentPosition.second > 12)
         throw;
-    uint8_t finalPiece = mergeTowers((*pieces)[currentPosition.first][currentPosition.second], currentPiece);
+    uint8_t finalPiece = mergeTowers((*pieces)[currentPosition.first][currentPosition.second] & Piece::towerMask, currentPiece);
     (*pieces)[currentPosition.first][currentPosition.second] &= Piece::turnPieceMask;
     (*pieces)[currentPosition.first][currentPosition.second] |= finalPiece;
     if (move.isTurn)
@@ -400,6 +422,8 @@ std::pair<int, int> FastMoveGenerator::getPositionInDirection(std::pair<int, int
 
 uint8_t FastMoveGenerator::mergeTowers(uint8_t staticTower, uint8_t mergingTower)
 {
+    if (staticTower == 0)
+        return mergingTower;
     return ((staticTower & Piece::addOnMask) | (mergingTower & Piece::colourMask)) + Piece::height(staticTower) + Piece::height(mergingTower);
 }
 
@@ -412,5 +436,7 @@ void FastMoveGenerator::printMove(FastMoveGenerator::move move)
         position = getPositionInDirection(position, fragment.dir);
         Utils::print("(" + std::to_string(position.first) + ", " + std::to_string(position.second) + ")|" + std::to_string(fragment.splitAmount) + ", ");
     }
+    Utils::print(move.isMerge ? " merging" : "");
+    Utils::print(move.isTurn ? " turning" : "");
     Utils::print("", true);
 }

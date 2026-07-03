@@ -3,6 +3,9 @@
 void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
 {
     BoardState_T boardState = BoardState_T(pieces);
+
+    Utils::print("Position: " + boardState.dumpPos(), true);
+
     std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> correctMoves = boardState.getMoves(isWhite, false, false);
     std::vector<FastMoveGenerator::move> movesToCompare = FastMoveGenerator::getMoves(pieces, isWhite);
 
@@ -26,6 +29,7 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
             illegalMoves++;
             Utils::print("Illegal: ", false);
             FastMoveGenerator::printMove(move);
+            Utils::print(BoardState_T(&movePieces).dumpPos(), true);
             memcpy(&movePieces, pieces, sizeof(*pieces));
             FastMoveGenerator::applyMove(&movePieces, move);
         }
@@ -76,12 +80,23 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
 
 void compareGenerators()
 {
+    int positionNumber = 0;
     BoardState_T boardState = BoardState_T();
-    // boardState.loadPos("-W10006 -B11206 11010100001100111111"); //("-W10006 11010100001100111111");
-    // runPosition(boardState.getPiecesReference(), true);
-    // runPosition(boardState.getPiecesReference(), false);
-    boardState.loadPos("-W10006 -W10106 -B21206 11010100001100111111");
+    boardState.loadPos("-W10006 -B11206 11010100001100111111"); //("-W10006 11010100001100111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
     runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
+    boardState.loadPos("-W20606 -B30506 11010100001100111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
+    // boardState.loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+    boardState.loadPos("rW30606 -W10607 -B50605 -B50706 -B50506 11111100101101111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    // Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     // runPosition(boardState.getPiecesReference(), false);
 }
 
