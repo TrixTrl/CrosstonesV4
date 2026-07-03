@@ -149,7 +149,7 @@ void BoardState_T::wipe()
     {
         for (int j = 0; j < 13; j++)
         {
-            pieces[i][j] &= 0b10000000;
+            pieces[i][j] &= hasTurnPiece;
         }
     }
 }
@@ -157,6 +157,11 @@ void BoardState_T::wipe()
 void BoardState_T::copyBoard(uint8_t (*dest)[13][13]) const
 {
     std::memcpy(dest, &pieces, sizeof(pieces));
+}
+
+void BoardState_T::loadBoard(uint8_t (*src)[13][13])
+{
+    std::memcpy(&pieces, src, sizeof(pieces));
 }
 
 void debugPrint_T(std::string str)
@@ -258,7 +263,7 @@ std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::get
             int i = I - 1;
             int j = J - 1;
             uint8_t piece = pieces[i][j];
-            if (!(Piece::height(piece) == 0 || Piece::isAddOn(piece)) && !(Piece::isWhiteTower(piece) == !isWhite))
+            if (!(Piece::height(piece) == 0 || Piece::isAddOn(piece)) && !(Piece::isWhite(piece) == !isWhite))
             {
                 uint8_t boardCopy[13][13];
                 copyBoard(&boardCopy);
@@ -352,7 +357,7 @@ void BoardState_T::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>
 
         if ((dest & 0b00111111) == 0)
         { // Most basic case : empty target square
-            for (int splitOff = 1; splitOff < 5; splitOff++)
+            for (int splitOff = 1; splitOff <= 5; splitOff++)
             { // number of moved pieces
                 if (splitOff > Piece::height(piece))
                     continue;
@@ -688,14 +693,14 @@ int BoardState_T::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
         {
             std::memcpy(&pieces, newState, sizeof(pieces));
 
-            forcedebugPrint_T(dumpPos());
-            forcedebugPrint_T("\n");
+            // forcedebugPrint_T(dumpPos());
+            // forcedebugPrint_T("\n");
 
-            gameRecord.emplace_back(std::to_string(i) + " ");
+            // gameRecord.emplace_back(std::to_string(i) + " ");
 
-            dumpGame();
+            // dumpGame();
 
-            return i == 0 ? 0 : 1;
+            return i;
         }
     }
     return -1;
@@ -918,4 +923,9 @@ std::string BoardState_T::getKey()
         }
     }
     return key;
+}
+
+uint8_t (*BoardState_T::getPiecesReference())[13][13]
+{
+    return &pieces;
 }

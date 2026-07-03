@@ -21,6 +21,7 @@
 #include "trix-bots/DemoKnight.h"
 #include "trix-bots/Hydra.h"
 #include "trix-bots/AlphaCruncher.h"
+#include "trix-bots/GeneratorComparer.h"
 
 #include "globals/PlayerInputKey.h"
 
@@ -34,15 +35,14 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#pragma comment(linker, "/STACK:" STR(CUSTOM_STACK_SIZE))
-#pragma comment(linker, "/HEAP:200000000")
-
 #define KEYBOARDCONTROLL 0
 #define EXPLOREMOVEGENERATION 0
 #define EXPLORECHADMOVES 0
 #define EVALUATIONTESTING 0
 #define DEEPCHADTESTINGSUITE 0
 #define GAMEVIEWER 0
+#define RUNNINGCOMPARISON 1
+#define RUNNINGTIMECOMPARISON 0
 
 const int screenWidth = 755;
 const int screenHeight = 755;
@@ -294,14 +294,22 @@ int main()
 			}
 		}
 	}
+	else if (RUNNINGCOMPARISON)
+	{
+		compareGenerators();
+	}
+	else if (RUNNINGTIMECOMPARISON)
+	{
+		executionSpeedTest();
+	}
 	else
 	{
 		Player *p1 = new
 			// TheFirst(2);
-			Deepchad(4);
-		// Hydra(4, 14);
-		// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
-		// AlphaCruncher(20);
+			// Deepchad(4);
+			// Hydra(4, 14);
+			// ManualPlayer(&ui, globalHwnd, &displayBoard[0]);
+			AlphaCruncher(60);
 		Player *p2 = new
 			// TheFirst(2);
 			// Hydra(4, 14);
@@ -314,15 +322,17 @@ int main()
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW50607 bB50610 -W30712 rW20808 b-11200 b-11212 11111111100111111111");
 		// gameMaster->loadPos("-W10006 -B11206 11010100001100111111");
+		// gameMaster->loadPos("-W20006 -B21206 11010100001100111111");
 		// gameMaster->loadPos("bW30404 -B10600 -B10800 rW30804 11010100001100111111");
 		// gameMaster->loadPos("b-10000 b-10012 rW30406 -B30500 -B30502 -W10512 rB20610 bB30611 -B30700 -W30712 b-11200 b-11212 11110011111111101111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30408 -B30500 -B30502 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -B10500 -B10502 -W10510 -W10512 b-10606 -B10700 -B10702 -W10710 -W10712 b-11200 r-11206 b-11212 11111111111111111111");
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W10409 -B10502 bW20603 -W20710 -B10803 -B10900 b-11200 r-11206 b-11212 11111111111111111111");
 		// gameMaster->loadPos("-B10500 -W10602 11111111111111111111");
-		gameMaster->loadPos("b-10000 r-10006 b-10012 -W30510 -B30502 b-10606 -B30702 -W30710 b-11200 r-11206 b-11212 11111111111111111111"); // slaughterhouse
+		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30510 -B30502 b-10606 -B30702 -W30710 b-11200 r-11206 b-11212 11111111111111111111"); // slaughterhouse
 		// gameMaster->loadPos("b-10000 r-10006 b-10012 -W30609 -B30603 b-11200 r-11206 b-11212 11111111111111111111");
-		// gameMaster->loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+		gameMaster->loadPos("b-10002 b-10005 -B10102 -W20308 rW30404 -B10500 -B10512 -B10602 -W20604 b-10607 r-10608 -W30610 -B10700 b-10708 -W10804 -W10912 -B11100 -B11110 11111100101101111111");
+		// gameMaster->loadPos("-B50506 -B50605 rW30606 -W10607 -B50706 11111100101101111111");
 		/// gameMaster->loadPos("r-10006 bW40112 -B30202 -B20300 -B10302 bB20400 -B10402 -W30411 -W20508 bW20606 -W30610 -B20801 -B20902 b-11200 r-11206 b-11212 00000000000100000000");
 		RaylibUI::init();
 		std::jthread gm_thread([](std::stop_token stopToken) {
