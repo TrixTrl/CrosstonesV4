@@ -1547,3 +1547,8 @@ std::string Utils::convertToPosString(uint8_t (*pieces)[13][13])
 	}
 	return str + turnPieceStr;
 }
+
+int Utils::millis()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
