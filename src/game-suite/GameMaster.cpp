@@ -10,27 +10,28 @@ void print(std::string str) {
 	OutputDebugString(wideString);
 }
 
-GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player2, int timeControl_, int enforceTime, uint8_t (*displayBoard)[13][13]) {
+GameMaster::GameMaster(std::bitset<3>& gamemode, Player* player1, Player* player2, int timeControl_, int enforceTime, GamePosition& displayBoard)
+	: displayBoard(displayBoard) {
 	bs.rst(gamemode);
 	players[0] = player1;
 	players[1] = player2;
 	timeControl = timeControl_;
 	timeEnforcement[0] = (enforceTime & 2) != 0;
 	timeEnforcement[1] = (enforceTime & 1) != 0;
-	displayBoardPointer = displayBoard;
 }
 
 void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToStart) {
-	bs.copyBoard(displayBoardPointer);
+	bs.copyPositionTo(displayBoard);
 	InvalidateRect(globalHwnd, NULL, NULL);
-	bs.gameRecord.emplace_back(bs.dumpPos() + " | ");
+	bs.gameRecord.emplace_back(bs.dumpPosition() + " | ");
 
 	isWhiteTurn = whiteToStart;
 	bool ended = false;
 	bool passed[2] = { false, false };	//we keep track of if the last move of either player was passing
 	while (bs.gameOver(!isWhiteTurn) == Board::winValue::none && !ended && !stopToken.stop_requested()) {		//we only check for wins after the move was made and the playing color was switched, so our win check needs the inverse value
-		uint8_t board[13][13];
-		bs.copyBoard(&board);
+		
+		GamePosition board = bs.positionCopy();
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		int timeEnd = Time::millis() + timeControl;
 		try {
@@ -41,7 +42,7 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 			// launch player move generation
 			std::thread bot_thread([promise, player, &board, this, timeEnd]() {
 				try {
-					player->getMoveToPlay(&board, isWhiteTurn, timeEnd);
+					player->getMoveToPlay(&board.pieces, isWhiteTurn, timeEnd);
 					promise->set_value();
 				} catch (...) {
 					promise->set_exception(std::current_exception());
@@ -81,9 +82,9 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 			print(" has lost by going over the allotted time\n");
 		}
 		else {
-			int feedback;
-			feedback = bs.makeMove(&board, isWhiteTurn);
-			bs.copyBoard(displayBoardPointer);
+			int feedback = bs.makeMove(board, isWhiteTurn);
+			bs.copyPositionTo(displayBoard);
+			
 			InvalidateRect(globalHwnd, NULL, NULL);
 			if (feedback == -1) {
 				ended = true;
@@ -123,7 +124,7 @@ void GameMaster::play(std::stop_token stopToken, HWND globalHwnd, bool whiteToSt
 
 void GameMaster::loadPos(std::string str)
 {
-	bs.loadPos(str);
+	bs.loadPosition(str);
 }
 
 void GameMaster::notifyPlayersKeyDown(PlayerInputKey key)

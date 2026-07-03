@@ -16,10 +16,10 @@ private:
 	Player* players[2];
 	int timeControl;
 	bool timeEnforcement[2];
-	uint8_t (*displayBoardPointer)[13][13];
+	GamePosition& displayBoard;
 
 public:
-	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, uint8_t (*displayBoard)[13][13]);
+	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, GamePosition& displayBoard);
 	void play(std::stop_token stopToken, HWND globalHwnd, bool whiteToStart = true);
 	void loadPos(std::string str);
 	void notifyPlayersKeyDown(PlayerInputKey key);

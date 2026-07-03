@@ -85,7 +85,16 @@ public:
 	static const inline uint8_t addOn(uint8_t const piece) { return piece & addOnMask; }
 	static const inline uint8_t tower(uint8_t const piece) { return piece & towerMask; }
 	static const inline uint8_t turnPiece(uint8_t const piece) { return piece & turnPieceMask; }
+	static inline bool isBlockedByGate(uint8_t tile, int direction) {
+		if ((tile & hasTurnPiece) == 0) return false;
+		
+		// d%2 == 0 means Vertical (0=N, 2=S). d%2 == 1 means Horizontal (1=E, 3=W)
+		bool isMovingHorizontal = (direction % 2 == 1);
+		bool isGateHorizontal = ((tile & setTurnPiece) != 0);
 
+		return isMovingHorizontal == isGateHorizontal;
+	}
+	
 	static bool isColour(uint8_t piece, int colour);
 	static bool isWhite(uint8_t piece);
 	static bool isWhiteTower(uint8_t piece);

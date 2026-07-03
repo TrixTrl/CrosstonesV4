@@ -30,7 +30,11 @@
 #include <chrono>
 #include "UI.h"
 
-#pragma comment(linker, "/STACK:200000000")
+#define CUSTOM_STACK_SIZE 67108864  // 64MB - do not overflow 32-bit integer limit, else ignored
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+#pragma comment(linker, "/STACK:" STR(CUSTOM_STACK_SIZE))
 #pragma comment(linker, "/HEAP:200000000")
 
 #define KEYBOARDCONTROLL 0
@@ -43,7 +47,7 @@
 const int screenWidth = 755;
 const int screenHeight = 755;
 
-uint8_t displayBoard[3][13][13];
+GamePosition displayBoard[3];
 HWND globalHwnd = NULL;
 
 GameMaster *gameMaster = nullptr;
@@ -69,23 +73,22 @@ int main()
 		// bs.loadPos("b-10002 b-10012 -W10104 -B20204 r-10207 -B40400 -W10410 -W10607 -W10609 -B10708 -W10812 b-11200 -B11202 r-11206 b-11212 111111011110100111111011");
 		// bs.loadPos("b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 b-10608 -B10206 -B20204 -B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 -B21104 11110111111111111111"); //Seagull (black)
 		// bs.loadPos("-B10700 -W10803 -W10602 00000000000000000000");
-		bs.loadPos("b-10000 rB20006 b-10012 -B30300 -B20404 -W20408 -W30512 -W20602 bW20605 -B30804 -W10805 -W30912 b-11200 rB21206 b-11212 11111111111111111111");
+		bs.loadPosition("b-10000 rB20006 b-10012 -B30300 -B20404 -W20408 -W30512 -W20602 bW20605 -B30804 -W10805 -W30912 b-11200 rB21206 b-11212 11111111111111111111");
 		bool isWhite = false;
 
 		// bs.loadPos("-B10800 -W10803 -W10602 00000000000000000000");
 		// bs.loadPos("-B10500 -B10600 -B10700 -B10501 -B10601 -B10701 -B10502 -B10602 -B10702 -B10503 -B10603 -B10703 -W10509 -W10609 -W10709 -W10510 -W10610 -W10710 -W10511 -W10611 -W10711 -W10512 -W10612 -W10712 00000000000000000000");
 		// bs.loadPos("-W10909 -W11209 -W10910 -W11210 -W10911 -W11211 -W10912 -W11212 00000000000000000000");
 		// bs.loadPos("-W10009 -W10309 -W10010 -W10310 -W10011 -W10311 -W10012 -W10312 00000000000000000000");
-		bs.copyBoard(&(displayBoard[0]));
+		bs.copyPositionTo(displayBoard[0]);
 
 		// Utils::print(Utils::generateMetadata(&(displayBoard[0])), false);
 
 		InvalidateRect(globalHwnd, NULL, NULL);
 
-		std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
-		moves = bs.getMoves(isWhite);
+		std::vector<std::vector<Board::xMove>> moves = bs.getMoves(isWhite);
 
-		std::string str = std::to_string(moves->size());
+		std::string str = std::to_string(moves.size());
 		str += "\n";
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		LPCWSTR wideString = temp.c_str();
@@ -110,11 +113,11 @@ int main()
 
 		// Prepare chad move exploration
 		dc::BotBoard chadBoard = dc::BotBoard();
-		chadBoard.initialize(&displayBoard[0], isWhite);
+		chadBoard.initialize(&displayBoard[0].pieces, isWhite);
 
 		std::vector<dc::Move> chadMoves;
 		dc::Evaluation evaluator = dc::Evaluation();
-		dc::MoveGenerator::getMovesStatic(&chadMoves, &displayBoard[0], isWhite, true);
+		dc::MoveGenerator::getMovesStatic(&chadMoves, &displayBoard[0].pieces, isWhite, true);
 		std::vector<int> chadMoveIndices = MoveOrdering(evaluator).makeMoveOrdering(Utility::createNullMove(), chadBoard, chadMoves, true);
 
 		// Cycle through moves with left and right arrow keys
@@ -139,15 +142,15 @@ int main()
 			}
 			else
 			{
-				bs.makeMove(&((*moves)[i % moves->size()]), isWhite);
-				bs.copyBoard(&(displayBoard[0]));
-				bs.unsafeMakeMove(&((*moves)[i % moves->size()]));
+				bs.makeMove(moves[i % moves.size()], isWhite);
+				bs.copyPositionTo(displayBoard[0]);
+				bs.unsafeMakeMove(moves[i % moves.size()]);
 			}
 			InvalidateRect(globalHwnd, NULL, NULL);
 
 			Utils::print("--------", true);
 
-			std::string str2 = EVALUATIONTESTING ? std::to_string(Utils::improvedPosEval(isWhite, &(displayBoard[0]))) : std::to_string(i);
+			std::string str2 = EVALUATIONTESTING ? std::to_string(Utils::improvedPosEval(isWhite, &(displayBoard[0].pieces))) : std::to_string(i);
 			str2 += "\n";
 			std::wstring temp2 = std::wstring(str2.begin(), str2.end());
 			LPCWSTR wideString2 = temp2.c_str();
@@ -167,9 +170,8 @@ int main()
 			Deepchad chad = Deepchad(1);
 
 			Utils::print("Chad: ", false);
-			uint8_t dcTempBoard[13][13];
-			std::memcpy(dcTempBoard, displayBoard[0], sizeof(dcTempBoard));
-			chad.getMoveToPlay(&dcTempBoard, !isWhite, 1000);
+			GamePosition dcTempBoard = displayBoard[0];
+			chad.getMoveToPlay(&dcTempBoard.pieces, !isWhite, 1000);
 
 		EXPLORE_WAIT_FOR_UPDATE:
 			InvalidateRect(globalHwnd, NULL, NULL);
@@ -190,17 +192,16 @@ int main()
 				// Show the move that DC would have played for the opponent (on second call undo it)
 				else if (switchMove == -12345)
 				{
-					uint8_t copiedBoard[13][13];
-					std::memcpy(copiedBoard, displayBoard[0], sizeof(copiedBoard));
-					std::memcpy(displayBoard[0], dcTempBoard, sizeof(dcTempBoard));
-					std::memcpy(dcTempBoard, copiedBoard, sizeof(dcTempBoard));
+					GamePosition copiedBoard = displayBoard[0];
+					displayBoard[0] = dcTempBoard;
+					dcTempBoard = copiedBoard;
 					switchMove = 0;
 					goto EXPLORE_WAIT_FOR_UPDATE;
 				}
 				else
 				{
-					i += moves->size() * 3 + switchMove;
-					i %= moves->size();
+					i += moves.size() * 3 + switchMove;
+					i %= moves.size();
 				}
 				switchMove = 0;
 			}
@@ -208,7 +209,7 @@ int main()
 	}
 	else if (DEEPCHADTESTINGSUITE)
 	{
-		DCTestSuite::run(globalHwnd, &(displayBoard[0]));
+		DCTestSuite::run(globalHwnd, &displayBoard[0].pieces);
 	}
 	else if (GAMEVIEWER)
 	{
@@ -221,18 +222,18 @@ int main()
 		/*Man vs AI (Longmen Insanity)*/				 // std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b- 11200 r-11206 b-11212 11111111111111111111 | 27 132 12 39 134 176 24 50 26 15 45 154 51 133 114 237 542 491 151 165 19 23 25 184 341 351 451 427 168 429 449 318 464 364 308 30 216 181 177 457 415 574 158 619 66 386 413 364 3 271 24 292 87 278 186 12 258 71 96 83 38 33 93 19 191 211 54 251 209 219 261 263 94 262 79 224 218 289 206 239 184 182 27 2 135 256 86 202 53 241 12 240";
 		/*DC(white) vs v1 of AlphaCruncher*/ std::string gameCode = "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111 | 20 95 17 151 141 29 37 125 35 175 148 6 29 102 105 163 73 108 105 250 16 127 111 179 29 312 29 103 28 163";
 
-		Board bs;
+		Board board;
 
 		size_t pos = gameCode.find("|");
 		std::string startingPos = gameCode.substr(0, pos - 1);
-		bs.loadPos(startingPos);
-		bs.copyBoard(&(displayBoard[0]));
+		board.loadPosition(startingPos);
+		board.copyPositionTo(displayBoard[0]);
 		InvalidateRect(globalHwnd, NULL, NULL);
 
 		gameCode.erase(0, pos + 2);
 
 		size_t pos2 = 0;
-		std::vector<std::vector<Board::xMove> *> gameReplay;
+		std::vector<std::vector<Board::xMove>> gameReplay;
 		// gameReplay = std::vector<std::vector<BoardState::xMove>>();
 
 		while ((pos2 = gameCode.find(" ")) != std::string::npos)
@@ -240,21 +241,13 @@ int main()
 			int moveIndex = std::stoi(gameCode.substr(0, pos2));
 			gameCode.erase(0, pos2 + 1);
 
-			std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
-			moves = bs.getMoves(gameReplay.size() % 2 == 0);
-			std::vector<Board::xMove> *pain;
-			pain = new std::vector<Board::xMove>();
+			std::vector<std::vector<Board::xMove>> moves = board.getMoves(gameReplay.size() % 2 == 0);
+			std::vector<Board::xMove> move = moves[moveIndex];
 
-			for (int i = 0; i < (*moves)[moveIndex].size(); i++)
-			{
-				Board::xMove moveCopy = Board::xMove((*moves)[moveIndex][i].i, (*moves)[moveIndex][i].j, (*moves)[moveIndex][i].delta);
-				pain->emplace_back(moveCopy);
-			}
-
-			gameReplay.emplace_back(pain);
-			bs.makeMove(gameReplay[gameReplay.size() - 1], gameReplay.size() % 2 == 1);
+			gameReplay.emplace_back(move);
+			board.makeMove(gameReplay[gameReplay.size() - 1], gameReplay.size() % 2 == 1);
 		}
-		bs.loadPos(startingPos);
+		board.loadPosition(startingPos);
 		int currentMove = 0;
 		while (true)
 		{
@@ -266,34 +259,34 @@ int main()
 				switchMove = 0;
 				if (currentMove == gameReplay.size())
 					continue;
-				bs.unsafeMakeMove(gameReplay[currentMove]);
-				bs.copyBoard(&(displayBoard[0]));
+				board.unsafeMakeMove(gameReplay[currentMove]);
+				board.copyPositionTo(displayBoard[0]);
 				InvalidateRect(globalHwnd, NULL, NULL);
 				currentMove++;
-				Utils::print(bs.dumpPos(), true);
+				Utils::print(board.dumpPosition(), true);
 			}
 			else if (switchMove == -1)
 			{
 				switchMove = 0;
 				if (currentMove == 0)
 					continue;
-				bs.unsafeMakeMove(gameReplay[currentMove - 1]);
-				bs.copyBoard(&(displayBoard[0]));
+				board.unsafeMakeMove(gameReplay[currentMove - 1]);
+				board.copyPositionTo(displayBoard[0]);
 				InvalidateRect(globalHwnd, NULL, NULL);
 				currentMove--;
-				Utils::print(bs.dumpPos(), true);
+				Utils::print(board.dumpPosition(), true);
 			}
 			else if (switchMove == -99999)
 			{
 				switchMove = 0;
 				while (currentMove > 0)
 				{
-					bs.unsafeMakeMove(gameReplay[currentMove - 1]);
+					board.unsafeMakeMove(gameReplay[currentMove - 1]);
 					currentMove--;
 				}
-				bs.copyBoard(&(displayBoard[0]));
+				board.copyPositionTo(displayBoard[0]);
 				InvalidateRect(globalHwnd, NULL, NULL);
-				Utils::print(bs.dumpPos(), true);
+				Utils::print(board.dumpPosition(), true);
 			}
 			else
 			{
@@ -316,7 +309,7 @@ int main()
 			AlphaCruncher(60);
 
 		std::bitset<3> gamemode(0b010); /*Gates, Bases, Ports*/
-		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, &displayBoard[0]);
+		gameMaster = new GameMaster(gamemode, p1, p2, 10000, 0, displayBoard[0]);
 
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW30608 bB50610 -W30712 rW40808 b-11200 b-11212 11111111100111111111");
 		// gameMaster->loadPos("b-10000 b-10012 -B30404 -W30512 -B30602 rW50607 bB50610 -W30712 rW20808 b-11200 b-11212 11111111100111111111");
@@ -337,7 +330,7 @@ int main()
 		});
 
 
-		RaylibUI::draw(&displayBoard[0]);
+		RaylibUI::draw(&displayBoard[0].pieces);
 
 		// gameMaster->play(globalHwnd, /*whiteToStart: */ false);
 		//   while(true) {}
@@ -346,6 +339,11 @@ int main()
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+DWORD WINAPI MainThreadWrapper(LPVOID lpParam) {
+    main();
+    return 0;
+}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
@@ -386,10 +384,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	ShowWindow(hwnd, nCmdShow);
 
-	// Run the message loop.
+	// Create the background thread with an explicit 16MB stack limit
+	HANDLE hThread = CreateThread(
+		NULL,                               // Default security attributes
+		CUSTOM_STACK_SIZE,                  // forced 16MB stack size
+		MainThreadWrapper,                  // Thread function
+		NULL,                               // Argument
+		STACK_SIZE_PARAM_IS_A_RESERVATION,  // Let it grow up to 16MB
+		NULL                                // Don't need thread ID
+	);
 
-	std::thread mainThread(main);
-	mainThread.detach();
+	if (hThread != NULL) {
+		CloseHandle(hThread);
+	}
 
 	MSG msg = {};
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -413,10 +420,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_PAINT:
 	{
-		memcpy(displayBoard[2], displayBoard[1], sizeof(displayBoard[0]));
-		memcpy(displayBoard[1], displayBoard[0], sizeof(displayBoard[0]));
+		displayBoard[2] = displayBoard[1];
+		displayBoard[1] = displayBoard[0];
 
-		ui.paint(hwnd, firstDraw, &displayBoard[1]);
+		ui.paint(hwnd, firstDraw, &displayBoard[1].pieces);
 
 		firstDraw = false;
 		return 0;

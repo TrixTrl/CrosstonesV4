@@ -6,7 +6,7 @@
 
 StateTester::StateTester(Board bs)
 {
-	bs.copyBoard(&pieces);
+	bs.copyPositionTo(&pieces);
 	BS = bs;
 }
 
@@ -73,15 +73,14 @@ int StateTester::blueCount()
 bool StateTester::checkAllMoves()
 {
 	bool passing = true;
-	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
-	moves = BS.getMoves(true);
+	std::vector<std::vector<Board::xMove>> moves = BS.getMoves(true);
 	int baseCount = pieceCount();
 	int baseBlueCount = blueCount();
 	int baseRedCount = redCount();
-	for (int i = 0; i < moves->size(); i++) {
-		BS.unsafeMakeMove(&(*moves)[i]);
-		BS.copyBoard(&pieces);
-		BS.unsafeMakeMove(&(*moves)[i]);
+	for (int i = 0; i < moves.size(); i++) {
+		BS.unsafeMakeMove(moves[i]);
+		BS.copyPositionTo(&pieces);
+		BS.unsafeMakeMove(moves[i]);
 		bool staticCheck = staticLegality();
 		if (!staticCheck) {
 			error += "		error on white move " + std::to_string(i) + "\n";
@@ -116,10 +115,10 @@ bool StateTester::checkAllMoves()
 		}
 	}
 	moves = BS.getMoves(false);
-	for (int i = 0; i < moves->size(); i++) {
-		BS.unsafeMakeMove(&(*moves)[i]);
-		BS.copyBoard(&pieces);
-		BS.unsafeMakeMove(&(*moves)[i]);
+	for (int i = 0; i < moves.size(); i++) {
+		BS.unsafeMakeMove(moves[i]);
+		BS.copyPositionTo(&pieces);
+		BS.unsafeMakeMove(moves[i]);
 		bool staticCheck = staticLegality();
 		if (!staticCheck) {
 			error += "		error on black move " + std::to_string(i) + "\n";

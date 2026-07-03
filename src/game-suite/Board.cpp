@@ -24,42 +24,42 @@ Board::Board()
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			pieces[i][j] = 0;
+			gamePos[i][j] = 0;
 		}
 	}
 
 	// Ports
-	// pieces[0][0] = hasTurnPiece;
-	pieces[2][0] = hasTurnPiece;
-	pieces[0][2] = hasTurnPiece;
-	pieces[2][2] = hasTurnPiece;
+	// gamePos[0][0] = hasTurnPiece;
+	gamePos[2][0] = hasTurnPiece;
+	gamePos[0][2] = hasTurnPiece;
+	gamePos[2][2] = hasTurnPiece;
 
-	pieces[10][0] = hasTurnPiece;
-	// pieces[12][0] = hasTurnPiece;
-	pieces[10][2] = hasTurnPiece;
-	pieces[12][2] = hasTurnPiece;
+	gamePos[10][0] = hasTurnPiece;
+	// gamePos[12][0] = hasTurnPiece;
+	gamePos[10][2] = hasTurnPiece;
+	gamePos[12][2] = hasTurnPiece;
 
-	// pieces[0][12] = hasTurnPiece;
-	pieces[2][12] = hasTurnPiece;
-	pieces[0][10] = hasTurnPiece;
-	pieces[2][10] = hasTurnPiece;
+	// gamePos[0][12] = hasTurnPiece;
+	gamePos[2][12] = hasTurnPiece;
+	gamePos[0][10] = hasTurnPiece;
+	gamePos[2][10] = hasTurnPiece;
 
-	pieces[10][12] = hasTurnPiece;
-	// pieces[12][12] = hasTurnPiece;
-	pieces[10][10] = hasTurnPiece;
-	pieces[12][10] = hasTurnPiece;
+	gamePos[10][12] = hasTurnPiece;
+	// gamePos[12][12] = hasTurnPiece;
+	gamePos[10][10] = hasTurnPiece;
+	gamePos[12][10] = hasTurnPiece;
 
 	// Bases
-	pieces[6][0] = hasTurnPiece;
-	pieces[6][2] = hasTurnPiece;
-	pieces[6][10] = hasTurnPiece;
-	pieces[6][12] = hasTurnPiece;
+	gamePos[6][0] = hasTurnPiece;
+	gamePos[6][2] = hasTurnPiece;
+	gamePos[6][10] = hasTurnPiece;
+	gamePos[6][12] = hasTurnPiece;
 
 	// Gates
-	pieces[2][6] = hasTurnPiece;
-	pieces[4][6] = hasTurnPiece;
-	pieces[8][6] = hasTurnPiece;
-	pieces[10][6] = hasTurnPiece;
+	gamePos[2][6] = hasTurnPiece;
+	gamePos[4][6] = hasTurnPiece;
+	gamePos[8][6] = hasTurnPiece;
+	gamePos[10][6] = hasTurnPiece;
 }
 
 void Board::rst(std::bitset<3> &tps)
@@ -67,79 +67,79 @@ void Board::rst(std::bitset<3> &tps)
 	uint8_t turnPieceMask = 0b10111111;
 	uint8_t resetMask = 0b11000000;
 
-	// pieces[0][0] = turnPieceMask & pieces[0][0] | (tps[0] * setTurnPiece);
-	pieces[2][0] = turnPieceMask & pieces[2][0] | (tps[0] * setTurnPiece);
-	pieces[0][2] = turnPieceMask & pieces[0][2] | (tps[0] * setTurnPiece);
-	pieces[2][2] = turnPieceMask & pieces[2][2] | (tps[0] * setTurnPiece);
+	// gamePos[0][0] = turnPieceMask & gamePos[0][0] | (tps[0] * setTurnPiece);
+	gamePos[2][0] = turnPieceMask & gamePos[2][0] | (tps[0] * setTurnPiece);
+	gamePos[0][2] = turnPieceMask & gamePos[0][2] | (tps[0] * setTurnPiece);
+	gamePos[2][2] = turnPieceMask & gamePos[2][2] | (tps[0] * setTurnPiece);
 
-	pieces[10][0] = turnPieceMask & pieces[10][0] | (tps[0] * setTurnPiece);
-	// pieces[12][0] = turnPieceMask & pieces[12][0] | (tps[0] * setTurnPiece);
-	pieces[10][2] = turnPieceMask & pieces[10][2] | (tps[0] * setTurnPiece);
-	pieces[12][2] = turnPieceMask & pieces[12][2] | (tps[0] * setTurnPiece);
+	gamePos[10][0] = turnPieceMask & gamePos[10][0] | (tps[0] * setTurnPiece);
+	// gamePos[12][0] = turnPieceMask & gamePos[12][0] | (tps[0] * setTurnPiece);
+	gamePos[10][2] = turnPieceMask & gamePos[10][2] | (tps[0] * setTurnPiece);
+	gamePos[12][2] = turnPieceMask & gamePos[12][2] | (tps[0] * setTurnPiece);
 
-	// pieces[0][12] = turnPieceMask & pieces[0][12] | (tps[0] * setTurnPiece);
-	pieces[2][12] = turnPieceMask & pieces[2][12] | (tps[0] * setTurnPiece);
-	pieces[0][10] = turnPieceMask & pieces[0][10] | (tps[0] * setTurnPiece);
-	pieces[2][10] = turnPieceMask & pieces[2][10] | (tps[0] * setTurnPiece);
+	// gamePos[0][12] = turnPieceMask & gamePos[0][12] | (tps[0] * setTurnPiece);
+	gamePos[2][12] = turnPieceMask & gamePos[2][12] | (tps[0] * setTurnPiece);
+	gamePos[0][10] = turnPieceMask & gamePos[0][10] | (tps[0] * setTurnPiece);
+	gamePos[2][10] = turnPieceMask & gamePos[2][10] | (tps[0] * setTurnPiece);
 
-	pieces[10][12] = turnPieceMask & pieces[10][12] | (tps[0] * setTurnPiece);
-	// pieces[12][12] = turnPieceMask & pieces[12][12] | (tps[0] * setTurnPiece);
-	pieces[10][10] = turnPieceMask & pieces[10][10] | (tps[0] * setTurnPiece);
-	pieces[12][10] = turnPieceMask & pieces[12][10] | (tps[0] * setTurnPiece);
+	gamePos[10][12] = turnPieceMask & gamePos[10][12] | (tps[0] * setTurnPiece);
+	// gamePos[12][12] = turnPieceMask & gamePos[12][12] | (tps[0] * setTurnPiece);
+	gamePos[10][10] = turnPieceMask & gamePos[10][10] | (tps[0] * setTurnPiece);
+	gamePos[12][10] = turnPieceMask & gamePos[12][10] | (tps[0] * setTurnPiece);
 
-	pieces[6][0] = turnPieceMask & pieces[6][0] | (tps[1] * setTurnPiece);
-	pieces[6][2] = turnPieceMask & pieces[6][2] | (tps[1] * setTurnPiece);
-	pieces[6][10] = turnPieceMask & pieces[6][10] | (tps[1] * setTurnPiece);
-	pieces[6][12] = turnPieceMask & pieces[6][12] | (tps[1] * setTurnPiece);
+	gamePos[6][0] = turnPieceMask & gamePos[6][0] | (tps[1] * setTurnPiece);
+	gamePos[6][2] = turnPieceMask & gamePos[6][2] | (tps[1] * setTurnPiece);
+	gamePos[6][10] = turnPieceMask & gamePos[6][10] | (tps[1] * setTurnPiece);
+	gamePos[6][12] = turnPieceMask & gamePos[6][12] | (tps[1] * setTurnPiece);
 
-	pieces[2][6] = turnPieceMask & pieces[2][6] | (tps[2] * setTurnPiece);
-	pieces[4][6] = turnPieceMask & pieces[4][6] | (tps[2] * setTurnPiece);
-	pieces[8][6] = turnPieceMask & pieces[8][6] | (tps[2] * setTurnPiece);
-	pieces[10][6] = turnPieceMask & pieces[10][6] | (tps[2] * setTurnPiece);
+	gamePos[2][6] = turnPieceMask & gamePos[2][6] | (tps[2] * setTurnPiece);
+	gamePos[4][6] = turnPieceMask & gamePos[4][6] | (tps[2] * setTurnPiece);
+	gamePos[8][6] = turnPieceMask & gamePos[8][6] | (tps[2] * setTurnPiece);
+	gamePos[10][6] = turnPieceMask & gamePos[10][6] | (tps[2] * setTurnPiece);
 
 	for (int i = 0; i < 13; i++)
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			pieces[i][j] &= resetMask;
+			gamePos[i][j] &= resetMask;
 		}
 	}
 
-	pieces[5][0] |= 3 | Piece::Black;
-	pieces[7][0] |= 3 | Piece::Black;
-	pieces[5][2] |= 3 | Piece::Black;
-	pieces[7][2] |= 3 | Piece::Black;
+	gamePos[5][0] |= 3 | Piece::Black;
+	gamePos[7][0] |= 3 | Piece::Black;
+	gamePos[5][2] |= 3 | Piece::Black;
+	gamePos[7][2] |= 3 | Piece::Black;
 
-	pieces[5][10] |= 3 | Piece::White;
-	pieces[7][10] |= 3 | Piece::White;
-	pieces[5][12] |= 3 | Piece::White;
-	pieces[7][12] |= 3 | Piece::White;
+	gamePos[5][10] |= 3 | Piece::White;
+	gamePos[7][10] |= 3 | Piece::White;
+	gamePos[5][12] |= 3 | Piece::White;
+	gamePos[7][12] |= 3 | Piece::White;
 
-	pieces[0][0] |= Piece::Blue | 1;
-	pieces[12][0] |= Piece::Blue | 1;
-	pieces[0][12] |= Piece::Blue | 1;
-	pieces[12][12] |= Piece::Blue | 1;
-	pieces[6][6] |= Piece::Blue | 1;
+	gamePos[0][0] |= Piece::Blue | 1;
+	gamePos[12][0] |= Piece::Blue | 1;
+	gamePos[0][12] |= Piece::Blue | 1;
+	gamePos[12][12] |= Piece::Blue | 1;
+	gamePos[6][6] |= Piece::Blue | 1;
 
-	pieces[0][6] |= Piece::Red | 1;
-	pieces[12][6] |= Piece::Red | 1;
+	gamePos[0][6] |= Piece::Red | 1;
+	gamePos[12][6] |= Piece::Red | 1;
 
-	/*pieces[5][10] |= Piece::White | 1;
-	pieces[6][9] |= Piece::White | 5;
-	pieces[2][8] |= Piece::White | 1;
-	pieces[5][4] |= Piece::White | 2 | Piece::Blue;
-	pieces[8][4] |= Piece::White | 1;
-	pieces[6][3] |= Piece::White | 1;
-	pieces[8][3] |= Piece::White | 3 | Piece::Red;
-	pieces[6][8] |= Piece::Black | 2 | Piece::Blue;
-	pieces[6][6] |= Piece::Black | 4 | Piece::Red;
-	pieces[3][2] |= Piece::Black | 2 | Piece::Blue;
-	pieces[6][2] |= Piece::Black | 3;*/
+	/*gamePos[5][10] |= Piece::White | 1;
+	gamePos[6][9] |= Piece::White | 5;
+	gamePos[2][8] |= Piece::White | 1;
+	gamePos[5][4] |= Piece::White | 2 | Piece::Blue;
+	gamePos[8][4] |= Piece::White | 1;
+	gamePos[6][3] |= Piece::White | 1;
+	gamePos[8][3] |= Piece::White | 3 | Piece::Red;
+	gamePos[6][8] |= Piece::Black | 2 | Piece::Blue;
+	gamePos[6][6] |= Piece::Black | 4 | Piece::Red;
+	gamePos[3][2] |= Piece::Black | 2 | Piece::Blue;
+	gamePos[6][2] |= Piece::Black | 3;*/
 
-	/*pieces[5][2] |= 4 | Piece::Blue | Piece::White;
-	pieces[6][2] |= 3 | Piece::Black;
-	pieces[7][2] |= 2 | Piece::Black;
-	pieces[6][3] |= 3 | Piece::White;*/
+	/*gamePos[5][2] |= 4 | Piece::Blue | Piece::White;
+	gamePos[6][2] |= 3 | Piece::Black;
+	gamePos[7][2] |= 2 | Piece::Black;
+	gamePos[6][3] |= 3 | Piece::White;*/
 }
 
 void Board::wipe()
@@ -148,14 +148,9 @@ void Board::wipe()
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			pieces[i][j] &= 0b10000000;
+			gamePos[i][j] &= 0b10000000;
 		}
 	}
-}
-
-void Board::copyBoard(uint8_t (*dest)[13][13]) const
-{
-	std::memcpy(dest, &pieces, sizeof(pieces));
 }
 
 void debugPrint(std::string str)
@@ -174,36 +169,41 @@ void forceDebugPrint(std::string str)
 	OutputDebugString(wideString);
 }
 
-std::shared_ptr<std::vector<std::vector<Board::xMove>>> Board::getMoves(bool isWhite) const
+std::vector<std::vector<Board::xMove>> Board::getMoves(bool isWhite) const
 {
-	std::shared_ptr<std::vector<std::vector<xMove>>> moves = std::make_shared<std::vector<std::vector<xMove>>>();
-	moves->reserve(700);
+	std::vector<std::vector<xMove>> moves = std::vector<std::vector<xMove>>();
+	moves.reserve(700);
 
 	for (int i = 0; i < 13; i++)
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			uint8_t piece = pieces[i][j];
+			uint8_t piece = gamePos[i][j];
 			if (Piece::height(piece) == 0 || Piece::isAddOn(piece))
 				continue;
 			if (Piece::isWhiteTower(piece) == !isWhite)
 				continue;
 
-			uint8_t boardCopy[13][13];
-			copyBoard(&boardCopy);
-			bool visited[13][13];
-			memset(visited, false, sizeof(visited));
+			GamePosition gamePosCopy = gamePos;
+
+			VisitedMap visited;
 			visited[i][j] = true;
+
 			if (DEBUG_PRINTING)
-				debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-			basicGenerator(moves, &boardCopy, i, j, &visited, Piece::maxSteps(piece), false, isWhite);
+				debugPrint("X : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves.size()) + "\n");
+
+			basicGenerator(moves, gamePosCopy, i, j, visited, Piece::maxSteps(piece), false, isWhite);
 		}
 	}
 
 	return moves;
 }
 
-void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void Board::basicGenerator(
+	std::vector<std::vector<xMove>>& moves, 
+	const GamePosition& state, 
+	int x, int y, VisitedMap& visited, int remainingSteps, bool turned, bool isWhite
+) const
 {
 	std::vector<Board::xMove> move = std::vector<Board::xMove>();
 	move.reserve(10);
@@ -211,26 +211,26 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			if (pieces[i][j] == (*state)[i][j])
+			if (gamePos[i][j] == state[i][j])
 				continue;
-			move.emplace_back(xMove{i, j, ((uint8_t)((pieces[i][j]) ^ ((*state)[i][j])))}); // Creation of xor lists for moves
+			move.emplace_back(xMove{ i, j, (uint8_t)(gamePos[i][j] ^ state[i][j]) }); // Creation of xor lists for moves
 		}
 	}
-	if (moves->size() == 0 || move.size() > 0)
+	if (moves.size() == 0 || move.size() > 0)
 	{
-		moves->emplace_back(move);
+		moves.emplace_back(move);
 	}
 
-	if (!turned && (((*state)[x][y] & hasTurnPiece) != 0))
+	if (!turned && ((state[x][y] & hasTurnPiece) != 0))
 	{ // Turn in place if we can and haven't yet
-		uint8_t boardCopy[13][13];
-		std::memcpy(&boardCopy, state, sizeof(boardCopy));
+		GamePosition boardCopy = state;
 		boardCopy[x][y] ^= setTurnPiece;
-		bool visitedCopy[13][13];
-		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+		VisitedMap visitedCopy = visited;
+
 		if (DEBUG_PRINTING)
-			debugPrint("T : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
-		basicGenerator(moves, &boardCopy, x, y, &visitedCopy, remainingSteps, true, isWhite);
+			debugPrint("T : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves.size()) + "\n");
+
+		basicGenerator(moves, boardCopy, x, y, visitedCopy, remainingSteps, true, isWhite);
 	}
 
 	if (remainingSteps == 0)
@@ -243,45 +243,23 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 	*/
 	for (int d = 0; d < 4; d++)
 	{ // Loop through the 4 possible directions
-		uint8_t piece = ((*state)[x][y]);
-		if ((piece & hasTurnPiece) != 0)
-		{ // Obey turn pieces
-			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece)
-				continue; // This feels deeply cursed
-		}
-		int i = x;
-		int j = y;
-		switch (d)
-		{
-		case 0:
-			j--;
-			break;
-		case 1:
-			i++;
-			break;
-		case 2:
-			j++;
-			break;
-		case 3:
-			i--;
-			break;
-		}
-		uint8_t dest = (*state)[i][j];
-		if (i < 0 || i > 12 || j < 0 || j > 12)
-			continue;
-		if (i % 2 == 1 && j % 2 == 1)
-			continue;
-		if ((*visited)[i][j])
-			continue; // Bounds and revisiting check
-		if ((dest & hasTurnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece))
-			continue;
+		int destX = x + dx[d];
+		int destY = y + dy[d];
+		uint8_t piece = state[x][y];
+		uint8_t dest = state[destX][destY];
+
+		if (destX < 0 || destX > 12 || destY < 0 || destY > 12) continue; //borders check 
+		if (destX % 2 == 1 && destY % 2 == 1) continue; //voids check
+		if (visited[destX][destY]) continue; // Bounds and revisiting check
+		if (Piece::isBlockedByGate(piece, d)) continue;
+		if (Piece::isBlockedByGate(dest, d)) continue;
 
 		if ((dest & 0b00111111) == 0)
 		{ // Most basic case : empty target square
 			for (int splitOff = 1; splitOff <= Piece::height(piece); splitOff++)
 			{ // number of moved pieces
-				uint8_t boardCopy[13][13];
-				std::memcpy(&boardCopy, state, sizeof(boardCopy));
+				GamePosition boardCopy = state;
+
 				if (splitOff == Piece::height(piece))
 				{
 					boardCopy[x][y] &= 0b11000000;
@@ -294,17 +272,19 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 						boardCopy[x][y] &= 0b11011111; // erase trailing color
 					}
 				}
-				boardCopy[i][j] |= (uint8_t)((piece) & 0b00100000 | splitOff);
+				boardCopy[destX][destY] |= (uint8_t)((piece) & 0b00100000 | splitOff);
 				if (splitOff == Piece::height(piece))
 				{
-					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000); // addons, only if  we're moving the whole tower
+					boardCopy[destX][destY] |= (uint8_t)((piece) & 0b00011000); // addons, only if  we're moving the whole tower
 				}
-				bool visitedCopy[13][13];
-				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-				visitedCopy[i][j] = true;
+
+				VisitedMap visitedCopy = visited;
+				visitedCopy[destX][destY] = true;
+
 				if (DEBUG_PRINTING)
-					debugPrint("O : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
+					debugPrint("O : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+
+				basicGenerator(moves, boardCopy, destX, destY, visitedCopy, remainingSteps - 1, false, isWhite);
 			}
 		}
 		else if (Piece::height(dest) > 0 && (Piece::isAddOn(dest) ? true : (Piece::colour(dest) == Piece::colour(piece))))
@@ -313,8 +293,9 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 			{
 				if (splitOff == Piece::height(piece) && Piece::hasAddOn(piece))
 					continue;
-				uint8_t boardCopy[13][13];
-				std::memcpy(&boardCopy, state, sizeof(boardCopy));
+
+				GamePosition boardCopy = state;
+
 				if (splitOff == Piece::height(piece))
 				{
 					boardCopy[x][y] &= 0b11000000;
@@ -327,18 +308,20 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 						boardCopy[x][y] &= 0b11011111; // erase trailing color
 					}
 				}
-				boardCopy[i][j] |= (uint8_t)((piece) & 0b00100000); // color info
-				boardCopy[i][j] += splitOff;
+				boardCopy[destX][destY] |= (uint8_t)((piece) & 0b00100000); // color info
+				boardCopy[destX][destY] += splitOff;
 				if (splitOff == Piece::height(piece))
 				{
-					boardCopy[i][j] |= (uint8_t)((piece) & 0b00011000); // addons, only if we're moving the whole tower
+					boardCopy[destX][destY] |= (uint8_t)((piece) & 0b00011000); // addons, only if we're moving the whole tower
 				}
-				bool visitedCopy[13][13];
-				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-				visitedCopy[i][j] = true;
+
+				VisitedMap visitedCopy = visited;
+				visitedCopy[destX][destY] = true;
+
 				if (DEBUG_PRINTING)
-					debugPrint("M : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite);
+					debugPrint("M : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+
+				basicGenerator(moves, boardCopy, destX, destY, visitedCopy, 0, false, isWhite);
 			}
 		}
 
@@ -348,24 +331,6 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 			bool pushValid = false;
 			int pushHeight = Piece::height(dest);
 
-			int xDir = 0;
-			int yDir = 0;
-			switch (d)
-			{
-			case 0:
-				yDir = -1;
-				break;
-			case 1:
-				xDir = 1;
-				break;
-			case 2:
-				yDir = 1;
-				break;
-			case 3:
-				xDir = -1;
-				break;
-			}
-
 			/*
 				Continue checking in the direction of movement until pushing is either posible or it isn't
 				Offset is the offset from the original piece
@@ -374,13 +339,13 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 
 			while (true)
 			{
-				int pushX = x + xDir * offset;
-				int pushY = y + yDir * offset;
+				int pushX = x + dx[d] * offset;
+				int pushY = y + dy[d] * offset;
 
 				if (pushX < 0 || pushX > 12 || pushY < 0 || pushY > 12)
 					break;
 
-				uint8_t pushPiece = ((*state)[pushX][pushY]);
+				uint8_t pushPiece = state[pushX][pushY];
 
 				if ((pushPiece & hasTurnPiece) != 0)
 				{ // Obey turn pieces
@@ -404,26 +369,27 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 			}
 			if (!pushValid)
 				continue;
-			uint8_t boardCopy[13][13];
-			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+
+			GamePosition boardCopy = state;
 
 			for (int o = offset; o > 0; o--)
 			{ // loop backwards from the end of the push chain and copy the pieces over
-				int destX = x + xDir * o;
-				int destY = y + yDir * o;
-				int sourceX = x + xDir * (o - 1);
-				int sourceY = y + yDir * (o - 1);
+				int destX = x + dx[d] * o;
+				int destY = y + dy[d] * o;
+				int sourceX = x + dx[d] * (o - 1);
+				int sourceY = y + dy[d] * (o - 1);
 
 				boardCopy[destX][destY] |= boardCopy[sourceX][sourceY] & 0b00111111;
 				boardCopy[sourceX][sourceY] &= 0b11000000;
 			}
 
-			bool visitedCopy[13][13];
-			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-			visitedCopy[i][j] = true;
+			VisitedMap visitedCopy = visited;
+			visitedCopy[destX][destY] = true;
+
 			if (DEBUG_PRINTING)
-				debugPrint("P : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-			basicGenerator(moves, &boardCopy, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
+				debugPrint("P : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+
+			basicGenerator(moves, boardCopy, destX, destY, visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 
 		if (remainingSteps >= 2 && Piece::isTower(dest) && Piece::colour(dest) != Piece::colour(piece))
@@ -434,71 +400,61 @@ void Board::basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> move
 
 			// Logic: figure out all ways to capture and then generate all splitting options at the end to not redo the work over and over again (this might be something good to cache when trying to optimize)
 
-			uint8_t boardCopy[13][13];
-			std::memcpy(&boardCopy, state, sizeof(boardCopy));
-			boardCopy[i][j] &= 0b11000000; // remove piece we're capturing
-			bool visitedCopy[13][13];
-			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
-			visitedCopy[i][j] = true;
+			GamePosition boardCopy = state;
+
+			boardCopy[destX][destY] &= 0b11000000; // remove piece we're capturing
+			VisitedMap visitedCopy = visited;
+			visitedCopy[destX][destY] = true;
 			if (DEBUG_PRINTING)
-				debugPrint("C : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-			captureGenerator(moves, &boardCopy, x, y, i, j, &visitedCopy, remainingSteps - 1, false, isWhite);
+				debugPrint("C : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+			captureGenerator(moves, boardCopy, x, y, destX, destY, visitedCopy, remainingSteps - 1, false, isWhite);
 		}
 	}
 }
 
-void Board::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const
+void Board::captureGenerator(
+	std::vector<std::vector<xMove>>& moves, 
+	const GamePosition& state, 
+	int originX, int originY, int x, int y, 
+	VisitedMap& visited, int remainingSteps, bool turned, bool isWhite
+) const
 {
 	/*
 		0
 	   3 1
 		2
 	*/
-	uint8_t origin = ((*state)[originX][originY]);
+	uint8_t origin = state[originX][originY];
 
-	if (!turned && (((*state)[x][y] & hasTurnPiece) != 0))
+	if (!turned && ((state[x][y] & hasTurnPiece) != 0))
 	{ // Turn in place if we can and haven't yet
-		uint8_t boardCopy[13][13];
-		std::memcpy(&boardCopy, state, sizeof(boardCopy));
+		GamePosition boardCopy = state;
 		boardCopy[x][y] ^= setTurnPiece;
-		bool visitedCopy[13][13];
-		std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+
+		VisitedMap visitedCopy = visited;
+
 		if (DEBUG_PRINTING)
-			debugPrint("CT : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves->size()) + "\n");
-		captureGenerator(moves, &boardCopy, originX, originY, x, y, &visitedCopy, remainingSteps, true, isWhite);
+			debugPrint("CT : " + std::to_string(x) + " : " + std::to_string(y) + " | " + std::to_string(moves.size()) + "\n");
+
+		captureGenerator(moves, boardCopy, originX, originY, x, y, visitedCopy, remainingSteps, true, isWhite);
 	}
 
 	for (int d = 0; d < 4; d++)
 	{ // Loop through the 4 possible directions
-		uint8_t piece = ((*state)[x][y]);
+		uint8_t piece = state[x][y];
 		if ((piece & hasTurnPiece) != 0)
 		{ // Obey turn pieces
 			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece)
 				continue; // This feels deeply cursed
 		}
-		int i = x;
-		int j = y;
-		switch (d)
-		{
-		case 0:
-			j--;
-			break;
-		case 1:
-			i++;
-			break;
-		case 2:
-			j++;
-			break;
-		case 3:
-			i--;
-			break;
-		}
-		uint8_t dest = (*state)[i][j];
+		int i = x + dx[d];
+		int j = y + dy[d];
+		uint8_t dest = state[i][j];
 		if (i < 0 || i > 12 || j < 0 || j > 12)
 			continue;
 		if (i % 2 == 1 && j % 2 == 1)
 			continue;
-		if ((*visited)[i][j])
+		if (visited[i][j])
 			continue; // Bounds and revisiting check
 		if ((dest & hasTurnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece))
 			continue;
@@ -515,9 +471,8 @@ void Board::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> mo
 			// We have to split less than the full tower, except if the height is 1 and we can't go over the merge limit
 			for (int splitOff = 1; (Piece::height(origin) == 1 ? splitOff <= 1 : (splitOff < Piece::height(origin))) && (splitOff <= 5 - Piece::height(dest)); splitOff++)
 			{
+				GamePosition boardCopy = state;
 
-				uint8_t boardCopy[13][13];
-				std::memcpy(&boardCopy, state, sizeof(boardCopy));
 				if (Piece::height(origin) == 1)
 				{
 					boardCopy[originX][originY] &= 0b11000000; // wipe the orign only if the height is one
@@ -532,85 +487,68 @@ void Board::captureGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> mo
 				boardCopy[i][j] += splitOff;
 				boardCopy[i][j] |= Piece::colour(origin); // always copy color and add height as that should be allowed based on the only way this can be called
 
-				bool visitedCopy[13][13];
-				std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+				VisitedMap visitedCopy = visited;
 				visitedCopy[i][j] = true;
+
 				if (DEBUG_PRINTING)
-					debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-				basicGenerator(moves, &boardCopy, i, j, &visitedCopy, 0, false, isWhite); // do last move
-																						  // TODO: Wrong ruleset bug, verify this change is correct
-																						  //  //if dest is empty, continue the move if possible
-																						  // basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);
+					debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves.size()) + "\n");
+				basicGenerator(moves, boardCopy, i, j, visitedCopy, 0, false, isWhite); // do last move
+																						// TODO: Wrong ruleset bug, verify this change is correct
+																						//  //if dest is empty, continue the move if possible
+																						// basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);
 			}
 		}
 		else if (remainingSteps + Piece::isBlue(origin) > 1 && Piece::isTower(dest) && Piece::colour(origin) != Piece::colour(dest))
 		{
 			if (!Piece::isBlue(origin) && Piece::height(dest) > Piece::height(origin))
 				continue; // capturing height check
-			uint8_t boardCopy[13][13];
-			std::memcpy(&boardCopy, state, sizeof(boardCopy));
+			GamePosition boardCopy = state;
 			boardCopy[i][j] &= 0b11000000; // remove piece we're capturing
-			bool visitedCopy[13][13];
-			std::memcpy(&visitedCopy, visited, sizeof(visitedCopy));
+
+			VisitedMap visitedCopy = visited;
 			visitedCopy[i][j] = true;
-			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves->size()) + "\n");
-			captureGenerator(moves, &boardCopy, originX, originY, i, j, &visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite); // only decrement moves if the capturing piece doesn't have a blue addon
+
+			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves.size()) + "\n");
+			captureGenerator(moves, boardCopy, originX, originY, i, j, visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite); // only decrement moves if the capturing piece doesn't have a blue addon
 		}
 	}
 }
 
-void Board::unsafeMakeMove(std::vector<xMove> *move)
+void Board::unsafeMakeMove(const std::vector<xMove>& move)
 {
-	for (int i = 0; i < move->size(); i++)
+	unsafeApplyMove(gamePos, move);
+}
+
+void Board::unsafeApplyMove(GamePosition& position, const std::vector<xMove>& move)
+{
+	for (int i = 0; i < move.size(); i++)
 	{
-		pieces[(*move)[i].i][(*move)[i].j] ^= (*move)[i].delta;
+		position[move[i].i][move[i].j] ^= move[i].delta;
 	}
 }
 
-int Board::makeMove(std::vector<xMove> *move, bool isWhiteTurn)
+int Board::makeMove(const std::vector<xMove>& move, bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
-	moves = getMoves(isWhiteTurn);
-	uint8_t boardCopy1[13][13];
-	uint8_t boardCopy2[13][13];
-	std::memcpy(&boardCopy1, pieces, sizeof(boardCopy1));
-	for (int i = 0; i < move->size(); i++)
-	{
-		boardCopy1[(*move)[i].i][(*move)[i].j] ^= (*move)[i].delta;
-	}
-	for (int i = 0; i < moves->size(); i++)
-	{
-		std::memcpy(&boardCopy2, pieces, sizeof(boardCopy2));
-		for (int j = 0; j < (*moves)[i].size(); j++)
-		{
-			boardCopy2[(*moves)[i][j].i][(*moves)[i][j].j] ^= (*moves)[i][j].delta;
-		}
-		if (memcmp(&boardCopy1, &boardCopy2, sizeof(boardCopy1)) == 0)
-		{
-			std::memcpy(&pieces, boardCopy1, sizeof(pieces));
-			return i == 0 ? 0 : 1;
-		}
-	}
-	return -1;
+	GamePosition newState = gamePos;
+	unsafeApplyMove(newState, move);
+
+	return makeMove(newState, isWhiteTurn);
 }
 
-int Board::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
+int Board::makeMove(GamePosition& newState, bool isWhiteTurn)
 {
-	std::shared_ptr<std::vector<std::vector<Board::xMove>>> moves;
-	moves = getMoves(isWhiteTurn);
-	uint8_t boardCopy[13][13];
-	for (int i = 0; i < moves->size(); i++)
-	{
-		std::memcpy(&boardCopy, pieces, sizeof(boardCopy));
-		for (int j = 0; j < (*moves)[i].size(); j++)
-		{
-			boardCopy[(*moves)[i][j].i][(*moves)[i][j].j] ^= (*moves)[i][j].delta;
-		}
-		if (memcmp(newState, &boardCopy, sizeof(*newState)) == 0)
-		{
-			std::memcpy(&pieces, newState, sizeof(pieces));
+	std::vector<std::vector<Board::xMove>> moves = getMoves(isWhiteTurn);
 
-			forceDebugPrint(dumpPos());
+	for (int i = 0; i < moves.size(); i++)
+	{
+		GamePosition boardCopy = gamePos;
+		unsafeApplyMove(boardCopy, moves[i]);
+
+		if (newState == boardCopy)
+		{
+			gamePos = newState;
+
+			forceDebugPrint(dumpPosition());
 			forceDebugPrint("\n");
 
 			gameRecord.emplace_back(std::to_string(i) + " ");
@@ -622,6 +560,7 @@ int Board::makeMove(uint8_t (*newState)[13][13], bool isWhiteTurn)
 	}
 	return -1;
 }
+
 Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 {
 	// Check for full eliminations, if yes, that player wins
@@ -635,9 +574,9 @@ Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 	{
 		for (int j = 0; j < 13 && (whiteNoPieces || blackNoPieces); j++)
 		{
-			if (Piece::isTower(pieces[i][j]))
+			if (Piece::isTower(gamePos[i][j]))
 			{
-				if (Piece::isWhite(pieces[i][j]))
+				if (Piece::isWhite(gamePos[i][j]))
 				{
 					whiteNoPieces = false;
 				}
@@ -659,9 +598,9 @@ Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (Piece::isTower(pieces[i][j]))
+			if (Piece::isTower(gamePos[i][j]))
 			{
-				if (Piece::isWhite(pieces[i][j]))
+				if (Piece::isWhite(gamePos[i][j]))
 				{
 					bases[0][1] = true; // black base white piece
 				}
@@ -671,9 +610,9 @@ Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 				}
 			}
 
-			if (Piece::isTower(pieces[i][12 - j]))
+			if (Piece::isTower(gamePos[i][12 - j]))
 			{
-				if (Piece::isWhite(pieces[i][12 - j]))
+				if (Piece::isWhite(gamePos[i][12 - j]))
 				{
 					bases[0][0] = true; // white base white piece
 				}
@@ -703,16 +642,16 @@ Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 				switch (corner)
 				{
 				case 0:
-					piece = pieces[i][j];
+					piece = gamePos[i][j];
 					break;
 				case 1:
-					piece = pieces[12 - i][j];
+					piece = gamePos[12 - i][j];
 					break;
 				case 2:
-					piece = pieces[i][12 - j];
+					piece = gamePos[i][12 - j];
 					break;
 				case 3:
-					piece = pieces[12 - i][12 - j];
+					piece = gamePos[12 - i][12 - j];
 					break;
 				}
 				if (Piece::isTower(piece))
@@ -743,7 +682,27 @@ Board::winValue Board::gameOver(bool isWhite) // last player to make a move
 	return isWhite ? winValue::white : winValue::black;
 }
 
-std::string Board::dumpPos()
+void Board::copyPositionTo(GamePosition& dest) const
+{
+	dest = gamePos;
+}
+void Board::copyPositionTo(uint8_t(*dest)[13][13]) const
+{
+    for (int i = 0; i < 13; i++)
+    {
+        for (int j = 0; j < 13; j++)
+        {
+            (*dest)[i][j] = gamePos[i][j];
+        }
+    }
+}
+
+GamePosition Board::positionCopy() const 
+{
+	return gamePos;
+}
+
+std::string Board::dumpPosition() const
 {
 	std::string turnPieceStr = "";
 	std::string str = "";
@@ -752,7 +711,7 @@ std::string Board::dumpPos()
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			uint8_t piece = pieces[i][j];
+			uint8_t piece = gamePos[i][j];
 
 			if (!((piece & hasTurnPiece) == 0))
 			{
@@ -779,7 +738,7 @@ std::string Board::dumpPos()
 	return str + turnPieceStr;
 }
 
-void Board::loadPos(std::string str)
+void Board::loadPosition(std::string str)
 {
 	wipe();
 
@@ -800,7 +759,7 @@ void Board::loadPos(std::string str)
 		piece += token[2] - '0';
 		int x = 10 * (token[3] - '0') + (token[4] - '0');
 		int y = 10 * (token[5] - '0') + (token[6] - '0');
-		pieces[x][y] |= piece;
+		gamePos[x][y] |= piece;
 
 		str.erase(0, pos + delimiter.length());
 	}
@@ -810,9 +769,9 @@ void Board::loadPos(std::string str)
 	{
 		for (int j = 0; j < 13; j++)
 		{
-			if ((pieces[i][j] & hasTurnPiece) == 0)
+			if ((gamePos[i][j] & hasTurnPiece) == 0)
 				continue;
-			pieces[i][j] |= (token[n] == '1') ? setTurnPiece : 0;
+			gamePos[i][j] |= (token[n] == '1') ? setTurnPiece : 0;
 			n++;
 		}
 	}

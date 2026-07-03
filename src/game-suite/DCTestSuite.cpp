@@ -107,8 +107,8 @@ std::vector<dc::BotBoard> DCTestSuite::loadExampleBoards() {
 	for (int i = 0; i < positions.size(); i++) {
 		dc::BotBoard board;
 		board.isWhiteTurn = positions[i].second;
-		bsService.loadPos(positions[i].first);
-		bsService.copyBoard(&(board.square));
+		bsService.loadPosition(positions[i].first);
+		bsService.copyPositionTo(&(board.square));
 		boards.push_back(board);
 	}
 
