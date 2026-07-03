@@ -263,7 +263,7 @@ std::shared_ptr<std::vector<std::vector<BoardState_T::xMove>>> BoardState_T::get
             int i = I - 1;
             int j = J - 1;
             uint8_t piece = pieces[i][j];
-            if (!(Piece::height(piece) == 0 || Piece::isAddOn(piece)) && !(Piece::isWhiteTower(piece) == !isWhite))
+            if (!(Piece::height(piece) == 0 || Piece::isAddOn(piece)) && !(Piece::isWhite(piece) == !isWhite))
             {
                 uint8_t boardCopy[13][13];
                 copyBoard(&boardCopy);

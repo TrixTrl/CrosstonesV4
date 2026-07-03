@@ -2,7 +2,7 @@
 
 // #define FAST_MOVE_DEBUG_PRINTING
 
-std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(uint8_t (*pieces)[13][13], bool isWhite)
+std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(const uint8_t (*pieces)[13][13], bool isWhite)
 {
     std::vector<move> moves = std::vector<move>();
     moves.reserve(400);
@@ -26,7 +26,7 @@ std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(uint8_t (*piece
     return moves;
 }
 
-void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> *moves)
+void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> *moves)
 {
     std::vector<moveGenerationState> stack = std::vector<moveGenerationState>();
     stack.reserve(30);
@@ -126,7 +126,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             }
         }
 
-        uint8_t (*currentBoardState)[13][13] = pieces;
+        const uint8_t (*currentBoardState)[13][13] = pieces;
         uint8_t complexMoveCopy[13][13];
 
         if (isComplexMove)
@@ -271,7 +271,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
     }
 }
 
-std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirections(uint8_t (*pieces)[13][13], moveGenerationState currentState)
+std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirections(const uint8_t (*pieces)[13][13], moveGenerationState currentState)
 {
     std::vector<Direction> result = std::vector<Direction>();
     if (currentState.dir != Direction::SOUTH && currentState.position.second > 0 && currentState.position.first % 2 == 0)

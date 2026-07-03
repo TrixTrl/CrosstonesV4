@@ -78,11 +78,17 @@ void runPosition(uint8_t (*pieces)[13][13], bool isWhite)
     }
 }
 
+/*
+ *  Lines of Towers can be pushed at once if each subsequent Tower is equal to or shorter in
+ *  Height than the Tower pushing it.
+ */
+
 void compareGenerators()
 {
     int positionNumber = 0;
     BoardState_T boardState = BoardState_T();
 
+    /*
     // Position 0
     boardState.loadPos("-W10006 -B11206 11010100001100111111");
     Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
@@ -96,11 +102,12 @@ void compareGenerators()
     runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     runPosition(boardState.getPiecesReference(), false);
+    */
 
     // Position 2
-    boardState.loadPos("rW30606 -W10607 -B50605 -B50706 -B50506 11111100101101111111");
+    boardState.loadPos("rW30606 -W10607 -B50605 -B50706 -B10506 11111100101101111111");
     Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
-    runPosition(boardState.getPiecesReference(), true);
+    //runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     runPosition(boardState.getPiecesReference(), false);
 
