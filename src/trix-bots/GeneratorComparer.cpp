@@ -132,6 +132,20 @@ void compareGenerators()
     runPosition(boardState.getPiecesReference(), true);
     Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
     runPosition(boardState.getPiecesReference(), false);
+
+    // Position 6
+    boardState.loadPos("rW30404 -W20604 -W10804 11111100101101111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
+
+    // Position 7
+    boardState.loadPos("-W30610 r-10608 11111100101101111111");
+    Utils::print("\nPosition #" + std::to_string(positionNumber) + ", playing as White", true);
+    runPosition(boardState.getPiecesReference(), true);
+    Utils::print("\nPosition #" + std::to_string(positionNumber++) + ", playing as Black", true);
+    runPosition(boardState.getPiecesReference(), false);
 }
 
 void executionSpeedTest()

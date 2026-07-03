@@ -203,7 +203,8 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
                     {
                         std::pair<int, int> searchLocation = std::pair<int, int>(nextPosition);
                         uint8_t searchingPiece = (*currentBoardState)[searchLocation.first][searchLocation.second];
-                        while (Piece::isTower(searchingPiece) && Piece::isWhite(searchingPiece) == isWhite && Piece::height(searchingPiece) <= Piece::height(searchingPiece) &&
+                        uint8_t prevSearchingPiece = currentTower;
+                        while (Piece::isTower(searchingPiece) && Piece::isWhite(searchingPiece) == isWhite && Piece::height(searchingPiece) <= Piece::height(prevSearchingPiece) &&
                                (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::turnPieceMask : Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece)))
                         {
                             searchLocation = getPositionInDirection(searchLocation, direction);
@@ -211,6 +212,7 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
                             {
                                 break;
                             }
+                            prevSearchingPiece = searchingPiece;
                             searchingPiece = (*currentBoardState)[searchLocation.first][searchLocation.second];
                         }
                         if (!(searchLocation.first >= 0 && searchLocation.first <= 12 && searchLocation.second >= 0 && searchLocation.second <= 12 && (searchingPiece & Piece::towerMask) == 0 &&
@@ -241,6 +243,10 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
                     }
                 }
             }
+            else if (Piece::isAddOn(nextPiece))
+            {
+                canMove = false;
+            }
 
             for (int i = currentState.capturing ? currentState.movingAmount : 1; i <= currentState.movingAmount; i++)
             {
@@ -255,7 +261,8 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
                     nextState.capturing = currentState.capturing | canCapture;
                     stack.emplace_back(nextState);
                 }
-                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount) && Piece::height(nextPiece) + i <= 5)
+                if ((Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount) && Piece::height(nextPiece) + i <= 5) ||
+                    Piece::isAddOn(nextPiece) && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount))
                 {
                     moveGenerationState nextState = moveGenerationState();
                     nextState.position = nextPosition;
@@ -356,7 +363,7 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move, b
             uint8_t pushingPiece = (*pieces)[pushingPosition.first][pushingPosition.second] & Piece::towerMask;
             uint8_t pushingDestination = (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] & Piece::towerMask;
             (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
-            do
+            while (pushingDestination != 0)
             {
                 pushingPosition = getPositionInDirection(pushingPosition, fragment.dir);
                 (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
@@ -364,7 +371,7 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move, b
                 // pushingPosition = std::pair<int, int>(pushingPosition.first + fragmentDelta.first, pushingPosition.second + fragmentDelta.second);
                 pushingPiece = pushingDestination;
                 pushingDestination = (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] & Piece::towerMask;
-            } while (pushingDestination != 0);
+            };
             (*pieces)[pushingPosition.first + fragmentDelta.first][pushingPosition.second + fragmentDelta.second] |= pushingPiece;
         }
         else if (fragmentIndex < move.moveFragments.size() - 1)
