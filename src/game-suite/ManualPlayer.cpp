@@ -7,7 +7,6 @@
 #include <format>
 #include <string>
 #include <thread>
-#include <WinUser.h>
 
 
 void ManualPlayer::getMoveToPlay(uint8_t(*board)[13][13], bool isWhite, int endTime)
@@ -278,7 +277,7 @@ void ManualPlayer::moveInDirection(ManualPlayer::Direction dir)
 		*pStartPiece &= ~Piece::colourMask;
 	
 
-	ui->setHighlight(destX, destY);
+	setHighlight(destX, destY);
 	moveInfo = newMoveInfo;
 }
 
@@ -292,13 +291,32 @@ void ManualPlayer::resetMove(const bool print)
 	moveInfo = MoveInfo();
 	startTower = 0;
 	maxSteps = 0;
-	ui->clearAllHighlights();
+	clearAllHighlights();
 	
 }
 
 void ManualPlayer::updateDisplay()
 {
-	InvalidateRect(globalHwnd, NULL, NULL);
+	if (onDisplayChanged) onDisplayChanged();
+}
+
+void ManualPlayer::setHighlight(int x, int y)
+{
+	cellHighlights[x][y] = true;
+}
+
+void ManualPlayer::clearHighlight(int x, int y)
+{
+	cellHighlights[x][y] = false;
+}
+
+void ManualPlayer::clearAllHighlights()
+{
+	for (int x = 0; x < 13; x++) {
+		for (int y = 0; y < 13; y++) {
+			cellHighlights[x][y] = false;
+		}
+	}
 }
 
 void ManualPlayer::turn()
@@ -353,7 +371,7 @@ void ManualPlayer::changeTowerSelection(const int x, const int y)
 	moveInfo.split = Piece::height(targetContent);
 	moveInfo.blueProperty = Piece::isBlue(targetContent);
 
-	ui->setHighlight(x, y);
+	setHighlight(x, y);
 	Utils::print("Selecting", true);
 }
 void ManualPlayer::endMove()
@@ -364,7 +382,7 @@ void ManualPlayer::endMove()
 		return;
 	}
 
-	ui->clearAllHighlights();
+	clearAllHighlights();
 	memcpy(targetBoard, displayBoard, sizeof(*targetBoard));
 	isActive = false;
 }
