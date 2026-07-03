@@ -4,7 +4,6 @@
 extern Font appFont;
 
 static inline void initAppFont() {
-    // Load at high base size for crisp downscaling
     appFont = LoadFontEx("resources/FiraSans-Regular.ttf", 96, 0, 250);
     if (appFont.texture.id != 0) {
         SetTextureFilter(appFont.texture, TEXTURE_FILTER_BILINEAR);

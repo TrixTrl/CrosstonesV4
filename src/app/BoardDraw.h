@@ -2,13 +2,14 @@
 #include <cstdint>
 #include <string>
 #include "game-suite/fix_win32_compatibility.h"
+#include "game-suite/GamePosition.h"
 #include "raylib.h"
 #include "globals/Piece.h"
 #include "FontManager.h"
 
 const int cellSize = 75;
 
-inline void drawBoard(uint8_t (*pieces)[13][13], const bool highlights[13][13] = nullptr) {
+inline void drawBoard(const GamePosition& state, const bool highlights[13][13] = nullptr) {
     std::string drawTypes[] = {
         "ahthbht",
         "v v b v",
@@ -27,7 +28,7 @@ inline void drawBoard(uint8_t (*pieces)[13][13], const bool highlights[13][13] =
         for (int j = 0; j < 13; j++) {
             Color col;
             DrawPath path = NONE;
-            uint8_t piece = (*pieces)[i][j];
+            uint8_t piece = state[i][j];
             char typeChar = drawTypes[j < 7 ? j : 5 - (j % 7)][i < 7 ? i : 5 - (i % 7)];
 
             switch (typeChar) {

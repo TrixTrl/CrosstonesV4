@@ -9,7 +9,8 @@ enum class AppMode {
     Game,
     Explore,
     Viewer,
-    Test
+    Test,
+    Stub
 };
 
 struct PlayerConfig {

@@ -3,6 +3,7 @@
 #include "test-bots/BasicGenerator.h"
 #include "globals/Piece.h"
 #include "felix-bots/board/GameResult.h"
+#include "game-suite/GamePosition.h"
 
 #include <functional>
 #include <vector>
@@ -41,7 +42,7 @@ namespace dc
 			return (T(0) < val) - (val < T(0));
 		}
 
-		static void applyXMove(uint8_t(*state)[13][13], Move& move);
+		static void applyXMove(GamePosition& state, Move& move);
 
 		static bool isWinScore(int score)
 		{
@@ -49,7 +50,7 @@ namespace dc
 			return abs(score) > immediateWinScore - maxMateDepth;
 		}
 
-		static bool isStartingBoard(uint8_t(*state)[13][13]);
+		static bool isStartingBoard(const GamePosition& state);
 		static bool isLeftMove(Move& move);
 		static Move mirrorMoveLR(Move& move);
 

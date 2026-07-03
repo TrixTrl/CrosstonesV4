@@ -473,8 +473,10 @@ float Utils::improvedPosEval(bool isWhite, uint8_t (*pieces)[13][13])
 
 float Utils::felixEvalWrapper(bool isWhite, uint8_t (*pieces)[13][13])
 {
+	GamePosition gp;
+	std::memcpy(&gp, pieces, sizeof(gp));
 	dc::BotBoard board;
-	board.initialize(pieces, isWhite);
+	board.initialize(gp, isWhite);
 	dc::Evaluation evaluator;
 	return evaluator.evaluate(board);
 }

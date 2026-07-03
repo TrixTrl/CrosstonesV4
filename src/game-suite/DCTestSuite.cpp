@@ -31,17 +31,17 @@ bool DCTestSuite::run(std::function<void()> onBoardChanged, uint8_t(*display)[13
 	dc::Utility::print(std::format("Deepchad Time: {}\n", execTime), true);
 
 
-	std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> newMoveGenerator = 
-		[](uint8_t(*pieces)[13][13], bool isWhite)
+	std::function<std::vector<Move>(const GamePosition&, bool)> newMoveGenerator = 
+		[](const GamePosition& pieces, bool isWhite)
 		{
 			std::vector<Move> moves;
 			dc::MoveGenerator::getMovesStatic(&moves, pieces, isWhite, false);
 			return moves;
 		};
-	std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> oldMoveGenerator =
-		[](uint8_t(*pieces)[13][13], bool isWhite)
+	std::function<std::vector<Move>(const GamePosition&, bool)> oldMoveGenerator =
+		[](const GamePosition& pieces, bool isWhite)
 		{
-			std::shared_ptr<std::vector<Move>> moves = BasicGenerator::getMoves(isWhite, pieces);
+			std::shared_ptr<std::vector<Move>> moves = BasicGenerator::getMoves(isWhite, &pieces.pieces);
 			return std::vector<Move>(moves->begin() + 1, moves->end());
 		};
 
@@ -83,7 +83,7 @@ std::vector<dc::BotBoard> DCTestSuite::loadExampleBoards() {
 		dc::BotBoard board;
 		board.isWhiteTurn = positions[i].second;
 		bsService.loadPosition(positions[i].first);
-		bsService.copyPositionTo(&(board.square));
+		bsService.copyPositionTo(board.square);
 		boards.push_back(board);
 	}
 

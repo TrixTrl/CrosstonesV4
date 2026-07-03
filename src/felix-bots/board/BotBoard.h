@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "game-suite/GamePosition.h"
 #include "felix-bots/util/Utility.h"
 #include "felix-bots/board/GameResult.h"
 
@@ -12,13 +13,13 @@ namespace dc
 	public:
 
 		uint64_t zobristKey;
-		uint8_t square[13][13];
+		GamePosition square;
 		bool isWhiteTurn = false;
 		GameResult gameResult;
 
 		BotBoard() : gameResult(GameResult::NotStarted) {}
 
-		void initialize(uint8_t(*state)[13][13], bool isWhiteTurn);
+		void initialize(const GamePosition& state, bool isWhiteTurn);
 
 		void updateWinValue();
 		void makeMove(Move& move);
@@ -27,7 +28,7 @@ namespace dc
 		std::string moveToString(Move& move);
 		
 		/* Testing */
-		u64 bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves);
+		u64 bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(const GamePosition&, bool)> getMoves);
 	
 	private:
 

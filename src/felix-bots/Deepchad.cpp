@@ -1,5 +1,6 @@
 ﻿#include "Deepchad.h"
 #include "felix-bots/util/Utility.h"
+#include "game-suite/GamePosition.h"
 #include "test-bots/BasicGenerator.h"
 #include "globals/Player.h"
 #include "globals/Piece.h"
@@ -8,27 +9,28 @@
 #include <thread>
 #include <chrono>
 #include <limits>
+#include <cstring>
 
 using namespace std;
 
 // should only handle time controll and alike
 void Deepchad::getMoveToPlay(uint8_t(*state)[13][13], bool isWhite, int endTime)
 {
-	board.initialize(state, isWhite);
+	GamePosition gp;
+	std::memcpy(&gp, state, sizeof(gp));
+	board.initialize(gp, isWhite);
 	
 	searcher.startSearch();
 
 	auto result = searcher.getSearchResult();
 
 	//Ensure first move of a game is left handed
-	if (isWhite && Utility::isStartingBoard(state) && !Utility::isLeftMove(result.first))
+	if (isWhite && Utility::isStartingBoard(gp) && !Utility::isLeftMove(result.first))
 	{
 		result.first = Utility::mirrorMoveLR(result.first);
 		Utility::print("Mirroring Move to the left.", true);
 	}
 
-	//if (result.first != Utility::nullMove)
-	Utility::applyXMove(state, result.first);
-
-	//this_thread::sleep_for(chrono::milliseconds(1000));
+	Utility::applyXMove(gp, result.first);
+	std::memcpy(state, &gp, sizeof(gp));
 }

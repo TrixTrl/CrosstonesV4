@@ -41,7 +41,7 @@ private:
             GamePosition nextState = start;
             
             for (const auto& step : moveSequence) {
-                nextState.pieces[step.i][step.j] ^= step.delta;
+                nextState[step.i][step.j] ^= step.delta;
             }
             
             resultingPositions.push_back(nextState);

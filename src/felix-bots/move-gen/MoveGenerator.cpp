@@ -5,18 +5,18 @@
 using namespace dc;
 
 MoveGenerator MoveGenerator::moveGen;
-void MoveGenerator::getMovesStatic(std::vector<dc::Move> *targetList, const uint8_t (*board)[13][13], const bool isWhite, const bool onlyClaimsAndCaptures)
+void MoveGenerator::getMovesStatic(std::vector<dc::Move> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
 {
-	moveGen.getMoves(targetList, board, isWhite, onlyClaimsAndCaptures);
+	moveGen.getMoves(targetList, state, isWhite, onlyClaimsAndCaptures);
 }
 
-void MoveGenerator::getMoves(std::vector<dc::Move> *targetList, const uint8_t (*board)[13][13], const bool isWhite, const bool onlyClaimsAndCaptures)
+void MoveGenerator::getMoves(std::vector<dc::Move> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
 {
 	target = targetList;
 	target->reserve(onlyClaimsAndCaptures ? 80 : 550);
 
-	std::memcpy(&currentSquares, board, sizeof(currentSquares));
-	std::memcpy(&origSquares, board, sizeof(origSquares));
+	currentSquares = state;
+	origSquares = state;
 	memset(visited, false, sizeof(visited));
 
 	for (int i = 0; i < 13; i++)
@@ -274,8 +274,7 @@ void MoveGenerator::basicGenerator(
 				if (!pushValid)
 					continue;
 
-				uint8_t boardCopy[13][13];
-				std::memcpy(&boardCopy, currentSquares, sizeof(boardCopy));
+				GamePosition boardCopy = currentSquares;
 
 				for (int o = offset; o > 0; o--)
 				{ // loop backwards from the end of the push chain and copy the pieces over
@@ -295,7 +294,7 @@ void MoveGenerator::basicGenerator(
 				visited[i][j] = false;
 
 				// copy changes back
-				std::memcpy(&currentSquares, boardCopy, sizeof(currentSquares));
+				currentSquares = boardCopy;
 			}
 
 			// Capturing case

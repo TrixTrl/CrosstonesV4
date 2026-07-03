@@ -132,7 +132,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	}
 
 	std::vector<Move> moves = std::vector<Move>();
-	moveGenerator.getMoves(&moves, &(board.square), board.isWhiteTurn);
+	moveGenerator.getMoves(&moves, board.square, board.isWhiteTurn);
 
 	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
 	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(prevBestMove, board, moves);
@@ -231,7 +231,7 @@ int Searcher::quiescenceSearch(int alpha, int beta, bool madeQMove)
 	}
 
 	std::vector<Move> moves;
-	moveGenerator.getMoves(&moves, &(board.square), board.isWhiteTurn, true);
+	moveGenerator.getMoves(&moves, board.square, board.isWhiteTurn, true);
 	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(Utility::createNullMove(), board, moves);
 
 	for (int moveNumber = 0; moveNumber < moves.size(); moveNumber++)

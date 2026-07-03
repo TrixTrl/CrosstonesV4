@@ -384,7 +384,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	ShowWindow(hwnd, nCmdShow);
 
-	// Create the background thread with an explicit 16MB stack limit
 	HANDLE hThread = CreateThread(
 		NULL,                               // Default security attributes
 		CUSTOM_STACK_SIZE,                  // forced 16MB stack size

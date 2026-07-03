@@ -1,17 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <algorithm>
-#include <vector>
-#include <cstring>
+#include "game-suite/GamePosition.h"
 
-struct BoardState {
-    uint8_t pieces[13][13];
-
-    bool operator==(const BoardState& other) const {
-        return std::memcmp(pieces, other.pieces, sizeof(pieces)) == 0;
-    }
-    bool operator<(const BoardState& other) const {
-        return std::memcmp(pieces, other.pieces, sizeof(pieces)) < 0;
-    }
-};
+using BoardState = GamePosition;

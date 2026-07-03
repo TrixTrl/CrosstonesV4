@@ -5,9 +5,9 @@
 
 using namespace dc;
 
-void BotBoard::initialize(uint8_t(*state)[13][13], bool isWhiteTurn)
+void BotBoard::initialize(const GamePosition& state, bool isWhiteTurn)
 {
-	std::memcpy(square, state, sizeof(square));
+	square = state;
 	this->isWhiteTurn = isWhiteTurn;
 
 	gameResult = GameResult::InProgress;
@@ -187,13 +187,13 @@ void BotBoard::appyMoveReversible(Move& move)
 }
 
 
-u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(uint8_t(*)[13][13], bool)> getMoves)
+u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(const GamePosition&, bool)> getMoves)
 {
 
 	int n_moves, i;
 	u64 nodes = 0;
 
-	std::vector<Move> moves = getMoves(&square, isWhiteTurn);
+	std::vector<Move> moves = getMoves(square, isWhiteTurn);
 	//MoveGenerator::getMovesStatic(&moves, &square, isWhiteTurn);
 
 	n_moves = moves.size();

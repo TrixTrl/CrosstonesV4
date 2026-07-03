@@ -6,32 +6,29 @@
 
 #include "app/Config.h"
 #include "app/LauncherMenu.h"
-#include "app/GameMode.h"
-#include "app/ExploreMode.h"
-#include "app/ViewerMode.h"
-#include "app/TestMode.h"
+#include "app/AppRegistry.h"
 #include "app/FontManager.h"
+#include "app/StackThread.h"
 #include <iostream>
 
 Font appFont;
 
-#define CUSTOM_STACK_SIZE 67108864  // 64MB
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
-
+// Also used by StackThread for background-thread stack size
 #pragma comment(linker, "/STACK:" STR(CUSTOM_STACK_SIZE))
 #pragma comment(linker, "/HEAP:200000000")
 
 int main(int argc, char* argv[]) {
+    registerAllApps();
+
     // Try loading config file first
     AppConfig config = AppConfig::fromFile("crosstones_config.txt");
 
     // Override with CLI args
     AppConfig cliConfig = AppConfig::fromArgs(argc, argv);
     if (argc > 1) {
-        // CLI mode was specified
         if (cliConfig.mode == AppMode::None) {
-            // Invalid args, show usage but keep going
             std::cerr << "Usage: crosstones [game|explore|viewer|test] [options...]" << std::endl;
             std::cerr << "  --p1 <type> <param>    Player 1 (Deepchad, AlphaCruncher, Hydra, TheFirst, ManualPlayer)" << std::endl;
             std::cerr << "  --p2 <type> <param>    Player 2" << std::endl;
@@ -41,7 +38,6 @@ int main(int argc, char* argv[]) {
             std::cerr << "  --config <path>        Config file path" << std::endl;
             return 1;
         }
-        // Merge: CLI overrides config file
         config.mode = cliConfig.mode;
         if (cliConfig.game.player1.type != "Deepchad" || cliConfig.game.player1.param != 4)
             config.game.player1 = cliConfig.game.player1;
@@ -59,26 +55,22 @@ int main(int argc, char* argv[]) {
 
     // No mode selected via CLI → show launcher menu
     if (config.mode == AppMode::None) {
-        config = LauncherMenu::show(config);
+        LauncherMenu launcher;
+        launcher.run(config);
+        if (launcher.selectedMode != AppMode::None) {
+            config = launcher.resultConfig;
+        } else {
+            return 0;
+        }
     }
 
-    // Run selected mode
-    switch (config.mode) {
-        case AppMode::Game:
-            GameMode::run(config);
-            break;
-        case AppMode::Explore:
-            ExploreMode::run(config);
-            break;
-        case AppMode::Viewer:
-            ViewerMode::run(config);
-            break;
-        case AppMode::Test:
-            TestMode::run(config);
-            break;
-        default:
-            std::cerr << "No mode selected." << std::endl;
-            return 1;
+    // Run selected mode via registry
+    auto app = AppRegistry::create(config.mode);
+    if (app) {
+        app->run(config);
+    } else {
+        std::cerr << "No mode selected." << std::endl;
+        return 1;
     }
 
     return 0;
