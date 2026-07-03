@@ -31,8 +31,9 @@
 #include <chrono>
 #include "UI.h"
 
-// #pragma comment(linker, "/STACK:200000000")
-// #pragma comment(linker, "")
+#define CUSTOM_STACK_SIZE 67108864  // 64MB - do not overflow 32-bit integer limit, else ignored
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
 
 #define KEYBOARDCONTROLL 0
 #define EXPLOREMOVEGENERATION 0
