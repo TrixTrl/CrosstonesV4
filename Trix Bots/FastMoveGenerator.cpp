@@ -139,7 +139,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
             {
                 tempComplexMove.moveFragments.emplace_back(fragment);
             }
-            applyMove(&complexMoveCopy, tempComplexMove);
+            applyMove(&complexMoveCopy, tempComplexMove, true);
             currentBoardState = &complexMoveCopy;
         }
 
@@ -159,7 +159,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                 }
                 currentMove.moveFragments.emplace_back(fragment);
             }
-            if (Piece::isTower(pieceAtCurrentLocation) && Piece::isWhite(pieceAtCurrentLocation) == isWhite && currentState.stepsLeft == -2)
+            if (currentState.stepsLeft == -2)
             {
                 currentMove.isMerge = true;
             }
@@ -201,7 +201,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                 {
                     if (Piece::height(nextPiece) <= Piece::height(currentTower))
                     {
-                        std::pair<int, int> searchLocation = nextPosition;
+                        std::pair<int, int> searchLocation = std::pair<int, int>(nextPosition);
                         uint8_t searchingPiece = (*currentBoardState)[searchLocation.first][searchLocation.second];
                         while (Piece::isTower(searchingPiece) && Piece::isWhite(searchingPiece) == isWhite && Piece::height(searchingPiece) <= Piece::height(searchingPiece) &&
                                (Piece::turnPiece(searchingPiece) == 0 || ((direction == Direction::NORTH || direction == Direction::SOUTH) ? Piece::turnPiece(searchingPiece) == Piece::turnPieceMask : Piece::turnPiece(searchingPiece) == Piece::hasTurnPiece)))
@@ -255,7 +255,7 @@ void FastMoveGenerator::generateMoves(uint8_t (*pieces)[13][13], bool isWhite, s
                     nextState.capturing = currentState.capturing | canCapture;
                     stack.emplace_back(nextState);
                 }
-                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount))
+                if (Piece::isTower(nextPiece) && Piece::isWhite(nextPiece) == isWhite && (Piece::hasAddOn(currentTower) == 0 || i < currentState.movingAmount) && Piece::height(nextPiece) + i <= 5)
                 {
                     moveGenerationState nextState = moveGenerationState();
                     nextState.position = nextPosition;
@@ -310,7 +310,7 @@ std::vector<FastMoveGenerator::Direction> FastMoveGenerator::getLegalMoveDirecti
     return result;
 }
 
-void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move)
+void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move, bool skipLastOverwrite)
 {
     uint8_t currentPiece = Piece::towerMask & (*pieces)[move.start.first][move.start.second];
     std::pair<int, int> currentPosition = std::pair<int, int>(move.start);
@@ -384,6 +384,8 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move)
     if (currentPosition.first < 0 || currentPosition.first > 12 || currentPosition.second < 0 || currentPosition.second > 12)
         throw;
     uint8_t finalPiece = mergeTowers((*pieces)[currentPosition.first][currentPosition.second] & Piece::towerMask, currentPiece);
+    if (skipLastOverwrite)
+        return;
     (*pieces)[currentPosition.first][currentPosition.second] &= Piece::turnPieceMask;
     (*pieces)[currentPosition.first][currentPosition.second] |= finalPiece;
     if (move.isTurn)
