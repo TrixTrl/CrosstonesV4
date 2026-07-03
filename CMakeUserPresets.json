@@ -5,7 +5,7 @@
             "name": "debug",
             "inherits": "vcpkg",
             "environment": {
-                "VCPKG_ROOT": "C:/Users/Trix/Documents/vcpkg",
+                "VCPKG_ROOT": "C:/Program Files/vcpkg",
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
@@ -13,7 +13,7 @@
             "name": "release",
             "inherits": "vcpkg",
             "environment": {
-                "VCPKG_ROOT": "C:/Users/Trix/Documents/vcpkg",
+                "VCPKG_ROOT": "C:/Program Files/vcpkg",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         }

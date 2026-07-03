@@ -7,6 +7,33 @@ project(CROSSTONES_V4)
 
 find_package(raylib CONFIG REQUIRED)
 
-add_executable(Crosstones_V4 Main.cpp DCTestSuite.cpp BoardState.cpp Globals/Piece.cpp GameMaster.cpp ManualPlayer.cpp "Test Bots/TestBotRnd.cpp" "Felix Bots/Deepchad.cpp" "Trix Bots/TheFirst.cpp" "Trix Bots/Utils.cpp" "Trix Bots/DemoKnight.cpp" "Trix Bots/Hydra.cpp" Globals/PlayerInputKey.h UI.cpp "Felix Bots/Board.cpp" "Felix Bots/Evaluation.cpp" "Felix Bots/DebugPrinting.cpp" "Felix Bots/MoveGenerator.cpp" "Felix Bots/MoveOrdering.cpp" "Felix Bots/TranspositionTable.h" "Felix Bots/Utility.cpp" "Felix Bots/Zobrist.cpp" BoardState.h "Felix Bots/Searcher.cpp" "Trix Bots/TranspositionTable.cpp" "Trix Bots/Utils.h" "Felix Bots/MoveGenerator.cpp" "Test Bots/BasicGenerator.cpp" "Trix Bots/MCTS.cpp" "Trix Bots/AlphaCruncher.cpp" "Trix Bots/TrixBoardState.cpp" "Trix Bots/FastMoveGenerator.cpp" "Trix Bots/GeneratorComparer.cpp")
+add_executable(crosstones_executable src/game-suite/Main.cpp)
 
-target_link_libraries(Crosstones_V4 PRIVATE raylib)
+target_link_libraries(crosstones_executable PRIVATE raylib)
+set(MY_MODULES
+    felix-bots
+    game-suite
+    globals
+    test-bots
+    test-suite
+    trix-bots
+)
+
+foreach(MOD ${MY_MODULES})
+    message(STATUS "Configuring module: ${MOD}")
+
+    file(GLOB_RECURSE MOD_SOURCES CONFIGURE_DEPENDS 
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.hpp"
+    )
+
+    add_library(${MOD} STATIC ${MOD_SOURCES})
+
+    target_include_directories(${MOD} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    
+    target_link_libraries(${MOD} PUBLIC raylib)
+
+    target_link_libraries(crosstones_executable PRIVATE ${MOD})
+endforeach()
+
