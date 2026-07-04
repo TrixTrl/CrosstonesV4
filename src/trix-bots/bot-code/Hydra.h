@@ -1,7 +1,7 @@
 #pragma once
 
 #include "globals/Player.h"
-#include "TranspositionTable.h"
+#include "../utils/TranspositionTable.h"
 
 class Hydra : public Player
 {

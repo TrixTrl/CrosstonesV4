@@ -5,9 +5,9 @@
 #include "globals/Player.h"
 #include "globals/Piece.h"
 #include "felix-bots/Deepchad.h"
-#include "trix-bots/TheFirst.h"
-#include "trix-bots/Hydra.h"
-#include "trix-bots/AlphaCruncher.h"
+#include "trix-bots/bot-code/TheFirst.h"
+#include "trix-bots/bot-code/Hydra.h"
+#include "trix-bots/bot-code/AlphaCruncher.h"
 #include <string>
 #include <bitset>
 #include <cstring>

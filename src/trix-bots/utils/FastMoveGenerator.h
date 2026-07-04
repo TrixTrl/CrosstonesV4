@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "../Globals/Piece.h"
+#include "../../Globals/Piece.h"
 #include "Utils.h"
 
 class FastMoveGenerator
