@@ -19,6 +19,10 @@
 #define MAXEVAL 99999
 #define BITSETINDEX (i + (j * 13))
 
+void Utils::runCode()
+{
+}
+
 void Utils::print(std::string str, bool newLine)
 {
 	if (newLine)

@@ -3,13 +3,8 @@
 #include "globals/Player.h"
 #include <memory>
 #include "../utils/TrixBoardState.h"
-<<<<<<< HEAD
 #include "../mcts/MCTS.h"
 #include "../mcts/Toggles.h"
-=======
-#include "../utils/MCTS.h"
-#include "../utils/Toggles.h"
->>>>>>> fbfe60251222b6453cb38841641b5d46a67ebea5
 
 class AlphaCruncher : public Player
 {
