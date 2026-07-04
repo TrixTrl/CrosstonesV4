@@ -1,5 +1,9 @@
 #include "AlphaCruncher.h"
+<<<<<<< HEAD
 #include "../mcts/MCTS.h"
+=======
+#include "../utils/MCTS.h"
+>>>>>>> fbfe60251222b6453cb38841641b5d46a67ebea5
 
 void AlphaCruncher::getMoveToPlay(uint8_t (*board)[13][13], bool isWhite, int endTime)
 {
