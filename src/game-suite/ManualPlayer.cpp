@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "ManualPlayer.h"
 #include "globals/Piece.h"
-#include "trix-bots/Utils.h"
+#include "trix-bots/utils/Utils.h"
 
 #include <algorithm>
 #include <format>

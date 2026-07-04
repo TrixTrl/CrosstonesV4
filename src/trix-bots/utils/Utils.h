@@ -8,8 +8,8 @@
 
 #include "test-bots/BasicGenerator.h"
 #include "game-suite/Board.h"
-#include "MCTS_Structs.h"
-#include "Toggles.h"
+#include "../mcts/MCTS_Structs.h"
+#include "../mcts/Toggles.h"
 
 class Utils
 {

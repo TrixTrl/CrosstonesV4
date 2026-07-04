@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Toggles.h"
-#include "TrixBoardState.h"
+#include "../utils/TrixBoardState.h"
 #include <vector>
 #include <map>
 #include <time.h>
 #include <string>
-#include "Utils.h"
+#include "../utils/Utils.h"
 #include <algorithm>
 #include "MCTS_Structs.h"
 #include <algorithm>

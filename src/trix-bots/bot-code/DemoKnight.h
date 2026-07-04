@@ -1,7 +1,7 @@
 #pragma once
 
 #include "globals/Player.h"
-#include "Utils.h"
+#include "../utils/Utils.h"
 
 class DemoKnight : public Player
 {
