@@ -107,7 +107,7 @@ void LauncherMenu::onFrame() {
     Button p2Prev = makeButton(430, 145 + modeYOffset, 30, 30, "<");
     Button p2Next = makeButton(690, 145 + modeYOffset, 30, 30, ">");
 
-    Button runUtilFunction = makeButton(10, 300, 100, 30, "Run");
+    Button runUtilFunction = makeButton(10, 500, 100, 30, "Run");
 
     if (!gmDropdownOpen && activeField == 0) {
         for (auto& btn : modeBtns)
@@ -280,6 +280,8 @@ void LauncherMenu::onFrame() {
     }
 
     drawText("ESC: exit", 50, 500 + modeYOffset, 14, GRAY);
+
+    drawArrowButton(runUtilFunction);
 
     EndDrawing();
 }

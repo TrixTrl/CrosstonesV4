@@ -29,7 +29,7 @@ std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(const uint8_t (
 void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> *moves)
 {
     std::vector<moveGenerationState> stack = std::vector<moveGenerationState>();
-    stack.reserve(30);
+    stack.reserve(50);
 
     moveGenerationState startingState = moveGenerationState();
     startingState.position = start;
@@ -135,6 +135,7 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
             move tempComplexMove = move();
             tempComplexMove.start = std::pair<int, int>(start);
             tempComplexMove.moveFragments = std::vector<moveFragment>();
+            tempComplexMove.moveFragments.reserve(inProgressMoveFragments.size());
             for (const auto &fragment : inProgressMoveFragments)
             {
                 tempComplexMove.moveFragments.emplace_back(fragment);
@@ -149,6 +150,7 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
             move currentMove = move();
             currentMove.start = start;
             currentMove.moveFragments = std::vector<moveFragment>();
+            currentMove.moveFragments.reserve(max(0, int(inProgressMoveFragments.size()) - 1));
             bool skippedFirstFragment = false;
             for (const auto &fragment : inProgressMoveFragments)
             {

@@ -22,6 +22,7 @@
 void Utils::runCode()
 {
 	compareGenerators();
+	//executionSpeedTest();
 }
 
 void Utils::print(std::string str, bool newLine)
