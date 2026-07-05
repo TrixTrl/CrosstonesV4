@@ -15,7 +15,6 @@
 #include <thread>
 #include <shared_mutex>
 
-// using namespace ::std;
 
 std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchTime, bool isWhite, std::map<std::string, Node> *tree);
 void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::shared_mutex *treeLock);

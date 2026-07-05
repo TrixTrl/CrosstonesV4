@@ -21,6 +21,7 @@
 
 void Utils::runCode()
 {
+	compareGenerators();
 }
 
 void Utils::print(std::string str, bool newLine)

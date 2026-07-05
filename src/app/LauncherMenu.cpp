@@ -107,6 +107,8 @@ void LauncherMenu::onFrame() {
     Button p2Prev = makeButton(430, 145 + modeYOffset, 30, 30, "<");
     Button p2Next = makeButton(690, 145 + modeYOffset, 30, 30, ">");
 
+    Button runUtilFunction = makeButton(10, 300, 100, 30, "Run");
+
     if (!gmDropdownOpen && activeField == 0) {
         for (auto& btn : modeBtns)
             btn.hovered = CheckCollisionPointRec(mouse, btn.rect);
@@ -114,6 +116,7 @@ void LauncherMenu::onFrame() {
         p1Next.hovered = CheckCollisionPointRec(mouse, p1Next.rect);
         p2Prev.hovered = CheckCollisionPointRec(mouse, p2Prev.rect);
         p2Next.hovered = CheckCollisionPointRec(mouse, p2Next.rect);
+        runUtilFunction.hovered = CheckCollisionPointRec(mouse, runUtilFunction.rect);
     }
 
     // --- Handle clicks ---
@@ -137,6 +140,7 @@ void LauncherMenu::onFrame() {
         if (buttonClicked(p1Next, mouse, click)) p1TypeIdx = (p1TypeIdx + 1) % playerTypes.size();
         if (buttonClicked(p2Prev, mouse, click)) p2TypeIdx = (p2TypeIdx - 1 + (int)playerTypes.size()) % playerTypes.size();
         if (buttonClicked(p2Next, mouse, click)) p2TypeIdx = (p2TypeIdx + 1) % playerTypes.size();
+        if (buttonClicked(runUtilFunction, mouse, click)) Utils::runCode();
     }
 
     // --- Text input field interaction ---

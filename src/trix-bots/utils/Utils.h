@@ -10,6 +10,7 @@
 #include "game-suite/Board.h"
 #include "../mcts/MCTS_Structs.h"
 #include "../mcts/Toggles.h"
+#include "GeneratorComparer.h"
 
 class Utils
 {

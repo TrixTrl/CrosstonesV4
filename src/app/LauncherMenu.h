@@ -3,6 +3,7 @@
 #include "AppRegistry.h"
 #include <string>
 #include <vector>
+#include "../trix-bots/utils/Utils.h"
 
 class LauncherMenu : public App {
 public:
