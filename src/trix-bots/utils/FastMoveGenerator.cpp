@@ -1,6 +1,6 @@
 #include "FastMoveGenerator.h"
 
-#define FAST_MOVE_DEBUG_PRINTING
+// #define FAST_MOVE_DEBUG_PRINTING
 
 std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(const uint8_t (*pieces)[13][13], bool isWhite)
 {
@@ -145,6 +145,10 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
                     continue;
                 }
                 tempComplexMove.moveFragments.emplace_back(fragment);
+            }
+            if (currentState.stepsLeft == -2)
+            {
+                tempComplexMove.isMerge = true;
             }
             applyMove(&complexMoveCopy, tempComplexMove, true);
             currentBoardState = &complexMoveCopy;
