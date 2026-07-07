@@ -1,6 +1,6 @@
 #include "FastMoveGenerator.h"
 
-// #define FAST_MOVE_DEBUG_PRINTING
+#define FAST_MOVE_DEBUG_PRINTING
 
 std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(const uint8_t (*pieces)[13][13], bool isWhite)
 {
@@ -136,8 +136,14 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
             tempComplexMove.start = std::pair<int, int>(start);
             tempComplexMove.moveFragments = std::vector<moveFragment>();
             tempComplexMove.moveFragments.reserve(inProgressMoveFragments.size());
+            bool skippedFirstFragment = false;
             for (const auto &fragment : inProgressMoveFragments)
             {
+                if (!skippedFirstFragment)
+                {
+                    skippedFirstFragment = true;
+                    continue;
+                }
                 tempComplexMove.moveFragments.emplace_back(fragment);
             }
             applyMove(&complexMoveCopy, tempComplexMove, true);
@@ -368,6 +374,10 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move, b
             while (pushingDestination != 0)
             {
                 pushingPosition = getPositionInDirection(pushingPosition, fragment.dir);
+                if (pushingPosition.first < 0 || pushingPosition.first > 12 || pushingPosition.second < 0 || pushingPosition.second > 12)
+                {
+                    throw;
+                }
                 (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
                 (*pieces)[pushingPosition.first][pushingPosition.second] |= pushingPiece;
                 // pushingPosition = std::pair<int, int>(pushingPosition.first + fragmentDelta.first, pushingPosition.second + fragmentDelta.second);

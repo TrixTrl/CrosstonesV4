@@ -22,7 +22,7 @@
 void Utils::runCode()
 {
 	compareGenerators();
-	//executionSpeedTest();
+	// executionSpeedTest();
 }
 
 void Utils::print(std::string str, bool newLine)
@@ -1557,4 +1557,17 @@ std::string Utils::convertToPosString(uint8_t (*pieces)[13][13])
 int Utils::millis()
 {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
+std::string Utils::getKey(uint8_t (*pieces)[13][13])
+{
+	std::string key = "";
+	for (int i = 0; i < 13; i++)
+	{
+		for (int j = 0; j < 13; j++)
+		{
+			key += (char)pieces[i][j];
+		}
+	}
+	return key;
 }

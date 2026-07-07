@@ -1,8 +1,11 @@
+#pragma once
+
 #include "../../utils/Utils.h"
 #include "Evaluation.h"
 #include "../../utils/TrixBoardState.h"
 #include "../../utils/FastMoveGenerator.h"
 #include <vector>
+#include "DampSockStructs.h"
 
 /*
 function alphabeta(node, depth, α, β, maximizingPlayer) is
@@ -26,4 +29,4 @@ function alphabeta(node, depth, α, β, maximizingPlayer) is
         return value
 */
 
-float alphaBeta_sockVersion(uint8_t (*pieces)[13][13], int depth, float alpha, float beta, bool maximizing);
+std::pair<bool, float> alphaBeta_sockVersion(uint8_t (*pieces)[13][13], int depth, float alpha, float beta, bool maximizing, std::map<std::string, DampNode> &table, int endOfThinkingTime);

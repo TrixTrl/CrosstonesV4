@@ -8,6 +8,7 @@
 #include "trix-bots/bot-code/TheFirst.h"
 #include "trix-bots/bot-code/Hydra.h"
 #include "trix-bots/bot-code/AlphaCruncher.h"
+#include "trix-bots/bot-code/damp-sock/DampSock.h"
 #include <string>
 #include <bitset>
 #include <cstring>
@@ -22,6 +23,8 @@ Player* GameApp::createPlayer(const std::string& type, int param,
         return new Deepchad(param);
     } else if (type == "AlphaCruncher") {
         return new AlphaCruncher(param);
+    } else if (type == "DampSock") {
+        return new DampSock(param);
     } else if (type == "Hydra") {
         return new Hydra(param, 14);
     } else if (type == "TheFirst") {

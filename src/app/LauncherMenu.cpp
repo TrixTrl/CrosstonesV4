@@ -41,7 +41,7 @@ void LauncherMenu::drawArrowButton(const Button& btn) {
 }
 
 void LauncherMenu::onStart() {
-    playerTypes = {"Deepchad", "AlphaCruncher", "Hydra", "TheFirst", "ManualPlayer"};
+    playerTypes = {"Deepchad", "AlphaCruncher", "DampSock", "Hydra", "TheFirst", "ManualPlayer"};
 
     auto findType = [&](const std::string& name) -> int {
         for (size_t i = 0; i < playerTypes.size(); i++)

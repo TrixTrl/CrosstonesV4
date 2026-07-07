@@ -160,4 +160,6 @@ public:
 			}
 		}
 	};
+
+	static std::string getKey(uint8_t (*pieces)[13][13]);
 };
