@@ -9,16 +9,20 @@
 class MoveExplorerApp : public App {
 protected:
     void onStart()  override;
-    void onTick(float) override;
+    void onTick(float, const InputState&) override;
     void onDraw(Rectangle) override;
     void onDrawOverlay(Rectangle) override;
 
 private:
+    struct State {
+        int presetIdx = 0;
+        int moveIdx = 0;
+        bool paused = false;
+        int autoTimer = 0;
+    };
+    State state;
+
     Board board;
     ui::Board boardView;
-    int presetIdx = 0;
-    int moveIdx = 0;
-    bool paused = false;
-    int autoTimer = 0;
     ui::Dropdown dropdown;
 };

@@ -1,7 +1,7 @@
 #include "opening_explorer.h"
 #include "raylib.h"
-#include "raygui.h"
 #include "app/FontManager.h"
+#include "app/ui/components/panel.h"
 #include <fstream>
 #include <sstream>
 #include <bitset>
@@ -98,9 +98,9 @@ void OpeningExplorer::onStart() {
     };
 
     loadAndBuildTree();
+    phase = ExplorerPhase::ChoosingMode;
     selectedGameMode = -1;
-    buildMoveList();
-    buildMoveHistory();
+    onBoardStateChanged();
 }
 
 // ── loadAndBuildTree ─────────────────────────────────────────────────
@@ -200,7 +200,7 @@ static const char* modeNames[] = {
 void OpeningExplorer::buildMoveList() {
     moveList.entries.clear();
 
-    if (selectedGameMode < 0) {
+    if (phase == ExplorerPhase::ChoosingMode) {
         for (int i = 0; i < 8; i++) {
             ui::MoveEntry e;
             e.label = modeNames[i];
@@ -257,7 +257,7 @@ void OpeningExplorer::buildMoveHistory() {
 
     ui::HistoryRow r0;
     r0.moveNumber = 0;
-    if (selectedGameMode < 0) {
+    if (phase == ExplorerPhase::ChoosingMode) {
         r0.white = "<choose mode>";
         r0.black = "";
         moveHistory.rows.push_back(r0);
@@ -286,18 +286,23 @@ void OpeningExplorer::buildMoveHistory() {
 
 // ── navigation ──────────────────────────────────────────────────────
 
+void OpeningExplorer::onBoardStateChanged() {
+    buildMoveList();
+    buildMoveHistory();
+}
+
 void OpeningExplorer::playMove(int candidateIdx) {
     if (candidateIdx < 0 || candidateIdx >= (int)moveList.entries.size()) return;
 
-    if (selectedGameMode < 0) {
+    if (phase == ExplorerPhase::ChoosingMode) {
         if (candidateIdx >= 8) return;
         selectedGameMode = candidateIdx;
         lastSelectedMode = selectedGameMode;
+        phase = ExplorerPhase::Exploring;
         initBoardAtRoot(selectedGameMode);
         currentNode = &root;
         syncBoard();
-        buildMoveList();
-        buildMoveHistory();
+        onBoardStateChanged();
         return;
     }
 
@@ -324,18 +329,17 @@ void OpeningExplorer::playMove(int candidateIdx) {
     currentNode = nextNode;
     syncBoard();
 
-    buildMoveList();
-    buildMoveHistory();
+    onBoardStateChanged();
 }
 
 void OpeningExplorer::navigateBackTo(int historyRow) {
-    if (historyRow == 0 && selectedGameMode >= 0) {
+    if (historyRow == 0 && phase == ExplorerPhase::Exploring) {
+        phase = ExplorerPhase::ChoosingMode;
         selectedGameMode = -1;
         navPath.clear();
         currentNode = &root;
         initBoardAtRoot(lastSelectedMode);
-        buildMoveList();
-        buildMoveHistory();
+        onBoardStateChanged();
         return;
     }
     if (historyRow < 0) return;
@@ -352,7 +356,7 @@ void OpeningExplorer::undoToMoveCount(int targetMoves) {
     navPath.resize(targetMoves);
 
     Board b;
-    int gm = (selectedGameMode >= 0) ? selectedGameMode : 2;
+    int gm = (phase == ExplorerPhase::Exploring) ? selectedGameMode : 2;
     std::bitset<3> set(gm);
     b.rst(set);
     std::string pos = rootPos;
@@ -372,12 +376,11 @@ void OpeningExplorer::undoToMoveCount(int targetMoves) {
     board = std::move(b);
     syncBoard();
 
-    buildMoveList();
-    buildMoveHistory();
+    onBoardStateChanged();
 }
 
 std::string OpeningExplorer::getOpeningName() const {
-    if (selectedGameMode < 0) return "Select game mode";
+    if (phase == ExplorerPhase::ChoosingMode) return "Select game mode";
     std::string name;
     for (auto& step : navPath)
         if (step.node && !step.node->name.empty())
@@ -387,18 +390,11 @@ std::string OpeningExplorer::getOpeningName() const {
 
 // ── onTick ──────────────────────────────────────────────────────────
 
-void OpeningExplorer::onTick(float dt) {
-    Vector2 mouse = GetMousePosition();
-    bool click = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+void OpeningExplorer::onTick(float dt, const InputState& input) {
+    Vector2 mouse = input.mouse;
+    bool click = input.clicked;
 
-    float s = theme.scale;
-    ui::Slot* histSlot = layout.find("history");
-    ui::Slot* movesSlot = layout.find("moves");
-    int histY = (int)histSlot->rect.y + (int)(28 * s);
-    int histEnd = (int)histSlot->rect.y + (int)(28 * s) + moveHistory.totalHeight(theme) + (int)(4 * s);
-    int listY = histEnd + (int)(32 * s) + theme.fontSizeSmall + (int)(6 * s);
-    int rightX = (int)histSlot->rect.x;
-    int rightW = (int)histSlot->rect.width;
+    HitRects hr = computeHitRects();
 
     // ── keyboard navigation ──
     {
@@ -435,36 +431,32 @@ void OpeningExplorer::onTick(float dt) {
             if (moveList.hoveredIdx >= 0 && moveList.hoveredIdx < (int)moveList.entries.size())
                 playMove(moveList.hoveredIdx);
         } else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
-            if (selectedGameMode >= 0 && navPath.empty())
+            if (phase == ExplorerPhase::Exploring && navPath.empty())
                 navigateBackTo(0);
             else if (!navPath.empty())
                 undoToMoveCount((int)navPath.size() - 1);
         } else if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE) || IsKeyPressed(KEY_DELETE)) {
+            phase = ExplorerPhase::ChoosingMode;
             selectedGameMode = -1;
             navPath.clear();
             currentNode = &root;
             initBoardAtRoot(lastSelectedMode);
-            buildMoveList();
-            buildMoveHistory();
+            onBoardStateChanged();
         }
     }
 
     // ── mouse: move list clicks ──
     {
-        int listX = rightX + (int)(12 * s);
-        int listW = rightW - (int)(24 * s);
         int n = (int)moveList.entries.size();
-        int listAreaTop = listY;
-        int listAreaBot = (int)(movesSlot->rect.y + movesSlot->rect.height);
-        bool mouseInList = mouse.x >= listX && mouse.x < listX + listW &&
-                           mouse.y >= listAreaTop && mouse.y < listAreaBot;
+        bool mouseInList = mouse.x >= hr.listX && mouse.x < hr.listX + hr.listW &&
+                           mouse.y >= hr.listY && mouse.y < hr.listAreaBot;
 
         if (mouseInList) {
             moveList.hoveredIdx = -1;
             for (int i = 0; i < n; i++) {
-                int ry = listY + i * theme.itemH - (int)scrollArea.scroll.y;
-                if (ry + theme.itemH < listAreaTop || ry > listAreaBot) continue;
-                Rectangle r = {(float)listX, (float)ry, (float)listW, (float)theme.itemH};
+                int ry = hr.listY + i * theme.itemH + (int)scrollArea.scroll.y;
+                if (ry + theme.itemH < hr.listY || ry > hr.listAreaBot) continue;
+                Rectangle r = {(float)hr.listX, (float)ry, (float)hr.listW, (float)theme.itemH};
                 if (CheckCollisionPointRec(mouse, r)) {
                     moveList.hoveredIdx = i;
                     keyboardHoverActive = false;
@@ -478,33 +470,28 @@ void OpeningExplorer::onTick(float dt) {
 
     // ── mouse: history clicks ──
     {
-        if (click && mouse.x >= rightX && mouse.x < rightX + rightW)
+        if (click && mouse.x >= hr.right.x && mouse.x < hr.right.x + hr.right.width)
             keyboardHoverActive = false;
 
-        int histX = rightX + (int)(12 * s);
-        int histBaseY = (int)histSlot->rect.y + (int)(28 * s);
-        int histW = rightW - (int)(24 * s);
         int n = (int)moveHistory.rows.size();
-        int indent = (int)(12 * s);
-        int colSplit = histX + indent + (histW - indent * 2) / 2;
 
         moveHistory.hoveredIdx = -1;
         moveHistory.hoveredCell = -1;
         for (int i = 0; i < n; i++) {
-            int ry = histBaseY + i * theme.itemH;
+            int ry = hr.histY + i * theme.itemH;
 
-            Rectangle whiteRect = {(float)histX, (float)ry, (float)(colSplit - histX), (float)theme.itemH};
+            Rectangle whiteRect = {(float)hr.histX, (float)ry, (float)(hr.colSplit - hr.histX), (float)theme.itemH};
             if (CheckCollisionPointRec(mouse, whiteRect)) {
                 moveHistory.hoveredIdx = i;
                 moveHistory.hoveredCell = 0;
                 if (click) {
                     if (i == 0) {
-                        if (selectedGameMode >= 0) {
+                        if (phase == ExplorerPhase::Exploring) {
+                            phase = ExplorerPhase::ChoosingMode;
                             selectedGameMode = -1;
                             navPath.clear();
                             currentNode = &root;
-                            buildMoveList();
-                            buildMoveHistory();
+                            onBoardStateChanged();
                         }
                     } else {
                         int targetMoves = (i - 1) * 2 + 1;
@@ -516,7 +503,7 @@ void OpeningExplorer::onTick(float dt) {
             }
 
             if (!moveHistory.rows[i].black.empty()) {
-                Rectangle blackRect = {(float)colSplit, (float)ry, (float)(histX + histW - colSplit), (float)theme.itemH};
+                Rectangle blackRect = {(float)hr.colSplit, (float)ry, (float)(hr.histX + hr.histW - hr.colSplit), (float)theme.itemH};
                 if (CheckCollisionPointRec(mouse, blackRect)) {
                     moveHistory.hoveredIdx = i;
                     moveHistory.hoveredCell = 1;
@@ -536,19 +523,13 @@ void OpeningExplorer::onTick(float dt) {
         }
     }
 
-    // ── mouse wheel ──
-    {
-        float wheel = GetMouseWheelMove();
-        if (wheel != 0) {
-            int totalH = moveList.totalHeight(theme);
-            int visibleH = (int)(movesSlot->rect.y + movesSlot->rect.height - listY);
-            if (visibleH > 0) {
-                float maxScroll = (std::max)(0, totalH - visibleH);
-                scrollArea.scroll.y = (std::max)(0.0f, (std::min)(maxScroll,
-                    scrollArea.scroll.y - wheel * theme.itemH * 3));
-            }
-        }
-    }
+    // Mouse wheel and scrollbar-drag scrolling are both handled internally
+    // by GuiScrollPanel (called from ScrollArea::begin in onDrawOverlay) —
+    // it owns scrollArea.scroll.y entirely. A second, independently
+    // computed wheel handler here used to fight it every frame (both would
+    // add their own delta to the same value on the same GetMouseWheelMove()
+    // reading, then GuiScrollPanel's clamp would win), which is why drag
+    // and wheel scrolling didn't work.
 
     // ── highlights / preview ──
     int mlHover = moveList.hoveredIdx;
@@ -556,7 +537,7 @@ void OpeningExplorer::onTick(float dt) {
     // Determine history hover ply (-2 = none, -1 = root, >=0 = ply)
     int histPly = -2;
     if (moveHistory.hoveredIdx >= 0 && moveHistory.hoveredCell >= 0) {
-        if (moveHistory.hoveredIdx == 0 && selectedGameMode >= 0 && !navPath.empty()) {
+        if (moveHistory.hoveredIdx == 0 && phase == ExplorerPhase::Exploring && !navPath.empty()) {
             histPly = -1;  // root state
         } else if (moveHistory.hoveredIdx >= 1) {
             int ply = (moveHistory.hoveredIdx - 1) * 2 + moveHistory.hoveredCell;
@@ -566,7 +547,7 @@ void OpeningExplorer::onTick(float dt) {
     }
 
     // Mode choice hover
-    bool modeChoiceHover = selectedGameMode < 0 && mlHover >= 0 && mlHover < 8;
+    bool modeChoiceHover = phase == ExplorerPhase::ChoosingMode && mlHover >= 0 && mlHover < 8;
     int previewKey = modeChoiceHover ? (1000 + mlHover) : (histPly >= -1 ? histPly : -2);
 
     // Preview transition
@@ -639,10 +620,41 @@ void OpeningExplorer::onTick(float dt) {
 // ── onDraw ──────────────────────────────────────────────────────────
 
 void OpeningExplorer::onDraw(Rectangle rect) {
-    resolveLayout(rect);
-
     ui::Slot* boardSlot = layout.find("board");
     boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+}
+
+// ── computeHitRects ──────────────────────────────────────────────────
+// Shared by onTick (hit-testing) and onDrawOverlay (drawing) so the two
+// never drift out of sync the way they previously could (each recomputed
+// the same rects independently).
+
+OpeningExplorer::HitRects OpeningExplorer::computeHitRects() {
+    float s = theme.scale;
+    ui::Slot* histSlot = layout.find("history");
+    ui::Slot* movesSlot = layout.find("moves");
+    ui::Slot* rightSlot = layout.find("right");
+
+    HitRects hr{};
+    hr.right = rightSlot ? rightSlot->rect : Rectangle{0, 0, 0, 0};
+    int rightX = (int)hr.right.x;
+    int rightW = (int)hr.right.width;
+
+    hr.histX = rightX + (int)(12 * s);
+    hr.histY = histSlot ? (int)histSlot->rect.y + (int)(28 * s) : 0;
+    hr.histW = rightW - (int)(24 * s);
+    int indent = (int)(12 * s);
+    hr.colSplit = hr.histX + indent + (hr.histW - indent * 2) / 2;
+
+    hr.histEnd = hr.histY + moveHistory.totalHeight(theme) + (int)(4 * s);
+
+    hr.listHeaderY = hr.histEnd + (int)(32 * s);
+    hr.listX = hr.histX;
+    hr.listW = hr.histW;
+    hr.listY = hr.listHeaderY + theme.fontSizeSmall + (int)(6 * s);
+    hr.listAreaBot = movesSlot ? (int)(movesSlot->rect.y + movesSlot->rect.height) : hr.listY;
+
+    return hr;
 }
 
 // ── onDrawOverlay ────────────────────────────────────────────────────
@@ -652,39 +664,30 @@ void OpeningExplorer::onDrawOverlay(Rectangle rect) {
     float w = rect.width;
     float leftEdge = rect.x;
 
-    ui::Slot* histSlot = layout.find("history");
-    ui::Slot* movesSlot = layout.find("moves");
-    ui::Slot* rightSlot = layout.find("right");
-    int rightX = (int)rightSlot->rect.x;
-    int rightW = (int)rightSlot->rect.width;
+    HitRects hr = computeHitRects();
 
-    GuiPanel(rightSlot->rect, "");
+    ui::Panel::draw(hr.right, "", theme);
 
-    int x = rightX + (int)(12 * s);
-    int ww = rightW - (int)(24 * s);
-
-    DrawAppText("Moves played", (float)x, (float)histSlot->rect.y + 8 * s,
+    DrawAppText("Moves played", (float)hr.histX, (float)hr.histY - 20 * s,
                 (float)theme.fontSizeSmall, theme.textSection);
-    moveHistory.draw(x, (int)histSlot->rect.y + (int)(28 * s), ww, theme);
+    moveHistory.draw(hr.histX, hr.histY, hr.histW, theme);
 
-    int histEnd = (int)histSlot->rect.y + (int)(28 * s) + moveHistory.totalHeight(theme) + (int)(4 * s);
-    DrawLine(x, histEnd, x + ww, histEnd, theme.border);
+    DrawLine(hr.histX, hr.histEnd, hr.histX + hr.histW, hr.histEnd, theme.border);
 
-    DrawAppText(getOpeningName().c_str(), (float)x, (float)(histEnd + 8 * s),
+    DrawAppText(getOpeningName().c_str(), (float)hr.histX, (float)(hr.histEnd + 8 * s),
                 (float)theme.fontSizeTitle, theme.textAccent);
 
-    int listHeaderY = (int)(histEnd + 32 * s);
-    DrawAppText("Next moves", (float)x, (float)listHeaderY,
+    DrawAppText("Next moves", (float)hr.histX, (float)hr.listHeaderY,
                 (float)theme.fontSizeSmall, theme.textSection);
     float evalW = MeasureAppText("-0.00", (float)theme.fontSizeSmall);
-    DrawAppText("Eval", (float)(x + ww - evalW - 4 * s), (float)listHeaderY,
+    DrawAppText("Eval", (float)(hr.histX + hr.histW - evalW - 4 * s), (float)hr.listHeaderY,
                 (float)theme.fontSizeSmall, theme.textDim);
 
-    int listY = listHeaderY + theme.fontSizeSmall + (int)(6 * s);
-    int clipH = (int)(movesSlot->rect.y + movesSlot->rect.height - listY);
-    BeginScissorMode(rightX, listY, rightW, clipH);
-    moveList.draw(x, listY - (int)scrollArea.scroll.y, ww, theme);
-    EndScissorMode();
+    Rectangle scrollBounds = { (float)hr.listX, (float)hr.listY, (float)hr.listW,
+                               (float)(hr.listAreaBot - hr.listY) };
+    Rectangle view = scrollArea.begin(scrollBounds, moveList.totalHeight(theme));
+    moveList.draw((int)view.x, (int)view.y + (int)scrollArea.scroll.y, (int)view.width, theme);
+    scrollArea.end();
 
     // Analysis panel
     ui::Slot* analysisSlot = layout.find("analysis");

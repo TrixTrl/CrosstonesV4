@@ -1,8 +1,10 @@
 #include "dropdown.h"
 #include "app/FontManager.h"
-#include "app/ui/popup.h"
+#include "app/ui/overlay.h"
 #include <vector>
 #include <algorithm>
+#include <cstdint>
+#include <string>
 
 namespace ui {
 
@@ -19,12 +21,14 @@ void Dropdown::draw(Rectangle rect, std::span<const std::string_view> items, con
 
     if (open && !items.empty()) {
         std::vector<std::string_view> itemsCopy(items.begin(), items.end());
-        schedulePopupDraw([this, rect, itemsCopy, t]() {
+        int hoveredSnapshot = hoveredIdx;
+        std::string id = std::to_string(reinterpret_cast<std::uintptr_t>(this));
+        overlayPush(id, [rect, itemsCopy, hoveredSnapshot](const Theme& t) {
             for (int p = 0; p < (int)itemsCopy.size(); p++) {
                 Rectangle optRect = { rect.x, rect.y + rect.height + p * rect.height, rect.width, rect.height };
-                DrawRectangleRec(optRect, hoveredIdx == p ? t.panelHover : t.panelActive);
+                DrawRectangleRec(optRect, hoveredSnapshot == p ? t.panelHover : t.panelActive);
                 DrawRectangleLinesEx(optRect, 1, t.border);
-                DrawAppText(itemsCopy[p].data(), optRect.x + 10 * t.scale, optRect.y + 5 * t.scale, (float)t.fontSize, hoveredIdx == p ? WHITE : t.textDim);
+                DrawAppText(itemsCopy[p].data(), optRect.x + 10 * t.scale, optRect.y + 5 * t.scale, (float)t.fontSize, hoveredSnapshot == p ? WHITE : t.textDim);
             }
         });
     }

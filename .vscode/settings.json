@@ -6,9 +6,20 @@
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.configureSettings": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "C:/Users/knoef/AppData/Local/vcpkg/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_C_COMPILER": "cl.exe"
+        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_CXX_COMPILER": "C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe",
+        "CMAKE_C_COMPILER": "C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/ProgramData/chocolatey/lib/ninja/tools/ninja.exe"
     },
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+    "cmake.environment": {
+        "PATH": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64;C:\\Program Files\\CMake\\bin;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64;${env:PATH}",
+        "INCLUDE": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.51.36231\\include;C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\um;C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\winrt",
+        "LIB": "C:\\Program Files (x86)\\Microsoft Visual Studio\\18\\BuildTools\\VC\\Tools\\MSVC\\14.51.36231\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.26100.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.26100.0\\um\\x64"
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.exclude": {
+        "**/*.sln": true,
+        "**/*.vcxproj": true,
+        "**/*.vcxproj.filters": true
+    }
 }

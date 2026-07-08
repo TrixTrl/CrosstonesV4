@@ -1,6 +1,6 @@
 #include "GameViewerApp.h"
 #include "raylib.h"
-#include "raygui.h"
+#include "ui/components/panel.h"
 #include <string>
 #include <sstream>
 #include <bitset>
@@ -65,46 +65,43 @@ void GameViewerApp::onStart() {
         entries.push_back({s.name, buildGameCode(pos, s.moves)});
     }
 
-    presetIdx = 0;
+    state = State{};
     if (!loadedPosition.displayName.empty()) {
         for (size_t i = 0; i < entries.size(); i++) {
             if (entries[i].name == loadedPosition.displayName) {
-                presetIdx = (int)i;
+                state.presetIdx = (int)i;
                 break;
             }
         }
     }
 
     if (!entries.empty())
-        parseAndLoadGame(entries[presetIdx].gameCode);
-    currentMove = 0;
+        parseAndLoadGame(entries[state.presetIdx].gameCode);
+    state.currentMove = 0;
 }
 
-void GameViewerApp::onTick(float dt) {
+void GameViewerApp::onTick(float dt, const InputState& input) {
     if (entries.empty()) return;
-
-    Vector2 mouse = GetMousePosition();
-    bool click = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 
     if (!dropdown.open) {
         if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
-            if (currentMove < (int)gameReplay.size()) {
-                board.unsafeMakeMove(gameReplay[currentMove]);
+            if (state.currentMove < (int)gameReplay.size()) {
+                board.unsafeMakeMove(gameReplay[state.currentMove]);
                 board.copyPositionTo(boardView.position());
-                currentMove++;
+                state.currentMove++;
             }
         }
         if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
-            if (currentMove > 0) {
-                board.unsafeMakeMove(gameReplay[currentMove - 1]);
+            if (state.currentMove > 0) {
+                board.unsafeMakeMove(gameReplay[state.currentMove - 1]);
                 board.copyPositionTo(boardView.position());
-                currentMove--;
+                state.currentMove--;
             }
         }
         if (IsKeyPressed(KEY_BACKSPACE)) {
-            while (currentMove > 0) {
-                board.unsafeMakeMove(gameReplay[currentMove - 1]);
-                currentMove--;
+            while (state.currentMove > 0) {
+                board.unsafeMakeMove(gameReplay[state.currentMove - 1]);
+                state.currentMove--;
             }
             board.copyPositionTo(boardView.position());
         }
@@ -113,30 +110,30 @@ void GameViewerApp::onTick(float dt) {
     bool presetChanged = false;
     int numEntries = (int)entries.size();
     if (IsKeyPressed(KEY_LEFT_BRACKET)) {
-        presetIdx = (presetIdx - 1 + numEntries) % numEntries;
+        state.presetIdx = (state.presetIdx - 1 + numEntries) % numEntries;
         presetChanged = true;
     } else if (IsKeyPressed(KEY_RIGHT_BRACKET) || IsKeyPressed(KEY_TAB)) {
-        presetIdx = (presetIdx + 1) % numEntries;
+        state.presetIdx = (state.presetIdx + 1) % numEntries;
         presetChanged = true;
     }
 
     Rectangle panelRect = layout.find("panel")->rect;
     Rectangle dropdownRect = { panelRect.x, 20.0f * theme.scale, panelRect.width, (float)theme.itemH };
-    int sel = dropdown.handleInput(dropdownRect, mouse, click, numEntries);
+    int sel = dropdown.handleInput(dropdownRect, input.mouse, input.clicked, numEntries);
     if (sel >= 0) {
-        presetIdx = sel;
+        state.presetIdx = sel;
         presetChanged = true;
     }
 
     if (presetChanged) {
-        parseAndLoadGame(entries[presetIdx].gameCode);
-        currentMove = 0;
+        parseAndLoadGame(entries[state.presetIdx].gameCode);
+        state.currentMove = 0;
     }
 
     // Build highlights
     bool hl[13][13]{};
-    if (currentMove > 0) {
-        for (const auto& xm : gameReplay[currentMove - 1]) {
+    if (state.currentMove > 0) {
+        for (const auto& xm : gameReplay[state.currentMove - 1]) {
             if (xm.i >= 0 && xm.i < 13 && xm.j >= 0 && xm.j < 13)
                 hl[xm.i][xm.j] = true;
         }
@@ -145,14 +142,13 @@ void GameViewerApp::onTick(float dt) {
 }
 
 void GameViewerApp::onDraw(Rectangle rect) {
-    resolveLayout(rect);
     ui::Slot* boardSlot = layout.find("board");
     boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
 }
 
 void GameViewerApp::onDrawOverlay(Rectangle rect) {
     auto& r = layout.find("panel")->rect;
-    GuiPanel(r, "Game");
+    ui::Panel::draw(r, "Game", theme);
 
     std::vector<std::string_view> entryNames;
     for (auto& e : entries)
@@ -161,7 +157,7 @@ void GameViewerApp::onDrawOverlay(Rectangle rect) {
     dropdown.draw(dropdownRect, entryNames, theme);
 
     if (gameReplay.size() > 0) {
-        std::string moveInfo = "Move: " + std::to_string(currentMove) +
+        std::string moveInfo = "Move: " + std::to_string(state.currentMove) +
                                " / " + std::to_string(gameReplay.size());
         drawText(moveInfo.c_str(), (int)r.x, (int)(r.y + 56 * theme.scale), (int)theme.fontSizeTitle, theme.text);
     } else {

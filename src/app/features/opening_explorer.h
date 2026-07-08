@@ -13,7 +13,7 @@
 class OpeningExplorer : public App {
 protected:
     void onStart() override;
-    void onTick(float) override;
+    void onTick(float, const InputState&) override;
     void onDraw(Rectangle) override;
     void onDrawOverlay(Rectangle) override;
 
@@ -41,6 +41,8 @@ private:
     };
     std::vector<NavStep> navPath;
 
+    enum class ExplorerPhase { ChoosingMode, Exploring };
+    ExplorerPhase phase = ExplorerPhase::ChoosingMode;
     int selectedGameMode = -1;
     int lastSelectedMode = 0;
 
@@ -52,11 +54,25 @@ private:
 
     void buildMoveList();
     void buildMoveHistory();
+    // The only place that calls buildMoveList()+buildMoveHistory() — every
+    // board/nav mutation calls this once at its exit point instead of
+    // copy-pasting the pair (previously duplicated at 7 call sites).
+    void onBoardStateChanged();
     void playMove(int candidateIdx);
     void navigateBackTo(int historyRow);
     void undoToMoveCount(int targetMoves);
 
     std::string getOpeningName() const;
+
+    // Rect math shared by onTick (hit-testing) and onDrawOverlay (drawing) —
+    // computed once per frame from each call site instead of two
+    // independently maintained copies of the same formulas.
+    struct HitRects {
+        Rectangle right;
+        int histX, histY, histW, colSplit, histEnd;
+        int listHeaderY, listX, listY, listW, listAreaBot;
+    };
+    HitRects computeHitRects();
 
     float navCooldown = 0;
     bool keyboardHoverActive = false;

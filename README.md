@@ -29,17 +29,6 @@ build\Debug\crosstones_executable.exe
 
 The launcher window lets you pick a game mode, configure players (type + depth/time), and select rulesets.
 
-### CLI mode
-
-```cmd
-crosstones_executable game --p1 ManualPlayer 0 --p2 Deepchad 4 --mode 010
-crosstones_executable explore
-crosstones_executable viewer
-crosstones_executable test
-```
-
-Persistent settings are saved to `crosstones_config.txt`.
-
 ## Modes
 
 | Mode | Description |

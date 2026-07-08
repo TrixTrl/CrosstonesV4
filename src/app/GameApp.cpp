@@ -1,14 +1,11 @@
 #include "GameApp.h"
 #include "raylib.h"
 #include "app/FontManager.h"
+#include "app/services/player_factory.h"
 #include "game-suite/ManualPlayer.h"
 #include "game-suite/GameMaster.h"
 #include "StackThread.h"
 #include "data/GamePosition.h"
-#include "felix-bots/Deepchad.h"
-#include "trix-bots/TheFirst.h"
-#include "trix-bots/Hydra.h"
-#include "trix-bots/AlphaCruncher.h"
 #include <bitset>
 #include <cstring>
 #include <string>
@@ -24,39 +21,6 @@ static const char* timestampStr() {
     static char buf[32];
     strftime(buf, sizeof(buf), "%Y%m%d-%H%M%S", &lt);
     return buf;
-}
-
-Player* GameApp::createPlayer(const std::string& type, int param, ManualPlayer** outManual) {
-    *outManual = nullptr;
-    if (type == "Deepchad") return new Deepchad(param);
-    if (type == "AlphaCruncher") return new AlphaCruncher(param);
-    if (type == "Hydra") return new Hydra(param, 14);
-    if (type == "TheFirst") return new TheFirst(param);
-    if (type == "ManualPlayer") {
-        auto* mp = new ManualPlayer(&boardView.position().pieces);
-        mp->onDisplayChanged = []{};
-        *outManual = mp;
-        return mp;
-    }
-    return new Deepchad(3);
-}
-
-static void drawRadio(Rectangle r, const char* label, bool selected, Vector2 mouse, const ui::Theme& t) {
-    Color dot;
-    if (selected) dot = {100, 200, 100, 255};
-    else dot = {128, 128, 128, 255};
-    bool hover = CheckCollisionPointRec(mouse, r);
-    if (hover) {
-        if (selected) dot = {140, 240, 140, 255};
-        else dot = {180, 180, 180, 255};
-    }
-    float cx = r.x + 10 * t.scale;
-    float cy = r.y + r.height / 2;
-    DrawCircleV({cx, cy}, 6 * t.scale, dot);
-    if (selected)
-        DrawCircleV({cx, cy}, 3 * t.scale, WHITE);
-    Color dim = {180, 180, 180, 255};
-    DrawAppText(label, r.x + 22 * t.scale, r.y + 3 * t.scale, (float)t.fontSize, selected ? WHITE : dim);
 }
 
 static const char* gameModeNames[] = {
@@ -82,9 +46,9 @@ static void buildDropdownForSource(GameApp::PosSource src, GameEntries& entries,
 // ── onStart ──
 
 void GameApp::onStart() {
-    layout = { .dir = ui::Dir::Col, .children = {
+    layout = { .dir = ui::Dir::Col, .padding = {0, 50, 0, 50}, .children = {
         { .id = "title",   .fixed = 50  },
-        { .id = "players", .fixed = 90, .dir = ui::Dir::Row, .children = {
+        { .id = "players", .fixed = 90, .dir = ui::Dir::Row, .gap = 30, .children = {
             { .id = "p1slot", .flex = 1 },
             { .id = "p2slot", .flex = 1 },
         }},
@@ -92,84 +56,95 @@ void GameApp::onStart() {
         { .id = "startbtn",.fixed = 50  },
     }};
 
-    setup.playerTypes = {"Deepchad", "AlphaCruncher", "Hydra", "TheFirst", "ManualPlayer"};
+    setup.playerTypes.clear();
+    for (auto& t : services::availablePlayerTypes()) setup.playerTypes.push_back(t.id);
     setup.p1Field.text = "3";
     setup.p1Field.commit();
     setup.p2Field.text = "3";
     setup.p2Field.commit();
 }
 
-// ── onDraw ──
+// ── layout helper (shared by onTickSetup and drawSetupForm — computed once
+// per call site rather than duplicated, to avoid the desync risk of two
+// independently-maintained copies of the same rect math) ──
 
-void GameApp::onDraw(Rectangle rect) {
-    if (phase == SETUP) {
-        drawSetupForm(rect);
-        return;
-    }
-    resolveLayout(rect);
-    auto* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
-}
-
-void GameApp::drawSetupForm(Rectangle rect) {
-    resolveLayout(rect);
+GameApp::SetupRects GameApp::computeSetupRects() {
     float s = theme.scale;
     int itemH = theme.itemH;
-    int fs = theme.fontSize;
-    int fsTitle = theme.fontSizeTitle;
-    Vector2 mouse = GetMousePosition();
-    bool click = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-    auto& setup = this->setup;
+
+    auto* p1Slot = layout.find("p1slot");
+    auto* p2Slot = layout.find("p2slot");
+    auto* posSlot = layout.find("posarea");
+    auto* startSlot = layout.find("startbtn");
+
+    Rectangle p1r = p1Slot ? p1Slot->rect : Rectangle{0, 0, 0, 0};
+    Rectangle p2r = p2Slot ? p2Slot->rect : Rectangle{0, 0, 0, 0};
+    Rectangle posr = posSlot ? posSlot->rect : Rectangle{0, 0, 0, 0};
+    Rectangle startr = startSlot ? startSlot->rect : Rectangle{0, 0, 0, 0};
+
+    SetupRects r;
+    r.p1Stepper = {p1r.x + 35 * s, p1r.y + 28 * s, 230 * s, (float)itemH};
+    r.p1Input   = {p1r.x + 40 * s, p1r.y + 63 * s, 100 * s, (float)itemH};
+    r.p2Stepper = {p2r.x + 35 * s, p2r.y + 28 * s, 230 * s, (float)itemH};
+    r.p2Input   = {p2r.x + 40 * s, p2r.y + 63 * s, 100 * s, (float)itemH};
+
+    r.startPos     = {posr.x, posr.y + 25 * s, 130 * s, 22 * s};
+    r.preset       = {posr.x + 140 * s, posr.y + 25 * s, 80 * s, 22 * s};
+    r.saved        = {posr.x + 230 * s, posr.y + 25 * s, 80 * s, 22 * s};
+    r.mainDropdown = {posr.x, posr.y + 60 * s, 300 * s, (float)(itemH - 2)};
+
+    r.startBtn = {startr.x, startr.y + 5 * s, 160 * s, 40 * s};
+    return r;
+}
+
+// ── onTick ──
+
+void GameApp::onTick(float dt, const InputState& input) {
+    if (phase == SETUP) onTickSetup(input);
+    else onTickPlaying(input);
+}
+
+void GameApp::onTickSetup(const InputState& input) {
+    Vector2 mouse = input.mouse;
+    bool click = input.clicked;
 
     std::vector<std::string_view> dropdownNames;
     int dropdownCount = 0;
     buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
 
     bool blocked = setup.mainDropdown.open || setup.p1Field.active || setup.p2Field.active;
+    SetupRects r = computeSetupRects();
 
-    auto* playersSlot = layout.find("players");
-    auto* posSlot = layout.find("posarea");
-    auto* startSlot = layout.find("startbtn");
+    ui::RadioOption posOptions[] = {
+        {r.startPos, "Start position"},
+        {r.preset,   "Preset"},
+        {r.saved,    "Saved"},
+    };
 
-    const float startX = rect.x + 50 * s;
-    const float pY = playersSlot ? playersSlot->rect.y : (rect.y + 140 * s);
-    const float posY = posSlot ? posSlot->rect.y : (rect.y + 260 * s);
-    const float startBtnY = startSlot ? startSlot->rect.y : (rect.y + 380 * s);
-
-    Rectangle p1StepperR = {startX + 35 * s, pY + 28 * s, 230 * s, (float)itemH};
-    Rectangle p2StepperR = {startX + 415 * s, pY + 28 * s, 230 * s, (float)itemH};
-    Rectangle p1InputR   = {startX + 40 * s, pY + 63 * s, 100 * s, (float)itemH};
-    Rectangle p2InputR   = {startX + 420 * s, pY + 63 * s, 100 * s, (float)itemH};
-
-    Rectangle startPosR  = {startX, posY + 25 * s, 130 * s, 22 * s};
-    Rectangle presetR    = {startX + 140 * s, posY + 25 * s, 80 * s, 22 * s};
-    Rectangle savedR     = {startX + 230 * s, posY + 25 * s, 80 * s, 22 * s};
-    Rectangle mainDropdownR = {startX, posY + 60 * s, 300 * s, (float)(itemH - 2)};
-
-    // ── Input ──
-    if (!blocked && click) {
-        auto hit = [&](Rectangle r) { return CheckCollisionPointRec(mouse, r); };
-        if (hit(startPosR) && setup.posSource != POS_START) {
+    if (!blocked) {
+        int radioSel = setup.posRadio.handleInput(posOptions, mouse, click);
+        if (radioSel == 0 && setup.posSource != POS_START) {
             setup.posSource = POS_START;
             setup.mainDropdown.selectedIdx = setup.lastGmIdx;
             setup.mainDropdown.open = false;
-            buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
-        } else if (hit(presetR) && setup.posSource != POS_PRESET) {
+        } else if (radioSel == 1 && setup.posSource != POS_PRESET) {
             setup.posSource = POS_PRESET;
             setup.gameEntries = GameEntries::loadAll();
             buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
             setup.mainDropdown.selectedIdx = (std::min)(setup.presetIdx, (std::max)(0, dropdownCount - 1));
             setup.mainDropdown.open = false;
-        } else if (hit(savedR) && setup.posSource != POS_SAVED) {
+        } else if (radioSel == 2 && setup.posSource != POS_SAVED) {
             setup.posSource = POS_SAVED;
             setup.gameEntries = GameEntries::loadAll();
             buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
             setup.mainDropdown.selectedIdx = (std::min)(setup.saveIdx, (std::max)(0, dropdownCount - 1));
             setup.mainDropdown.open = false;
         }
+    } else {
+        setup.posRadio.hoveredIdx = -1;
     }
 
-    int ddSel = setup.mainDropdown.handleInput(mainDropdownR, mouse, click, dropdownCount);
+    int ddSel = setup.mainDropdown.handleInput(r.mainDropdown, mouse, click, dropdownCount);
     if (ddSel >= 0) {
         setup.mainDropdown.selectedIdx = ddSel;
         if (setup.posSource == POS_START) setup.lastGmIdx = ddSel;
@@ -178,138 +153,85 @@ void GameApp::drawSetupForm(Rectangle rect) {
     }
 
     if (!blocked) {
-        setup.p1Stepper.handleInput(p1StepperR, mouse, click, (int)setup.playerTypes.size());
-        setup.p2Stepper.handleInput(p2StepperR, mouse, click, (int)setup.playerTypes.size());
+        setup.p1Stepper.handleInput(r.p1Stepper, mouse, click, (int)setup.playerTypes.size());
+        setup.p2Stepper.handleInput(r.p2Stepper, mouse, click, (int)setup.playerTypes.size());
     }
-    setup.p1Field.handleInput(p1InputR, mouse, click);
-    setup.p2Field.handleInput(p2InputR, mouse, click);
+    setup.p1Field.handleInput(r.p1Input, mouse, click);
+    setup.p2Field.handleInput(r.p2Input, mouse, click);
 
-    Rectangle startBtnR = {startX, startBtnY + 5 * s, 160 * s, 40 * s};
-    bool startHover = CheckCollisionPointRec(mouse, startBtnR);
-    if (!blocked && click && startHover) {
-        Parameters& p = params;
-        p.player1Type = setup.playerTypes[setup.p1Stepper.selectedIdx];
-        p.player1Param = setup.p1Field.text;
-        p.player2Type = setup.playerTypes[setup.p2Stepper.selectedIdx];
-        p.player2Param = setup.p2Field.text;
-        p.gameModeBits = (setup.posSource == POS_START) ? setup.mainDropdown.selectedIdx : setup.lastGmIdx;
-
-        if (setup.posSource == POS_PRESET || setup.posSource == POS_SAVED) {
-            auto& src = (setup.posSource == POS_PRESET) ? setup.gameEntries.presets : setup.gameEntries.saves;
-            int idx = (setup.posSource == POS_PRESET) ? setup.presetIdx : setup.saveIdx;
-            if (idx >= 0 && idx < (int)src.size()) {
-                auto& entry = src[idx];
-                loadedPosition.position = entry.position.empty() ? setup.gameEntries.rootPos : entry.position;
-                loadedPosition.moveHistory = entry.moves;
-                loadedPosition.displayName = entry.name;
-            }
-        }
-
-        phase = PLAYING;
-        layout = { .dir = ui::Dir::Col, .children = {
-            { .id = "board", .flex = 1 },
-        }};
-
-        std::bitset<3> gamemode(p.gameModeBits);
-        int p1p = p.player1Param.empty() ? 4 : std::stoi(p.player1Param);
-        int p2p = p.player2Param.empty() ? 4 : std::stoi(p.player2Param);
-        p1 = createPlayer(p.player1Type, p1p, &manualP1);
-        p2 = createPlayer(p.player2Type, p2p, &manualP2);
-
-        gameMaster = std::make_unique<GameMaster>(
-            gamemode, p1, p2, 10000, 0, boardView.position()
-        );
-
-        if (!loadedPosition.position.empty())
-            gameMaster->loadPos(loadedPosition.position);
-
-        prevBoard = boardView.position();
-        std::memset(lastMoveHighlights, 0, sizeof(lastMoveHighlights));
-
-        gameThread = std::make_unique<StackThread>([this]() {
-            gameMaster->play(stopSource.get_token(), []{}, true);
-        });
-
-        return;
+    bool startClicked = setup.startButton.handleInput(r.startBtn, mouse, click);
+    if (!blocked && startClicked) {
+        startGame();
     }
-
-    // ── Draw ──
-    Color dim = {128, 128, 128, 255};
-    std::vector<std::string_view> typeOpts;
-    for (auto& t : setup.playerTypes) typeOpts.push_back(t);
-
-    auto* titleSlot = layout.find("title");
-    DrawAppText("Game Setup", titleSlot ? (titleSlot->rect.x + 50 * s) : (rect.x + 50 * s),
-                titleSlot ? (titleSlot->rect.y + 10 * s) : (rect.y + 20 * s),
-                (float)(fsTitle * 1.5f), WHITE);
-
-    DrawAppText("Player 1 (White):", startX, pY + 5 * s, (float)fsTitle, WHITE);
-    setup.p1Stepper.draw(p1StepperR, typeOpts, theme);
-    setup.p1Field.draw(p1InputR, theme);
-    DrawAppText("depth/time", startX + 150 * s, pY + 71 * s, (float)fs, dim);
-
-    DrawAppText("Player 2 (Black):", startX + 380 * s, pY + 5 * s, (float)fsTitle, WHITE);
-    setup.p2Stepper.draw(p2StepperR, typeOpts, theme);
-    setup.p2Field.draw(p2InputR, theme);
-    DrawAppText("depth/time", startX + 530 * s, pY + 71 * s, (float)fs, dim);
-
-    DrawAppText("Position:", startX, posY + 5 * s, (float)fsTitle, WHITE);
-    drawRadio(startPosR, "Start position", setup.posSource == POS_START, mouse, theme);
-    drawRadio(presetR, "Preset", setup.posSource == POS_PRESET, mouse, theme);
-    drawRadio(savedR, "Saved", setup.posSource == POS_SAVED, mouse, theme);
-
-    if (dropdownCount == 0 && setup.posSource != POS_START) {
-        float tw = MeasureAppText("(none available)", (float)fs);
-        DrawAppText("(none available)", mainDropdownR.x + (mainDropdownR.width - tw) / 2,
-                    mainDropdownR.y + 6 * s, (float)fs, dim);
-    } else {
-        setup.mainDropdown.draw(mainDropdownR, dropdownNames, theme);
-    }
-
-    bool startHoverD = CheckCollisionPointRec(mouse, startBtnR);
-    Color btnColor = startHoverD ? Color{60, 60, 90, 255} : Color{45, 45, 65, 255};
-    DrawRectangleRec(startBtnR, btnColor);
-    DrawRectangleLinesEx(startBtnR, (int)(1 * s), Color{80, 80, 120, 255});
-    float tw = MeasureAppText("Start Game", (float)fsTitle);
-    DrawAppText("Start Game", startBtnR.x + (startBtnR.width - tw) / 2,
-                startBtnR.y + (startBtnR.height - (float)fsTitle) / 2, (float)fsTitle, WHITE);
 }
 
-void GameApp::onTick(float dt) {
-    if (phase == SETUP) return;
+void GameApp::startGame() {
+    Parameters& p = params;
+    p.player1Type = setup.playerTypes[setup.p1Stepper.selectedIdx];
+    p.player1Param = setup.p1Field.text;
+    p.player2Type = setup.playerTypes[setup.p2Stepper.selectedIdx];
+    p.player2Param = setup.p2Field.text;
+    p.gameModeBits = (setup.posSource == POS_START) ? setup.mainDropdown.selectedIdx : setup.lastGmIdx;
 
+    if (setup.posSource == POS_PRESET || setup.posSource == POS_SAVED) {
+        auto& src = (setup.posSource == POS_PRESET) ? setup.gameEntries.presets : setup.gameEntries.saves;
+        int idx = (setup.posSource == POS_PRESET) ? setup.presetIdx : setup.saveIdx;
+        if (idx >= 0 && idx < (int)src.size()) {
+            auto& entry = src[idx];
+            loadedPosition.position = entry.position.empty() ? setup.gameEntries.rootPos : entry.position;
+            loadedPosition.moveHistory = entry.moves;
+            loadedPosition.displayName = entry.name;
+        }
+    }
+
+    phase = PLAYING;
+    layout = { .dir = ui::Dir::Col, .children = {
+        { .id = "board", .flex = 1 },
+    }};
+
+    std::bitset<3> gamemode(p.gameModeBits);
+    int p1p = p.player1Param.empty() ? 4 : std::stoi(p.player1Param);
+    int p2p = p.player2Param.empty() ? 4 : std::stoi(p.player2Param);
+    play.p1 = services::createPlayer(p.player1Type, p1p, &boardView.position(), &play.manualP1);
+    play.p2 = services::createPlayer(p.player2Type, p2p, &boardView.position(), &play.manualP2);
+
+    play.gameMaster = std::make_unique<GameMaster>(
+        gamemode, play.p1, play.p2, 10000, 0, boardView.position()
+    );
+
+    if (!loadedPosition.position.empty())
+        play.gameMaster->loadPos(loadedPosition.position);
+
+    play.prevBoard = boardView.position();
+    std::memset(play.lastMoveHighlights, 0, sizeof(play.lastMoveHighlights));
+
+    play.gameThread = std::make_unique<StackThread>([this]() {
+        play.gameMaster->play(play.stopSource.get_token(), []{}, true);
+    });
+}
+
+void GameApp::onTickPlaying(const InputState& input) {
     // Merge highlights
     bool merged[13][13]{};
     for (int x = 0; x < 13; x++)
         for (int y = 0; y < 13; y++) {
-            bool mh = (manualP1 && manualP1->cellHighlights[x][y]) ||
-                       (manualP2 && manualP2->cellHighlights[x][y]);
-            merged[x][y] = lastMoveHighlights[x][y] || mh;
+            bool mh = (play.manualP1 && play.manualP1->cellHighlights[x][y]) ||
+                       (play.manualP2 && play.manualP2->cellHighlights[x][y]);
+            merged[x][y] = play.lastMoveHighlights[x][y] || mh;
         }
 
     boardView.setHighlights(merged);
     boardView.setMoveInfo(nullptr);
-}
 
-void GameApp::onDrawOverlay(Rectangle rect) {
+    // Save button hover/click (drawn in onDrawOverlay)
     float s = theme.scale;
-    if (phase == SETUP) return;
-
-    // Save button
-    Rectangle btnRect = {rect.x + rect.width - 120 * s, rect.y + 8 * s, 110 * s, 28 * s};
-    bool hover = CheckCollisionPointRec(GetMousePosition(), btnRect);
-    bool clicked = hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-
-    Color btnColor = hover ? Color{80, 80, 120, 255} : Color{55, 55, 80, 255};
-    DrawRectangleRec(btnRect, btnColor);
-    DrawRectangleLinesEx(btnRect, (int)(1 * s), Color{100, 100, 150, 255});
-    float tw = MeasureAppText("Save Position", (float)theme.fontSize);
-    DrawAppText("Save Position", btnRect.x + (btnRect.width - tw) / 2,
-                btnRect.y + 7 * s, (float)theme.fontSize, WHITE);
+    Rectangle contentRect = layout.rect;
+    Rectangle btnRect = {contentRect.x + contentRect.width - 120 * s, contentRect.y + 8 * s, 110 * s, 28 * s};
+    bool clicked = play.saveButton.handleInput(btnRect, input.mouse, input.clicked);
 
     if (clicked || IsKeyPressed(KEY_F5)) {
-        if (gameMaster) {
-            auto& record = gameMaster->getBoard().gameRecord;
+        if (play.gameMaster) {
+            auto& record = play.gameMaster->getBoard().gameRecord;
             std::string name;
             if (params.player1Type == "ManualPlayer" && params.player2Type == "ManualPlayer") {
                 name = std::string("Human Game ") + timestampStr();
@@ -330,25 +252,102 @@ void GameApp::onDrawOverlay(Rectangle rect) {
             entry.player2 = params.player2Type;
             entry.moves = moves;
             GameEntries::appendSave(entry);
-            saveFlashTimer = 120;
+            play.saveFlashTimer = 120;
         }
     }
 
-    if (saveFlashTimer > 0) {
-        float alpha = (std::min)(saveFlashTimer / 60.0f, 1.0f);
-        Color flashColor = {100, 200, 100, (unsigned char)(alpha * 255)};
+    if (play.saveFlashTimer > 0) play.saveFlashTimer--;
+}
+
+// ── onDraw ──
+
+void GameApp::onDraw(Rectangle rect) {
+    if (phase == SETUP) {
+        drawSetupForm(rect);
+        return;
+    }
+    auto* boardSlot = layout.find("board");
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+}
+
+void GameApp::drawSetupForm(Rectangle rect) {
+    float s = theme.scale;
+    int fs = theme.fontSize;
+    int fsTitle = theme.fontSizeTitle;
+
+    std::vector<std::string_view> dropdownNames;
+    int dropdownCount = 0;
+    buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
+
+    SetupRects r = computeSetupRects();
+
+    Color dim = {128, 128, 128, 255};
+    std::vector<std::string_view> typeOpts;
+    for (auto& t : setup.playerTypes) typeOpts.push_back(t);
+
+    auto* titleSlot = layout.find("title");
+    Rectangle titleR = titleSlot ? titleSlot->rect : rect;
+    DrawAppText("Game Setup", titleR.x, titleR.y + 10 * s, (float)(fsTitle * 1.5f), WHITE);
+
+    auto* p1Slot = layout.find("p1slot");
+    auto* p2Slot = layout.find("p2slot");
+    Rectangle p1r = p1Slot ? p1Slot->rect : rect;
+    Rectangle p2r = p2Slot ? p2Slot->rect : rect;
+
+    DrawAppText("Player 1 (White):", p1r.x, p1r.y + 5 * s, (float)fsTitle, WHITE);
+    setup.p1Stepper.draw(r.p1Stepper, typeOpts, theme);
+    setup.p1Field.draw(r.p1Input, theme);
+    DrawAppText("depth/time", p1r.x + 150 * s, p1r.y + 71 * s, (float)fs, dim);
+
+    DrawAppText("Player 2 (Black):", p2r.x, p2r.y + 5 * s, (float)fsTitle, WHITE);
+    setup.p2Stepper.draw(r.p2Stepper, typeOpts, theme);
+    setup.p2Field.draw(r.p2Input, theme);
+    DrawAppText("depth/time", p2r.x + 150 * s, p2r.y + 71 * s, (float)fs, dim);
+
+    auto* posSlot = layout.find("posarea");
+    Rectangle posr = posSlot ? posSlot->rect : rect;
+    DrawAppText("Position:", posr.x, posr.y + 5 * s, (float)fsTitle, WHITE);
+
+    ui::RadioOption posOptions[] = {
+        {r.startPos, "Start position"},
+        {r.preset,   "Preset"},
+        {r.saved,    "Saved"},
+    };
+    setup.posRadio.draw(posOptions, (int)setup.posSource, theme);
+
+    if (dropdownCount == 0 && setup.posSource != POS_START) {
+        float tw = MeasureAppText("(none available)", (float)fs);
+        DrawAppText("(none available)", r.mainDropdown.x + (r.mainDropdown.width - tw) / 2,
+                    r.mainDropdown.y + 6 * s, (float)fs, dim);
+    } else {
+        setup.mainDropdown.draw(r.mainDropdown, dropdownNames, theme);
+    }
+
+    setup.startButton.draw(r.startBtn, "Start Game", theme);
+}
+
+void GameApp::onDrawOverlay(Rectangle rect) {
+    float s = theme.scale;
+    if (phase == SETUP) return;
+
+    // Save button
+    Rectangle btnRect = {rect.x + rect.width - 120 * s, rect.y + 8 * s, 110 * s, 28 * s};
+    play.saveButton.draw(btnRect, "Save Position", theme);
+
+    if (play.saveFlashTimer > 0) {
+        float alpha = (std::min)(play.saveFlashTimer / 60.0f, 1.0f);
+        Color flashColor = {theme.success.r, theme.success.g, theme.success.b, (unsigned char)(alpha * 255)};
         Rectangle flashRect = {rect.x + rect.width - 120 * s, rect.y + 40 * s, 110 * s, 22 * s};
         DrawRectangleRec(flashRect, {30, 30, 50, (unsigned char)(alpha * 200)});
         DrawAppText("Saved!", flashRect.x + 10 * s, flashRect.y + 4 * s, (float)theme.fontSize, flashColor);
-        saveFlashTimer--;
     }
 }
 
 void GameApp::onStop() {
-    stopSource.request_stop();
-    if (gameThread && gameThread->joinable())
-        gameThread->join();
+    play.stopSource.request_stop();
+    if (play.gameThread && play.gameThread->joinable())
+        play.gameThread->join();
 
-    delete p1;
-    delete p2;
+    delete play.p1;
+    delete play.p2;
 }
