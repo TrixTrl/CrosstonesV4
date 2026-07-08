@@ -4,6 +4,7 @@
 #include "MoveExplorerApp.h"
 #include "DCTestApp.h"
 #include "SettingsApp.h"
+#include "TrixTestApp.h"
 #include "features/opening_explorer.h"
 #include "FontManager.h"
 #include "ui/overlay.h"
@@ -25,6 +26,7 @@ void AppHost::onStart() {
         { "M", "Move Explorer"    },
         { "T", "DC Test Suite"    },
         { "S", "Settings"         },
+        { "X", "Trix Test"        },
     };
 
     std::unique_ptr<App> (*factories[])() = {
@@ -34,6 +36,7 @@ void AppHost::onStart() {
         []() -> std::unique_ptr<App> { return std::make_unique<MoveExplorerApp>(); },
         []() -> std::unique_ptr<App> { return std::make_unique<DCTestApp>(); },
         []() -> std::unique_ptr<App> { return std::make_unique<SettingsApp>(); },
+        []() -> std::unique_ptr<App> { return std::make_unique<TrixTestApp>(); },
     };
 
     for (auto& factory : factories) {

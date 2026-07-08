@@ -29,7 +29,7 @@ std::vector<FastMoveGenerator::move> FastMoveGenerator::getMoves(const uint8_t (
 void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWhite, std::pair<int, int> start, std::vector<move> *moves)
 {
     std::vector<moveGenerationState> stack = std::vector<moveGenerationState>();
-    stack.reserve(30);
+    stack.reserve(50);
 
     moveGenerationState startingState = moveGenerationState();
     startingState.position = start;
@@ -135,9 +135,20 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
             move tempComplexMove = move();
             tempComplexMove.start = std::pair<int, int>(start);
             tempComplexMove.moveFragments = std::vector<moveFragment>();
+            tempComplexMove.moveFragments.reserve(inProgressMoveFragments.size());
+            bool skippedFirstFragment = false;
             for (const auto &fragment : inProgressMoveFragments)
             {
+                if (!skippedFirstFragment)
+                {
+                    skippedFirstFragment = true;
+                    continue;
+                }
                 tempComplexMove.moveFragments.emplace_back(fragment);
+            }
+            if (currentState.stepsLeft == -2)
+            {
+                tempComplexMove.isMerge = true;
             }
             applyMove(&complexMoveCopy, tempComplexMove, true);
             currentBoardState = &complexMoveCopy;
@@ -149,6 +160,7 @@ void FastMoveGenerator::generateMoves(const uint8_t (*pieces)[13][13], bool isWh
             move currentMove = move();
             currentMove.start = start;
             currentMove.moveFragments = std::vector<moveFragment>();
+            currentMove.moveFragments.reserve(max(0, int(inProgressMoveFragments.size()) - 1));
             bool skippedFirstFragment = false;
             for (const auto &fragment : inProgressMoveFragments)
             {
@@ -366,6 +378,10 @@ void FastMoveGenerator::applyMove(uint8_t (*pieces)[13][13], const move &move, b
             while (pushingDestination != 0)
             {
                 pushingPosition = getPositionInDirection(pushingPosition, fragment.dir);
+                if (pushingPosition.first < 0 || pushingPosition.first > 12 || pushingPosition.second < 0 || pushingPosition.second > 12)
+                {
+                    throw;
+                }
                 (*pieces)[pushingPosition.first][pushingPosition.second] &= Piece::turnPieceMask;
                 (*pieces)[pushingPosition.first][pushingPosition.second] |= pushingPiece;
                 // pushingPosition = std::pair<int, int>(pushingPosition.first + fragmentDelta.first, pushingPosition.second + fragmentDelta.second);

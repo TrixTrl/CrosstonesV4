@@ -8,8 +8,9 @@
 
 #include "test-bots/BasicGenerator.h"
 #include "game-suite/Board.h"
-#include "MCTS_Structs.h"
-#include "Toggles.h"
+#include "../mcts/MCTS_Structs.h"
+#include "../mcts/Toggles.h"
+#include "GeneratorComparer.h"
 
 class Utils
 {
@@ -103,6 +104,8 @@ public:
 	static void basicGenerator_halfSplit_noPush(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t (*pieces)[13][13]);
 	static void captureGenerator_singleSplit(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t (*state)[13][13], int originX, int originY, int x, int y, bool (*visited)[13][13], int remainingSteps, bool turned, bool isWhite, uint8_t (*pieces)[13][13]);
 
+	static void runCode();
+
 	/*
 	std::shared_ptr<std::vector<std::vector<xMove>>> getMoves_qiessence(bool isWhite) const;
 	void basicGenerator(std::shared_ptr<std::vector<std::vector<xMove>>> moves, uint8_t(*state)[13][13], int x, int y, bool(*visited)[13][13], int remainingSteps, bool turned, bool isWhite) const;
@@ -157,4 +160,6 @@ public:
 			}
 		}
 	};
+
+	static std::string getKey(uint8_t (*pieces)[13][13]);
 };
