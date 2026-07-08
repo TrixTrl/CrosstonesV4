@@ -4,7 +4,7 @@
 
 using namespace dc;
 
-std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const BotBoard& board, const std::vector<Move>& moveList, bool debug)
+std::vector<int> MoveOrdering::makeMoveOrdering(const XMove& hashMove, const BotBoard& board, const std::vector<XMove>& moveList, bool debug)
 {
 	if (moveScores.size() < moveList.size())
 	{
@@ -18,18 +18,18 @@ std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const BotB
 	
 	for (int i = 0; i < moveList.size(); i++)
 	{
-		const Move& move = moveList[i];
-		if (Utility::sameMove(move, hashMove))
+		const XMove& move = moveList[i];
+		if (move == hashMove)
 		{
 			moveScores[i] = hashMoveScore;
 			continue;
 		}
 		int score = 0;
-		const BasicGenerator::xMove startXMove = move[0];
+		const XMoveTile startXMove = move[0];
 
 		if (move.size() >= 2)
 		{
-			const BasicGenerator::xMove endXMove = move[1];
+			const XMoveTile endXMove = move[1];
 			const uint8_t startPiece = Piece::tower(board.square[startXMove.i][startXMove.j]);
 			const uint8_t endPiece = Piece::tower(board.square[endXMove.i][endXMove.j]);
 			
@@ -37,7 +37,7 @@ std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const BotB
 			bool isCapture = false;
 			for (int visitedIdx = 2; visitedIdx < move.size(); visitedIdx++)
 			{
-				const BasicGenerator::xMove curXMove = move[visitedIdx];
+				const XMoveTile curXMove = move[visitedIdx];
 				const uint8_t curPiece = Piece::tower(board.square[visitedIdx][visitedIdx]);
 				if (Piece::isTower(curPiece))
 				{
@@ -58,7 +58,7 @@ std::vector<int> MoveOrdering::makeMoveOrdering(const Move& hashMove, const BotB
 			}
 			for (int visitedIdx = 0; visitedIdx < move.size(); visitedIdx++)
 			{
-				const BasicGenerator::xMove curXMove = move[visitedIdx];
+				const XMoveTile curXMove = move[visitedIdx];
 				const uint8_t pieceBefore = board.square[visitedIdx][visitedIdx];
 				const uint8_t pieceAfter = pieceBefore ^ curXMove.delta;
 				int scoreBefore = evaluation.getEffectivePieceWorth(board, pieceBefore, curXMove.i, curXMove.j);

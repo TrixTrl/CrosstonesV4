@@ -1,0 +1,14 @@
+{
+    "cmake.configureOnEdit": true,
+    "cmake.buildBeforeRun": true,
+    "cmake.useCMakePresets": "never",
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/knoef/AppData/Local/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_COMPILER": "cl.exe"
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}

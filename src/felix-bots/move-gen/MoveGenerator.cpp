@@ -5,12 +5,12 @@
 using namespace dc;
 
 MoveGenerator MoveGenerator::moveGen;
-void MoveGenerator::getMovesStatic(std::vector<dc::Move> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
+void MoveGenerator::getMovesStatic(std::vector<XMove> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
 {
 	moveGen.getMoves(targetList, state, isWhite, onlyClaimsAndCaptures);
 }
 
-void MoveGenerator::getMoves(std::vector<dc::Move> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
+void MoveGenerator::getMoves(std::vector<XMove> *targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures)
 {
 	target = targetList;
 	target->reserve(onlyClaimsAndCaptures ? 80 : 550);
@@ -46,7 +46,7 @@ void MoveGenerator::basicGenerator(
 	// Save move if start Tower has moved
 	if (!onlyClaimsAndCaptures && origSquares[startX][startY] != currentSquares[startX][startY])
 	{
-		auto &move = target->emplace_back();
+		XMove &move = target->emplace_back();
 		move.reserve(5);
 
 		move.emplace_back(startX, startY, (uint8_t)(origSquares[startX][startY] ^ currentSquares[startX][startY]));

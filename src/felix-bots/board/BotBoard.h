@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "game-suite/GamePosition.h"
+#include "data/GamePosition.h"
 #include "felix-bots/util/Utility.h"
 #include "felix-bots/board/GameResult.h"
 
@@ -22,16 +22,16 @@ namespace dc
 		void initialize(const GamePosition& state, bool isWhiteTurn);
 
 		void updateWinValue();
-		void makeMove(Move& move);
-		void unmakeMove(Move& move);
+		void makeMove(XMove& move);
+		void unmakeMove(XMove& move);
 
-		std::string moveToString(Move& move);
+		std::string moveToString(XMove& move);
 		
 		/* Testing */
-		u64 bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(const GamePosition&, bool)> getMoves);
+		u64 bulk_perft(int depth /* >= 1 */, std::function<std::vector<XMove>(const GamePosition&, bool)> getMoves);
 	
 	private:
 
-		void appyMoveReversible(Move& move);
+		void appyMoveReversible(XMove& move);
 	};
 }

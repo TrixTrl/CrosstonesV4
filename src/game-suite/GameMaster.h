@@ -21,6 +21,7 @@ public:
 	GameMaster(std::bitset<3>& gamemode, Player* p1, Player* p2, int timeControl, int enforceTime, GamePosition& displayBoard);
 	void play(std::stop_token stopToken, std::function<void()> onBoardChanged, bool whiteToStart = true);
 	void loadPos(std::string str);
+	Board& getBoard() { return bs; }
 	void notifyPlayersKeyDown(PlayerInputKey key);
 	void notifyPlayersClicked(bool isLeft, int gridX, int gridY);
 };

@@ -1,6 +1,6 @@
 ﻿#include "Deepchad.h"
 #include "felix-bots/util/Utility.h"
-#include "game-suite/GamePosition.h"
+#include "data/GamePosition.h"
 #include "test-bots/BasicGenerator.h"
 #include "globals/Player.h"
 #include "globals/Piece.h"
@@ -10,6 +10,7 @@
 #include <chrono>
 #include <limits>
 #include <cstring>
+#include <game-suite/Board.h>
 
 using namespace std;
 
@@ -30,7 +31,6 @@ void Deepchad::getMoveToPlay(uint8_t(*state)[13][13], bool isWhite, int endTime)
 		result.first = Utility::mirrorMoveLR(result.first);
 		Utility::print("Mirroring Move to the left.", true);
 	}
-
-	Utility::applyXMove(gp, result.first);
+	Board::unsafeApplyMove(gp, result.first);
 	std::memcpy(state, &gp, sizeof(gp));
 }

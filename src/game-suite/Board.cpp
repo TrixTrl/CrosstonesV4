@@ -169,9 +169,9 @@ void forceDebugPrint(std::string str)
 	OutputDebugString(wideString);
 }
 
-std::vector<std::vector<Board::xMove>> Board::getMoves(bool isWhite) const
+std::vector<XMove> Board::getMoves(bool isWhite) const
 {
-	std::vector<std::vector<xMove>> moves = std::vector<std::vector<xMove>>();
+	std::vector<XMove> moves = std::vector<XMove>();
 	moves.reserve(700);
 
 	for (int i = 0; i < 13; i++)
@@ -200,12 +200,12 @@ std::vector<std::vector<Board::xMove>> Board::getMoves(bool isWhite) const
 }
 
 void Board::basicGenerator(
-	std::vector<std::vector<xMove>>& moves, 
+	std::vector<XMove>& moves, 
 	const GamePosition& state, 
 	int x, int y, VisitedMap& visited, int remainingSteps, bool turned, bool isWhite
 ) const
 {
-	std::vector<Board::xMove> move = std::vector<Board::xMove>();
+	XMove move = XMove();
 	move.reserve(10);
 	for (int i = 0; i < 13; i++)
 	{
@@ -213,7 +213,7 @@ void Board::basicGenerator(
 		{
 			if (gamePos[i][j] == state[i][j])
 				continue;
-			move.emplace_back(xMove{ i, j, (uint8_t)(gamePos[i][j] ^ state[i][j]) }); // Creation of xor lists for moves
+			move.emplace_back(XMoveTile{ i, j, (uint8_t)(gamePos[i][j] ^ state[i][j]) }); // Creation of xor lists for moves
 		}
 	}
 	if (moves.size() == 0 || move.size() > 0)
@@ -441,23 +441,16 @@ void Board::captureGenerator(
 
 	for (int d = 0; d < 4; d++)
 	{ // Loop through the 4 possible directions
+		int destX = x + dx[d];
+		int destY = y + dy[d];
 		uint8_t piece = state[x][y];
-		if ((piece & hasTurnPiece) != 0)
-		{ // Obey turn pieces
-			if (((piece & setTurnPiece)) == (d % 2) * setTurnPiece)
-				continue; // This feels deeply cursed
-		}
-		int i = x + dx[d];
-		int j = y + dy[d];
-		uint8_t dest = state[i][j];
-		if (i < 0 || i > 12 || j < 0 || j > 12)
-			continue;
-		if (i % 2 == 1 && j % 2 == 1)
-			continue;
-		if (visited[i][j])
-			continue; // Bounds and revisiting check
-		if ((dest & hasTurnPiece) != 0 && (((dest & setTurnPiece)) == (d % 2) * setTurnPiece))
-			continue;
+		uint8_t dest = state[destX][destY];
+
+		if (destX < 0 || destX > 12 || destY < 0 || destY > 12) continue; //borders check 
+		if (destX % 2 == 1 && destY % 2 == 1) continue; //voids check
+		if (visited[destX][destY]) continue; // Bounds and revisiting check
+		if (Piece::isBlockedByGate(piece, d)) continue;
+		if (Piece::isBlockedByGate(dest, d)) continue;
 
 		// piece is the position where an enemy piece used to be that we are currently taking, this value has already been wiped
 		// dest is the piece we are now looking to move to, either to complete the capture or to continue the chain
@@ -484,15 +477,15 @@ void Board::captureGenerator(
 						boardCopy[originX][originY] &= 0b11011111; // if we left a single addon, remove the color
 				}
 
-				boardCopy[i][j] += splitOff;
-				boardCopy[i][j] |= Piece::colour(origin); // always copy color and add height as that should be allowed based on the only way this can be called
+				boardCopy[destX][destY] += splitOff;
+				boardCopy[destX][destY] |= Piece::colour(origin); // always copy color and add height as that should be allowed based on the only way this can be called
 
 				VisitedMap visitedCopy = visited;
-				visitedCopy[i][j] = true;
+				visitedCopy[destX][destY] = true;
 
 				if (DEBUG_PRINTING)
-					debugPrint("CM : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves.size()) + "\n");
-				basicGenerator(moves, boardCopy, i, j, visitedCopy, 0, false, isWhite); // do last move
+					debugPrint("CM : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+				basicGenerator(moves, boardCopy, destX, destY, visitedCopy, 0, false, isWhite); // do last move
 																						// TODO: Wrong ruleset bug, verify this change is correct
 																						//  //if dest is empty, continue the move if possible
 																						// basicGenerator(moves, &boardCopy, i, j, &visitedCopy, Piece::height(dest) == 0 ? remainingSteps - 1 : 0, false, isWhite);
@@ -503,23 +496,23 @@ void Board::captureGenerator(
 			if (!Piece::isBlue(origin) && Piece::height(dest) > Piece::height(origin))
 				continue; // capturing height check
 			GamePosition boardCopy = state;
-			boardCopy[i][j] &= 0b11000000; // remove piece we're capturing
+			boardCopy[destX][destY] &= 0b11000000; // remove piece we're capturing
 
 			VisitedMap visitedCopy = visited;
-			visitedCopy[i][j] = true;
+			visitedCopy[destX][destY] = true;
 
-			debugPrint("CC : " + std::to_string(i) + " : " + std::to_string(j) + " | " + std::to_string(moves.size()) + "\n");
-			captureGenerator(moves, boardCopy, originX, originY, i, j, visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite); // only decrement moves if the capturing piece doesn't have a blue addon
+			debugPrint("CC : " + std::to_string(destX) + " : " + std::to_string(destY) + " | " + std::to_string(moves.size()) + "\n");
+			captureGenerator(moves, boardCopy, originX, originY, destX, destY, visitedCopy, remainingSteps - !Piece::isBlue(origin), false, isWhite); // only decrement moves if the capturing piece doesn't have a blue addon
 		}
 	}
 }
 
-void Board::unsafeMakeMove(const std::vector<xMove>& move)
+void Board::unsafeMakeMove(const XMove& move)
 {
 	unsafeApplyMove(gamePos, move);
 }
 
-void Board::unsafeApplyMove(GamePosition& position, const std::vector<xMove>& move)
+void Board::unsafeApplyMove(GamePosition& position, const XMove& move)
 {
 	for (int i = 0; i < move.size(); i++)
 	{
@@ -527,7 +520,7 @@ void Board::unsafeApplyMove(GamePosition& position, const std::vector<xMove>& mo
 	}
 }
 
-int Board::makeMove(const std::vector<xMove>& move, bool isWhiteTurn)
+int Board::makeMove(const XMove& move, bool isWhiteTurn)
 {
 	GamePosition newState = gamePos;
 	unsafeApplyMove(newState, move);
@@ -537,7 +530,7 @@ int Board::makeMove(const std::vector<xMove>& move, bool isWhiteTurn)
 
 int Board::makeMove(GamePosition& newState, bool isWhiteTurn)
 {
-	std::vector<std::vector<Board::xMove>> moves = getMoves(isWhiteTurn);
+	std::vector<XMove> moves = getMoves(isWhiteTurn);
 
 	for (int i = 0; i < moves.size(); i++)
 	{

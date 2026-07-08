@@ -45,8 +45,10 @@ add_custom_command(TARGET crosstones_executable POST_BUILD
         ${CMAKE_SOURCE_DIR}/resources
         $<TARGET_FILE_DIR:crosstones_executable>/resources)
 
+
 set(MY_MODULES
     app
+    data
     felix-bots
     game-suite
     globals
@@ -73,13 +75,29 @@ foreach(MOD ${MY_MODULES})
     target_link_libraries(crosstones_executable PRIVATE ${MOD})
 endforeach()
 
-# Keep the test suite as a standalone console executable
-file(GLOB_RECURSE TEST_SUITE_SOURCES CONFIGURE_DEPENDS 
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/test-suite/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/test-suite/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/test-suite/*.hpp"
-)
-add_executable(crosstones_tests ${TEST_SUITE_SOURCES})
-target_include_directories(crosstones_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(crosstones_tests PRIVATE game-suite globals)
-target_compile_options(crosstones_tests PRIVATE /EHsc)
+option(BUILD_TESTS "Build self-tests" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*.hpp"
+    )
+    target_sources(crosstones_executable PRIVATE ${TEST_SOURCES})
+    # auto discover tests with *Tester.cpp suffix
+    file(GLOB TEST_CTEST_SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*Tester.cpp"
+    )
+    foreach(TSF ${TEST_CTEST_SOURCES})
+        get_filename_component(TEST_NAME ${TSF} NAME_WE)
+        add_test(NAME ${TEST_NAME}
+            COMMAND crosstones_executable --run-tests ${TEST_NAME})
+    endforeach()
+    # Run all tests on every build
+    add_custom_target(check ALL
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        DEPENDS crosstones_executable
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        USES_TERMINAL
+    )
+endif()

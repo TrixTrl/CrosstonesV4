@@ -31,18 +31,18 @@ bool DCTestSuite::run(std::function<void()> onBoardChanged, uint8_t(*display)[13
 	dc::Utility::print(std::format("Deepchad Time: {}\n", execTime), true);
 
 
-	std::function<std::vector<Move>(const GamePosition&, bool)> newMoveGenerator = 
+	std::function<std::vector<XMove>(const GamePosition&, bool)> newMoveGenerator = 
 		[](const GamePosition& pieces, bool isWhite)
 		{
-			std::vector<Move> moves;
+			std::vector<XMove> moves;
 			dc::MoveGenerator::getMovesStatic(&moves, pieces, isWhite, false);
 			return moves;
 		};
-	std::function<std::vector<Move>(const GamePosition&, bool)> oldMoveGenerator =
+	std::function<std::vector<XMove>(const GamePosition&, bool)> oldMoveGenerator =
 		[](const GamePosition& pieces, bool isWhite)
 		{
-			std::shared_ptr<std::vector<Move>> moves = BasicGenerator::getMoves(isWhite, &pieces.pieces);
-			return std::vector<Move>(moves->begin() + 1, moves->end());
+			std::shared_ptr<std::vector<XMove>> moves = BasicGenerator::getMoves(isWhite, &pieces.pieces);
+			return std::vector<XMove>(moves->begin() + 1, moves->end());
 		};
 
 

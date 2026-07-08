@@ -73,20 +73,20 @@ void Utils::print(BasicGenerator::xMove f, bool newLine)
 	OutputDebugString(wideString);
 }
 
-void Utils::print(Board::xMove f, bool newLine)
-{
-	std::string str = std::to_string(f.i);
-	str += " | ";
-	str += std::to_string(f.j);
-	str += " | ";
-	std::bitset<8> x(f.delta);
-	str += x.to_string();
-	if (newLine)
-		str += "\n";
-	std::string temp = std::string(str.begin(), str.end());
-	LPCSTR wideString = temp.c_str();
-	OutputDebugString(wideString);
-}
+// void Utils::print(Board::xMove f, bool newLine)
+// {
+// 	std::string str = std::to_string(f.i);
+// 	str += " | ";
+// 	str += std::to_string(f.j);
+// 	str += " | ";
+// 	std::bitset<8> x(f.delta);
+// 	str += x.to_string();
+// 	if (newLine)
+// 		str += "\n";
+// 	std::string temp = std::string(str.begin(), str.end());
+// 	LPCSTR wideString = temp.c_str();
+// 	OutputDebugString(wideString);
+// }
 
 void Utils::print(extraBoardData data, bool formatted)
 {

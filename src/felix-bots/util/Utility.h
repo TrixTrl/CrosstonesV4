@@ -3,8 +3,8 @@
 #include "test-bots/BasicGenerator.h"
 #include "globals/Piece.h"
 #include "felix-bots/board/GameResult.h"
-#include "game-suite/GamePosition.h"
-
+#include "data/GamePosition.h"
+#include "data/XMove.h"
 #include <functional>
 #include <vector>
 #include <string>
@@ -22,7 +22,6 @@ namespace dc
 		xMove(int I, int J, uint8_t D) : i(I), j(J), delta(D) {}
 	};*/
 
-	typedef std::vector<BasicGenerator::xMove> Move;
 	typedef unsigned long long u64;
 
 	struct Utility
@@ -31,9 +30,9 @@ namespace dc
 
 		static const int immediateWinScore = 100000;
 
-		static Move createNullMove() 
+		static XMove createNullMove() 
 		{
-			return std::vector<BasicGenerator::xMove>();
+			return XMove();
 		}
 
 		// The sign function
@@ -42,7 +41,7 @@ namespace dc
 			return (T(0) < val) - (val < T(0));
 		}
 
-		static void applyXMove(GamePosition& state, Move& move);
+		static void applyXMove(GamePosition& state, XMove& move);
 
 		static bool isWinScore(int score)
 		{
@@ -51,8 +50,8 @@ namespace dc
 		}
 
 		static bool isStartingBoard(const GamePosition& state);
-		static bool isLeftMove(Move& move);
-		static Move mirrorMoveLR(Move& move);
+		static bool isLeftMove(XMove& move);
+		static XMove mirrorMoveLR(XMove& move);
 
 		/* debug printing */
 		static void print(std::string s, bool newLine);
@@ -61,10 +60,6 @@ namespace dc
 		static void print(size_t s, bool newLine);
 		static void print(float s, bool newLine);
 		static void print(BasicGenerator::xMove, bool newLine);
-
-		static bool sameMove(const Move& moveA, const Move& moveB);
-
-		static bool sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB);
 	};
 }
 

@@ -92,7 +92,7 @@ public:
 	static void print(size_t s, bool newLine = false);
 	static void print(float s, bool newLine = false);
 	static void print(BasicGenerator::xMove, bool newLine = false);
-	static void print(Board::xMove, bool newLine = false);
+	//static void print(Board::xMove, bool newLine = false);
 	static void print(extraBoardData, bool formatted = true);
 	static void print(std::string s, int n, bool newLine = false);
 	static void print(std::string s, float n, bool newLine = false);

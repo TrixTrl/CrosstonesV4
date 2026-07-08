@@ -1,6 +1,6 @@
 #pragma once
 #include "felix-bots/util/Utility.h"
-#include "game-suite/GamePosition.h"
+#include "data/GamePosition.h"
 
 #include <cstdint>
 #include <vector>
@@ -14,8 +14,8 @@ namespace dc
 		const uint8_t hasTurnPiece = 128;
 		const uint8_t setTurnPiece = 64;
 
-		void getMoves(std::vector<dc::Move>* targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures = false);
-		static void getMovesStatic(std::vector<dc::Move>* targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures = false);
+		void getMoves(std::vector<XMove>* targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures = false);
+		static void getMovesStatic(std::vector<XMove>* targetList, const GamePosition& state, const bool isWhite, const bool onlyClaimsAndCaptures = false);
 
 		void basicGenerator(
 			int x, int y, 
@@ -36,7 +36,7 @@ namespace dc
 		GamePosition origSquares;
 		bool visited[13][13];
 
-		std::vector<dc::Move>* target;
+		std::vector<XMove>* target;
 
 	};
 }

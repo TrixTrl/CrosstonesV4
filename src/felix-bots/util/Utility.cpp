@@ -1,34 +1,17 @@
 #include "felix-bots/util/Utility.h"
 #include "globals/Piece.h"
 #include <vector>
+#include <data/XMove.h>
 
 using namespace std;
 using namespace dc;
 
-void Utility::applyXMove(GamePosition& state, Move& move)
+void Utility::applyXMove(GamePosition& state, XMove& move)
 {
 	for (auto& xMove : move)
 	{
 		state[xMove.i][xMove.j] ^= xMove.delta;
 	}
-}
-
-bool Utility::sameMove(const Move& moveA, const Move& moveB)
-{
-	if (moveA.size() != moveB.size())
-		return false;
-
-	for (int i = 0; i < moveA.size(); i++)
-	{
-		if (!sameXMove(moveA[i], moveB[i]))
-			return false;
-	}
-	return true;
-}
-
-bool Utility::sameXMove(const BasicGenerator::xMove& moveA, const BasicGenerator::xMove& moveB)
-{
-	return moveA.i == moveB.i && moveA.j == moveB.j && moveA.delta == moveB.delta;
 }
 
 bool Utility::isStartingBoard(const GamePosition& state)
@@ -49,13 +32,13 @@ bool Utility::isStartingBoard(const GamePosition& state)
 		&& (state[0][6] == Piece::red1)
 		&& (state[12][6] == Piece::red1);
 }
-bool Utility::isLeftMove(Move& move)
+bool Utility::isLeftMove(XMove& move)
 {
 	return move[0].i <= 6;
 }
-Move Utility::mirrorMoveLR(Move& move)
+XMove Utility::mirrorMoveLR(XMove& move)
 {
-	Move newMove = std::vector<BasicGenerator::xMove>();
+	XMove newMove = XMove();
 	for (const auto& xMove : move)
 		newMove.emplace_back(12 - xMove.i, xMove.j, xMove.delta);
 	return newMove;

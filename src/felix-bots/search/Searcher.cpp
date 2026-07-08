@@ -131,10 +131,10 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 		return eval;
 	}
 
-	std::vector<Move> moves = std::vector<Move>();
+	std::vector<XMove> moves = std::vector<XMove>();
 	moveGenerator.getMoves(&moves, board.square, board.isWhiteTurn);
 
-	Move prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
+	XMove prevBestMove = plyFromRoot == 0 ? bestMove : transpositionTable.tryGetStoredMove();
 	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(prevBestMove, board, moves);
 
 	//add passing move if there are no moves left
@@ -148,7 +148,7 @@ int Searcher::search(uint8_t plyRemaining, uint8_t plyFromRoot, int alpha, int b
 	}
 
 	int evaluationBound = TranspositionTable<1>::UpperBound;
-	Move* bestMoveInThisPosition = nullptr;
+	XMove* bestMoveInThisPosition = nullptr;
 
 	for (int moveNumber = 0; moveNumber < moves.size(); moveNumber++)
 	{
@@ -230,14 +230,14 @@ int Searcher::quiescenceSearch(int alpha, int beta, bool madeQMove)
 		alpha = eval;
 	}
 
-	std::vector<Move> moves;
+	std::vector<XMove> moves;
 	moveGenerator.getMoves(&moves, board.square, board.isWhiteTurn, true);
 	std::vector<int> moveIndices = moveOrdering.makeMoveOrdering(Utility::createNullMove(), board, moves);
 
 	for (int moveNumber = 0; moveNumber < moves.size(); moveNumber++)
 	{
 		const int i = moveIndices[moveNumber];
-		Move* move = &(moves[i]);
+		XMove* move = &(moves[i]);
 
 		board.makeMove(*move);
 		eval = -quiescenceSearch(-beta, -alpha, madeQMove);
@@ -257,13 +257,13 @@ int Searcher::quiescenceSearch(int alpha, int beta, bool madeQMove)
 	return alpha;
 }
 
-std::pair<Move, int> Searcher::getSearchResult()
+std::pair<XMove, int> Searcher::getSearchResult()
 {
-	return std::pair<Move, int>(bestMove, bestEval);
+	return std::pair<XMove, int>(bestMove, bestEval);
 }
 
 
-void Searcher::sortMoves(shared_ptr<vector<Move>> moves)
+void Searcher::sortMoves(shared_ptr<vector<XMove>> moves)
 {
 	//ideal would be in order:
 	// - merges onto addon
@@ -271,7 +271,7 @@ void Searcher::sortMoves(shared_ptr<vector<Move>> moves)
 	// - normal captures
 	// - moves with addOn
 	// - the rest
-	auto compareMoves = [](const Move& i1, const Move& i2) {
+	auto compareMoves = [](const XMove& i1, const XMove& i2) {
 		return i1.size() > i2.size();
 	};
 	sort(moves.get()->begin(), moves.get()->end(), compareMoves);

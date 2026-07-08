@@ -19,13 +19,13 @@ namespace dc
 		{
 			uint64_t key;
 			int value;
-			Move move;
+			XMove move;
 			uint8_t depth; // depth is how many ply were searched ahead from this position
 			uint8_t nodeType;
 
 			Entry() : key(0), value(0), depth(0), nodeType(0) {}
 
-			Entry(uint64_t _key, int _value, uint8_t _depth, uint8_t _nodeType, const Move& _move)
+			Entry(uint64_t _key, int _value, uint8_t _depth, uint8_t _nodeType, const XMove& _move)
 				: key(_key), value(_value), depth(_depth), nodeType(_nodeType), move(_move) 
 			{}
 		};
@@ -69,7 +69,7 @@ namespace dc
 			return board.zobristKey % count;
 		}
 
-		const Move tryGetStoredMove()
+		const XMove tryGetStoredMove()
 		{
 			return entries[index()].move;
 		}
@@ -115,7 +115,7 @@ namespace dc
 			return LookupFailed;
 		}
 
-		void storeEvaluation(int depth, int numPlySearched, int eval, int evalType, const Move& move)
+		void storeEvaluation(int depth, int numPlySearched, int eval, int evalType, const XMove& move)
 		{
 			if (!enabled)
 			{

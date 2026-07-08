@@ -4,7 +4,8 @@
 #include <bitset>
 #include <vector>
 #include <memory>
-#include "GamePosition.h"
+#include "data/GamePosition.h"
+#include "data/XMove.h"
 
 class Board
 {
@@ -13,11 +14,7 @@ public:
 	void rst(std::bitset<3>& tps);
 	void wipe();
 
-	struct xMove {
-		int i;
-		int j;
-		uint8_t delta;
-	};
+	using xMove = XMoveTile;
 	struct VisitedMap {
 		bool tiles[13][13] = {false};
 
@@ -35,23 +32,23 @@ public:
 	std::string dumpPosition() const;
 	void loadPosition(std::string str);
 
-	std::vector<std::vector<xMove>> getMoves(bool isWhite) const;
+	std::vector<XMove> getMoves(bool isWhite) const;
 	void basicGenerator(
-		std::vector<std::vector<xMove>>& moves, 
+		std::vector<XMove>& moves, 
 		const GamePosition& state, 
 		int x, int y, 
 		VisitedMap& visited, int remainingSteps, bool turned, bool isWhite
 	) const;
 	void captureGenerator(
-		std::vector<std::vector<xMove>>& moves, 
+		std::vector<XMove>& moves, 
 		const GamePosition& state, 
 		int originX, int originY, int x, int y, 
 		VisitedMap& visited, int remainingSteps, bool turned, bool isWhite
 	) const;
 
-	static void unsafeApplyMove(GamePosition& position, const std::vector<xMove>& move);
-	void unsafeMakeMove(const std::vector<xMove>& move);
-	int makeMove(const std::vector<xMove>& move, bool isWhiteTurn);	//return -1 for invalid, 0 for passing, and 1 for any other valid move
+	static void unsafeApplyMove(GamePosition& position, const XMove& move);
+	void unsafeMakeMove(const XMove& move);
+	int makeMove(const XMove& move, bool isWhiteTurn);	//return -1 for invalid, 0 for passing, and 1 for any other valid move
 	int makeMove(GamePosition& newState, bool isWhiteTurn);
 
 	enum class winValue {

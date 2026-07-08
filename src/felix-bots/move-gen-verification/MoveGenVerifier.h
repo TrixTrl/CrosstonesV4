@@ -1,6 +1,6 @@
 #include "test-bots/BasicGenerator.h"
 #include <iostream>
-#include <game-suite/GamePosition.h>
+#include "data/GamePosition.h"
 
 class MoveGenVerifier {
 public:

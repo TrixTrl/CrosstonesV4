@@ -154,18 +154,18 @@ candidateElimination:
 	}
 }
 
-void BotBoard::makeMove(Move& move)
+void BotBoard::makeMove(XMove& move)
 {
 	appyMoveReversible(move);
 	updateWinValue();
 }
-void BotBoard::unmakeMove(Move& move)
+void BotBoard::unmakeMove(XMove& move)
 {
 	appyMoveReversible(move);
 	gameResult = GameResult::InProgress;
 }
 
-void BotBoard::appyMoveReversible(Move& move)
+void BotBoard::appyMoveReversible(XMove& move)
 {
 	for (int i = 0; i < move.size(); i++) {
 		uint8_t pos = move[i].i + 13 * move[i].j;
@@ -187,13 +187,13 @@ void BotBoard::appyMoveReversible(Move& move)
 }
 
 
-u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(const GamePosition&, bool)> getMoves)
+u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<XMove>(const GamePosition&, bool)> getMoves)
 {
 
 	int n_moves, i;
 	u64 nodes = 0;
 
-	std::vector<Move> moves = getMoves(square, isWhiteTurn);
+	std::vector<XMove> moves = getMoves(square, isWhiteTurn);
 	//MoveGenerator::getMovesStatic(&moves, &square, isWhiteTurn);
 
 	n_moves = moves.size();
@@ -209,18 +209,18 @@ u64 BotBoard::bulk_perft(int depth /* >= 1 */, std::function<std::vector<Move>(c
 	return nodes;
 }
 
-std::string BotBoard::moveToString(Move& move)
+std::string BotBoard::moveToString(XMove& move)
 {
 	if (move.size() == 0)
 		return "Null move";
 
 	std::string result = "";
-	for (auto& xMove : move)
+	for (auto& xMoveTile : move)
 	{
 		// use binary xor value or concrete information if there is context
 		std::string action = "";
-		const uint8_t fieldBefore = square[xMove.i][xMove.j];
-		const uint8_t fieldAfter = fieldBefore ^ xMove.delta;
+		const uint8_t fieldBefore = square[xMoveTile.i][xMoveTile.j];
+		const uint8_t fieldAfter = fieldBefore ^ xMoveTile.delta;
 
 		if (Piece::height(fieldAfter) != Piece::height(fieldBefore)) {
 			action += (Piece::height(fieldAfter) > Piece::height(fieldBefore))
@@ -236,14 +236,14 @@ std::string BotBoard::moveToString(Move& move)
 		if ((fieldBefore ^ fieldAfter) & Piece::Blue)
 			action += "_Blue";
 
-		if (xMove.delta & Piece::setTurnPiece)
+		if (xMoveTile.delta & Piece::setTurnPiece)
 			action += "_T";
-		if (xMove.delta & Piece::hasTurnPiece)
+		if (xMoveTile.delta & Piece::hasTurnPiece)
 			action += " _turnPieceCreate";
 
 		result += std::format("\n({}, {}) | {}",
-			std::string(1, (char)xMove.i + 'A'),
-			13 - xMove.j,
+			std::string(1, (char)xMoveTile.i + 'A'),
+			13 - xMoveTile.j,
 			action
 		);
 	}

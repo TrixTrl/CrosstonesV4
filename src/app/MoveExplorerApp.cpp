@@ -1,5 +1,6 @@
 #include "MoveExplorerApp.h"
 #include "raylib.h"
+#include "raygui.h"
 #include "game-suite/Board.h"
 #include <string>
 #include <vector>
@@ -35,21 +36,28 @@ static const PositionPreset positionPresets[] = {
 static const int numPresets = sizeof(positionPresets) / sizeof(positionPresets[0]);
 
 void MoveExplorerApp::onStart() {
+    layout = { .dir = ui::Dir::Row, .children = {
+        { .id = "board", .flex = 1, .minPx = 600 },
+        { .id = "panel", .fixed = 300 },
+    }};
+
     presetIdx = 0;
-    for (int p = 0; p < numPresets; p++) {
-        if (config->explore.position == positionPresets[p].position) {
-            presetIdx = p;
-            break;
+    if (!loadedPosition.position.empty()) {
+        for (int p = 0; p < numPresets; p++) {
+            if (loadedPosition.position == positionPresets[p].position) {
+                presetIdx = p;
+                break;
+            }
         }
     }
 
     std::bitset<3> set(5);
     board.rst(set);
     board.loadPosition(positionPresets[presetIdx].position);
-    board.copyPositionTo(displayBoard);
+    board.copyPositionTo(boardView.position());
 }
 
-void MoveExplorerApp::onFrame() {
+void MoveExplorerApp::onTick(float dt) {
     bool isWhite = false;
     auto moves = board.getMoves(isWhite);
 
@@ -59,7 +67,7 @@ void MoveExplorerApp::onFrame() {
     bool moveRequested = false;
     int moveDelta = 0;
 
-    if (!dropdownOpen) {
+    if (!dropdown.open) {
         if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
             moveDelta = 1;
             moveRequested = true;
@@ -90,28 +98,12 @@ void MoveExplorerApp::onFrame() {
         presetChanged = true;
     }
 
-    Rectangle dropdownRect = { (float)panelX(), 20.0f, (float)panelW(), 26.0f };
-    hoveredDropdownIdx = -1;
-    if (dropdownOpen) {
-        for (int p = 0; p < numPresets; p++) {
-            Rectangle optRect = { dropdownRect.x, dropdownRect.y + dropdownRect.height + p * dropdownRect.height, dropdownRect.width, dropdownRect.height };
-            if (CheckCollisionPointRec(mouse, optRect)) {
-                hoveredDropdownIdx = p;
-                if (click) {
-                    presetIdx = p;
-                    presetChanged = true;
-                    dropdownOpen = false;
-                }
-                break;
-            }
-        }
-        if (click && hoveredDropdownIdx == -1 && !CheckCollisionPointRec(mouse, dropdownRect)) {
-            dropdownOpen = false;
-        }
-    } else {
-        if (click && CheckCollisionPointRec(mouse, dropdownRect)) {
-            dropdownOpen = true;
-        }
+    Rectangle panelRect = layout.find("panel")->rect;
+    Rectangle dropdownRect = { panelRect.x, 20.0f * theme.scale, panelRect.width, (float)theme.itemH };
+    int sel = dropdown.handleInput(dropdownRect, mouse, click, numPresets);
+    if (sel >= 0) {
+        presetIdx = sel;
+        presetChanged = true;
     }
 
     if (presetChanged) {
@@ -119,14 +111,14 @@ void MoveExplorerApp::onFrame() {
         std::bitset<3> set(5);
         board.rst(set);
         board.loadPosition(positionPresets[presetIdx].position);
-        board.copyPositionTo(displayBoard);
+        board.copyPositionTo(boardView.position());
         moves = board.getMoves(isWhite);
         moveIdx = 0;
         paused = false;
         autoTimer = 0;
     }
 
-    if (!paused && !dropdownOpen && moves.size() > 0) {
+    if (!paused && !dropdown.open && moves.size() > 0) {
         autoTimer++;
         if (autoTimer >= 30) {
             autoTimer = 0;
@@ -140,54 +132,47 @@ void MoveExplorerApp::onFrame() {
             moveIdx += moveDelta;
             moveIdx = (moveIdx % (int)moves.size() + (int)moves.size()) % (int)moves.size();
         }
-        board.copyPositionTo(displayBoard);
+        board.copyPositionTo(boardView.position());
         Board tempBoard = board;
-        tempBoard.unsafeApplyMove(displayBoard, moves[moveIdx]);
+        tempBoard.unsafeApplyMove(boardView.position(), moves[moveIdx]);
     } else {
-        board.copyPositionTo(displayBoard);
+        board.copyPositionTo(boardView.position());
     }
 
-    std::memset(highlights, 0, sizeof(highlights));
+    bool hl[13][13]{};
     if (moves.size() > 0) {
         for (const auto& xm : moves[moveIdx]) {
             if (xm.i >= 0 && xm.i < 13 && xm.j >= 0 && xm.j < 13)
-                highlights[xm.i][xm.j] = true;
+                hl[xm.i][xm.j] = true;
         }
     }
-
-    App::onFrame();
+    boardView.setHighlights(hl);
 }
 
-void MoveExplorerApp::onDrawOverlay() {
-    drawRightPanel();
+void MoveExplorerApp::onDraw(Rectangle rect) {
+    resolveLayout(rect);
+    ui::Slot* boardSlot = layout.find("board");
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+}
 
-    Rectangle dropdownRect = { (float)panelX(), 20.0f, (float)panelW(), 26.0f };
+void MoveExplorerApp::onDrawOverlay(Rectangle rect) {
+    auto& r = layout.find("panel")->rect;
+    GuiPanel(r, "Position");
+
+    std::vector<std::string_view> presetNames;
+    for (int p = 0; p < numPresets; p++)
+        presetNames.push_back(positionPresets[p].name);
+    Rectangle dropdownRect = { r.x, r.y + 24 * theme.scale, r.width, (float)theme.itemH };
+    dropdown.draw(dropdownRect, presetNames, theme);
 
     auto moves = board.getMoves(false);
     std::string moveInfo = "Move: " + std::to_string(moveIdx + 1) + " / " + std::to_string(moves.size());
     if (paused) moveInfo += "  [PAUSED]";
-    drawText(moveInfo.c_str(), panelX(), 56, 16, WHITE);
+    drawText(moveInfo.c_str(), (int)r.x, (int)(r.y + 56 * theme.scale), theme.fontSizeTitle, theme.text);
 
-    DrawRectangleRec(dropdownRect, dropdownOpen ? Color{70, 70, 100, 255} : Color{50, 50, 75, 255});
-    DrawRectangleLinesEx(dropdownRect, 1, Color{100, 100, 130, 255});
-    std::string presetName = positionPresets[presetIdx].name;
-    float nameW = measureText(presetName.c_str(), 16);
-    DrawAppText(presetName.c_str(), dropdownRect.x + dropdownRect.width / 2.0f - nameW / 2.0f, dropdownRect.y + 5, 16, WHITE);
-    DrawAppText(dropdownOpen ? "^" : "v", dropdownRect.x + dropdownRect.width - 20, dropdownRect.y + 5, 16, WHITE);
-
-    int ctrlY = 86;
-    drawText("SPACE: pause/resume", panelX(), ctrlY, 14, Color{180, 180, 180, 255});
-    drawText("A/D: navigate", panelX(), ctrlY + 18, 14, Color{180, 180, 180, 255});
-    drawText("DEL: reset", panelX(), ctrlY + 36, 14, Color{180, 180, 180, 255});
-    drawText("TAB: cycle presets", panelX(), ctrlY + 54, 14, Color{180, 180, 180, 255});
-
-    if (dropdownOpen) {
-        for (int p = 0; p < numPresets; p++) {
-            Rectangle optRect = { dropdownRect.x, dropdownRect.y + dropdownRect.height + p * dropdownRect.height, dropdownRect.width, dropdownRect.height };
-            DrawRectangleRec(optRect, hoveredDropdownIdx == p ? Color{70, 70, 100, 255} : Color{45, 45, 70, 255});
-            DrawRectangleLinesEx(optRect, 1, Color{100, 100, 130, 255});
-            std::string optName = positionPresets[p].name;
-            DrawAppText(optName.c_str(), optRect.x + 10, optRect.y + 5, 14, hoveredDropdownIdx == p ? WHITE : Color{180, 180, 180, 255});
-        }
-    }
+    int ctrlY = (int)(r.y + 86 * theme.scale);
+    drawText("SPACE: pause/resume", (int)r.x, ctrlY, theme.fontSize, theme.textDim);
+    drawText("A/D: navigate", (int)r.x, (int)(ctrlY + 18 * theme.scale), theme.fontSize, theme.textDim);
+    drawText("DEL: reset", (int)r.x, (int)(ctrlY + 36 * theme.scale), theme.fontSize, theme.textDim);
+    drawText("TAB: cycle presets", (int)r.x, (int)(ctrlY + 54 * theme.scale), theme.fontSize, theme.textDim);
 }

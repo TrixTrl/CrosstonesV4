@@ -55,9 +55,9 @@ namespace dc
 
 		// State
 		int currentDepth;
-		Move bestMove;
+		XMove bestMove;
 		int bestEval;
-		Move bestMoveThisIteration;
+		XMove bestMoveThisIteration;
 		int bestEvalThisIteration;
 		bool hasSearchedAtLeastOneMove;
 
@@ -74,7 +74,7 @@ namespace dc
 		{}
 
 		void startSearch();
-		std::pair<Move, int> getSearchResult();
+		std::pair<XMove, int> getSearchResult();
 
 		static bool isWinScore(int score)
 		{
@@ -92,6 +92,6 @@ namespace dc
 		int quiescenceSearch(int alpha, int beta, bool madeQMove = false);
 
 
-		void sortMoves(std::shared_ptr<std::vector<Move>> moves);
+		void sortMoves(std::shared_ptr<std::vector<XMove>> moves);
 	};
 }

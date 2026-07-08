@@ -1,5 +1,5 @@
 #pragma once
 
-#include "game-suite/GamePosition.h"
+#include "data/GamePosition.h"
 
 using BoardState = GamePosition;
