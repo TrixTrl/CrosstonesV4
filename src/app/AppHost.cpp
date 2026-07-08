@@ -6,15 +6,15 @@
 #include "SettingsApp.h"
 #include "features/opening_explorer.h"
 #include "FontManager.h"
-#include "ui/popup.h"
+#include "ui/overlay.h"
 #include "raylib.h"
 #include <memory>
 
 void AppHost::reapplyScaleToAll() {
-    applyThemeScale(uiScale);
+    applyThemeScale(uiScale.value());
     ui::applyTheme(theme);
     for (auto& child : children)
-        child->applyThemeScale(uiScale);
+        child->applyThemeScale(uiScale.value());
 }
 
 void AppHost::onStart() {
@@ -38,7 +38,8 @@ void AppHost::onStart() {
 
     for (auto& factory : factories) {
         auto child = factory();
-        child->applyThemeScale(uiScale);
+        child->applyThemeScale(uiScale.value());
+        child->injectServices(&uiScale);
         child->onStart();
         children.push_back(std::move(child));
     }
@@ -52,11 +53,13 @@ void AppHost::onStop() {
 void AppHost::run() {
     InitWindow(1280, 720, "Crosstones V4");
     Vector2 dpiScale = GetWindowScaleDPI();
-    uiScale = (dpiScale.x + dpiScale.y) * 0.5f;
-    if (uiScale < 1.0f) uiScale = 1.0f;
-    SetWindowSize((int)(1280 * uiScale), (int)(720 * uiScale));
+    float detected = (dpiScale.x + dpiScale.y) * 0.5f;
+    if (detected < 1.0f) detected = 1.0f;
+    uiScale.set(detected);
+    uiScale.consumeDirty(); // startup detect isn't a "dynamic rescale"
+    SetWindowSize((int)(1280 * uiScale.value()), (int)(720 * uiScale.value()));
     SetWindowState(FLAG_WINDOW_RESIZABLE);
-    SetWindowMinSize((int)(800 * uiScale), (int)(600 * uiScale));
+    SetWindowMinSize((int)(800 * uiScale.value()), (int)(600 * uiScale.value()));
     SetTargetFPS(30);
     initAppFont();
 
@@ -70,6 +73,7 @@ void AppHost::run() {
         int h = GetScreenHeight();
         Vector2 mouse = GetMousePosition();
         bool click = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+        InputState input{ mouse, click, GetMouseWheelMove() };
 
         float s = theme.scale;
         float sidebarW = sidebar.open ? 200.0f * s : 40.0f * s;
@@ -84,9 +88,10 @@ void AppHost::run() {
         sidebar.activeIdx = activeApp;
 
         // ── Tick active child ──
+        ui::overlayBegin();
         if (activeApp >= 0 && activeApp < (int)children.size()) {
             children[activeApp]->resolveLayout(contentRect);
-            children[activeApp]->onTick(GetFrameTime());
+            children[activeApp]->onTick(GetFrameTime(), input);
         }
 
         // ── Draw ──
@@ -100,12 +105,11 @@ void AppHost::run() {
             children[activeApp]->onDrawOverlay(contentRect);
         }
 
-        ui::flushPopupDraws();
+        ui::overlayFlush(theme);
         EndDrawing();
 
         // ── Dynamic re-scale ──
-        if (uiScaleDirty) {
-            uiScaleDirty = false;
+        if (uiScale.consumeDirty()) {
             reapplyScaleToAll();
         }
     }

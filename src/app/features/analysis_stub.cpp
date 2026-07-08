@@ -1,12 +1,12 @@
 #include "analysis_stub.h"
-#include "raygui.h"
+#include "app/ui/components/panel.h"
 #include "app/FontManager.h"
 #include "app/ui/theme.h"
 
 namespace ui {
 
 void AnalysisStub::draw(Rectangle bounds, const Theme& t) {
-    GuiPanel(bounds, "Analysis");
+    Panel::draw(bounds, "Analysis", t);
 
     int x = (int)(bounds.x + 12 * t.scale);
     int y = (int)(bounds.y + 30 * t.scale);

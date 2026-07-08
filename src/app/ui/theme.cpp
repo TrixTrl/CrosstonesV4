@@ -4,15 +4,7 @@
 
 namespace ui {
 
-static Theme gTheme;
-
-Theme& currentTheme() {
-    return gTheme;
-}
-
 void applyTheme(const Theme& t) {
-    gTheme = t;
-
     // ── DEFAULT (applies to all controls as base) ──
     GuiSetStyle(DEFAULT, BACKGROUND_COLOR,       ColorToInt(t.bg));
     GuiSetStyle(DEFAULT, BASE_COLOR_NORMAL,      ColorToInt(t.panel));

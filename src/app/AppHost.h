@@ -1,6 +1,7 @@
 #pragma once
 #include "App.h"
 #include "ui/components/sidebar.h"
+#include "ui/scale.h"
 #include <memory>
 #include <vector>
 #include <string_view>
@@ -17,6 +18,7 @@ protected:
 
 private:
     ui::Sidebar sidebar;
+    ui::UiScale uiScale;
     std::vector<std::unique_ptr<App>> children;
     int activeApp = 0;
 

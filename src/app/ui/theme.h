@@ -13,6 +13,8 @@ struct Theme {
     Color textDim{180, 180, 180, 255};
     Color textAccent{255, 200, 50, 255};
     Color textSection{130, 130, 160, 255};
+    Color success{100, 200, 100, 255};
+    Color successHover{140, 240, 140, 255};
 
     int fontSize{14};
     int fontSizeSmall{12};
@@ -22,7 +24,6 @@ struct Theme {
     float scale = 1.0f;
 };
 
-Theme& currentTheme();
 void applyTheme(const Theme& t);
 
 } // namespace ui

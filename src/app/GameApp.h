@@ -5,6 +5,8 @@
 #include "ui/components/stepper.h"
 #include "ui/components/int_field.h"
 #include "ui/components/dropdown.h"
+#include "ui/components/radio_group.h"
+#include "ui/components/button.h"
 #include "data/GameEntries.h"
 #include "data/GamePosition.h"
 #include <memory>
@@ -33,7 +35,7 @@ public:
 
 protected:
     void onStart() override;
-    void onTick(float dt) override;
+    void onTick(float dt, const InputState& input) override;
     void onDraw(Rectangle contentRect) override;
     void onDrawOverlay(Rectangle contentRect) override;
     void onStop() override;
@@ -51,6 +53,8 @@ private:
         ui::IntField p1Field;
         ui::IntField p2Field;
         ui::Dropdown mainDropdown;
+        ui::RadioGroup posRadio;
+        ui::Button startButton;
         GameEntries gameEntries;
         PosSource posSource = POS_START;
         int lastGmIdx = 2;
@@ -60,19 +64,31 @@ private:
     } setup;
 
     // PLAYING state
+    struct PlayState {
+        std::unique_ptr<GameMaster> gameMaster;
+        ManualPlayer* manualP1 = nullptr;
+        ManualPlayer* manualP2 = nullptr;
+        Player* p1 = nullptr;
+        Player* p2 = nullptr;
+        std::unique_ptr<StackThread> gameThread;
+        GamePosition prevBoard;
+        bool lastMoveHighlights[13][13]{};
+        std::stop_source stopSource;
+        int saveFlashTimer = 0;
+        ui::Button saveButton;
+    };
     Parameters params;
-    Player* createPlayer(const std::string& type, int param, ManualPlayer** outManual);
-    std::unique_ptr<GameMaster> gameMaster;
-    ManualPlayer* manualP1 = nullptr;
-    ManualPlayer* manualP2 = nullptr;
-    Player* p1 = nullptr;
-    Player* p2 = nullptr;
-    std::unique_ptr<StackThread> gameThread;
-    GamePosition prevBoard;
-    bool lastMoveHighlights[13][13]{};
-    std::stop_source stopSource;
-    int saveFlashTimer = 0;
+    PlayState play;
 
+    struct SetupRects {
+        Rectangle p1Stepper, p1Input, p2Stepper, p2Input;
+        Rectangle startPos, preset, saved, mainDropdown;
+        Rectangle startBtn;
+    };
+    SetupRects computeSetupRects();
+
+    void onTickSetup(const InputState& input);
+    void onTickPlaying(const InputState& input);
     void drawSetupForm(Rectangle rect);
     void startGame();
 };

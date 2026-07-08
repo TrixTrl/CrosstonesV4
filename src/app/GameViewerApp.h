@@ -9,7 +9,7 @@
 class GameViewerApp : public App {
 protected:
     void onStart()  override;
-    void onTick(float) override;
+    void onTick(float, const InputState&) override;
     void onDraw(Rectangle) override;
     void onDrawOverlay(Rectangle) override;
 
@@ -21,11 +21,15 @@ private:
 
     void parseAndLoadGame(const std::string& gameCode);
 
+    struct State {
+        int currentMove = 0;
+        int presetIdx = 0;
+    };
+    State state;
+
     Board board;
     ui::Board boardView;
     std::vector<std::vector<Board::xMove>> gameReplay;
-    int currentMove = 0;
-    int presetIdx = 0;
     ui::Dropdown dropdown;
     std::vector<Entry> entries;
 };

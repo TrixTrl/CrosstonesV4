@@ -5,12 +5,16 @@
 #include "raylib.h"
 #include "ui/theme.h"
 #include "ui/layout.h"
-#include "ui/popup.h"
+#include "ui/overlay.h"
+#include "ui/scale.h"
 #include "FontManager.h"
 #include "data/LoadedPosition.h"
 
-inline float uiScale = 1.0f;
-inline bool uiScaleDirty = false;
+struct InputState {
+    Vector2 mouse{0, 0};
+    bool clicked = false;
+    float wheel = 0;
+};
 
 class App {
 public:
@@ -31,10 +35,15 @@ public:
     std::string title;
 
     virtual void onStart() {}
-    virtual void onTick(float dt) {}
+    virtual void onTick(float dt, const InputState& input) {}
     virtual void onDraw(Rectangle rect) = 0;
     virtual void onDrawOverlay(Rectangle rect) {}
     virtual void onStop() {}
+
+    // Hook for AppHost to hand a screen a service it needs beyond the base
+    // App interface. Every screen but SettingsApp (the only scale writer)
+    // no-ops this.
+    virtual void injectServices(ui::UiScale*) {}
 
 protected:
     ui::Theme theme;

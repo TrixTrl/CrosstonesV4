@@ -3,16 +3,24 @@
 
 namespace ui {
 
-Rectangle ScrollArea::begin(Rectangle bounds) {
-    Rectangle content = {0, 0, bounds.width, (float)contentH};
+Rectangle ScrollArea::begin(Rectangle bounds, int contentHeight) {
+    contentH = contentHeight;
+    /* 
+     Content width must stay strictly below bounds.width - 2*borderWidth,
+     or GuiScrollPanel's `content.width > bounds.width - 2*border` check
+     triggers a horizontal scrollbar even though there is
+     nothing to scroll horizontally. 
+     */
+    float contentWidth = bounds.width - 4;
+    Rectangle content = {0, 0, contentWidth, (float)contentH};
     Rectangle view;
-    if (GuiScrollPanel(bounds, NULL, content, &scroll, &view)) {
-        return view;
-    }
-    return {};
+    GuiScrollPanel(bounds, NULL, content, &scroll, &view);
+    BeginScissorMode((int)view.x, (int)view.y, (int)view.width, (int)view.height);
+    return view;
 }
 
 void ScrollArea::end() {
+    EndScissorMode();
 }
 
 } // namespace ui

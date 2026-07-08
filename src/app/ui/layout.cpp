@@ -7,11 +7,23 @@ void Slot::resolve(Rectangle bounds, float scale) {
     rect = bounds;
     if (children.empty()) return;
 
+    Rectangle inner = {
+        bounds.x + padding.left * scale,
+        bounds.y + padding.top * scale,
+        bounds.width - (padding.left + padding.right) * scale,
+        bounds.height - (padding.top + padding.bottom) * scale
+    };
+    if (inner.width < 0) inner.width = 0;
+    if (inner.height < 0) inner.height = 0;
+
     int n = (int)children.size();
     if (n == 1) {
-        children[0].resolve(bounds, scale);
+        children[0].resolve(inner, scale);
         return;
     }
+
+    float gapScaled = gap * scale;
+    float totalGap = gapScaled * (n - 1);
 
     float totalFlex = 0;
     float totalFixed = 0;
@@ -22,12 +34,12 @@ void Slot::resolve(Rectangle bounds, float scale) {
             totalFlex += child.flex;
     }
 
-    float available = (dir == Dir::Row ? bounds.width : bounds.height) - totalFixed;
+    float available = (dir == Dir::Row ? inner.width : inner.height) - totalFixed - totalGap;
     if (available < 0) available = 0;
 
-    float pos = (dir == Dir::Row ? bounds.x : bounds.y);
-    float crossPos = (dir == Dir::Row ? bounds.y : bounds.x);
-    float crossSize = (dir == Dir::Row ? bounds.height : bounds.width);
+    float pos = (dir == Dir::Row ? inner.x : inner.y);
+    float crossPos = (dir == Dir::Row ? inner.y : inner.x);
+    float crossSize = (dir == Dir::Row ? inner.height : inner.width);
 
     for (auto& child : children) {
         float size = 0;
@@ -48,7 +60,7 @@ void Slot::resolve(Rectangle bounds, float scale) {
         }
 
         child.resolve(childRect, scale);
-        pos += size;
+        pos += size + gapScaled;
     }
 }
 

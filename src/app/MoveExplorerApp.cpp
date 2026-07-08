@@ -1,6 +1,6 @@
 #include "MoveExplorerApp.h"
 #include "raylib.h"
-#include "raygui.h"
+#include "ui/components/panel.h"
 #include "game-suite/Board.h"
 #include <string>
 #include <vector>
@@ -41,11 +41,11 @@ void MoveExplorerApp::onStart() {
         { .id = "panel", .fixed = 300 },
     }};
 
-    presetIdx = 0;
+    state = State{};
     if (!loadedPosition.position.empty()) {
         for (int p = 0; p < numPresets; p++) {
             if (loadedPosition.position == positionPresets[p].position) {
-                presetIdx = p;
+                state.presetIdx = p;
                 break;
             }
         }
@@ -53,16 +53,13 @@ void MoveExplorerApp::onStart() {
 
     std::bitset<3> set(5);
     board.rst(set);
-    board.loadPosition(positionPresets[presetIdx].position);
+    board.loadPosition(positionPresets[state.presetIdx].position);
     board.copyPositionTo(boardView.position());
 }
 
-void MoveExplorerApp::onTick(float dt) {
+void MoveExplorerApp::onTick(float dt, const InputState& input) {
     bool isWhite = false;
     auto moves = board.getMoves(isWhite);
-
-    Vector2 mouse = GetMousePosition();
-    bool click = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 
     bool moveRequested = false;
     int moveDelta = 0;
@@ -81,28 +78,28 @@ void MoveExplorerApp::onTick(float dt) {
             moveDelta = -10;
             moveRequested = true;
         } else if (IsKeyPressed(KEY_DELETE)) {
-            moveIdx = 0;
+            state.moveIdx = 0;
             moveRequested = true;
         } else if (IsKeyPressed(KEY_SPACE)) {
-            paused = !paused;
-            autoTimer = 0;
+            state.paused = !state.paused;
+            state.autoTimer = 0;
         }
     }
 
     bool presetChanged = false;
     if (IsKeyPressed(KEY_LEFT_BRACKET)) {
-        presetIdx = (presetIdx - 1 + numPresets) % numPresets;
+        state.presetIdx = (state.presetIdx - 1 + numPresets) % numPresets;
         presetChanged = true;
     } else if (IsKeyPressed(KEY_RIGHT_BRACKET) || IsKeyPressed(KEY_TAB)) {
-        presetIdx = (presetIdx + 1) % numPresets;
+        state.presetIdx = (state.presetIdx + 1) % numPresets;
         presetChanged = true;
     }
 
     Rectangle panelRect = layout.find("panel")->rect;
     Rectangle dropdownRect = { panelRect.x, 20.0f * theme.scale, panelRect.width, (float)theme.itemH };
-    int sel = dropdown.handleInput(dropdownRect, mouse, click, numPresets);
+    int sel = dropdown.handleInput(dropdownRect, input.mouse, input.clicked, numPresets);
     if (sel >= 0) {
-        presetIdx = sel;
+        state.presetIdx = sel;
         presetChanged = true;
     }
 
@@ -110,18 +107,18 @@ void MoveExplorerApp::onTick(float dt) {
         board = Board();
         std::bitset<3> set(5);
         board.rst(set);
-        board.loadPosition(positionPresets[presetIdx].position);
+        board.loadPosition(positionPresets[state.presetIdx].position);
         board.copyPositionTo(boardView.position());
         moves = board.getMoves(isWhite);
-        moveIdx = 0;
-        paused = false;
-        autoTimer = 0;
+        state.moveIdx = 0;
+        state.paused = false;
+        state.autoTimer = 0;
     }
 
-    if (!paused && !dropdown.open && moves.size() > 0) {
-        autoTimer++;
-        if (autoTimer >= 30) {
-            autoTimer = 0;
+    if (!state.paused && !dropdown.open && moves.size() > 0) {
+        state.autoTimer++;
+        if (state.autoTimer >= 30) {
+            state.autoTimer = 0;
             moveDelta = 1;
             moveRequested = true;
         }
@@ -129,19 +126,19 @@ void MoveExplorerApp::onTick(float dt) {
 
     if (moves.size() > 0) {
         if (moveRequested) {
-            moveIdx += moveDelta;
-            moveIdx = (moveIdx % (int)moves.size() + (int)moves.size()) % (int)moves.size();
+            state.moveIdx += moveDelta;
+            state.moveIdx = (state.moveIdx % (int)moves.size() + (int)moves.size()) % (int)moves.size();
         }
         board.copyPositionTo(boardView.position());
         Board tempBoard = board;
-        tempBoard.unsafeApplyMove(boardView.position(), moves[moveIdx]);
+        tempBoard.unsafeApplyMove(boardView.position(), moves[state.moveIdx]);
     } else {
         board.copyPositionTo(boardView.position());
     }
 
     bool hl[13][13]{};
     if (moves.size() > 0) {
-        for (const auto& xm : moves[moveIdx]) {
+        for (const auto& xm : moves[state.moveIdx]) {
             if (xm.i >= 0 && xm.i < 13 && xm.j >= 0 && xm.j < 13)
                 hl[xm.i][xm.j] = true;
         }
@@ -150,14 +147,13 @@ void MoveExplorerApp::onTick(float dt) {
 }
 
 void MoveExplorerApp::onDraw(Rectangle rect) {
-    resolveLayout(rect);
     ui::Slot* boardSlot = layout.find("board");
     boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
 }
 
 void MoveExplorerApp::onDrawOverlay(Rectangle rect) {
     auto& r = layout.find("panel")->rect;
-    GuiPanel(r, "Position");
+    ui::Panel::draw(r, "Position", theme);
 
     std::vector<std::string_view> presetNames;
     for (int p = 0; p < numPresets; p++)
@@ -166,8 +162,8 @@ void MoveExplorerApp::onDrawOverlay(Rectangle rect) {
     dropdown.draw(dropdownRect, presetNames, theme);
 
     auto moves = board.getMoves(false);
-    std::string moveInfo = "Move: " + std::to_string(moveIdx + 1) + " / " + std::to_string(moves.size());
-    if (paused) moveInfo += "  [PAUSED]";
+    std::string moveInfo = "Move: " + std::to_string(state.moveIdx + 1) + " / " + std::to_string(moves.size());
+    if (state.paused) moveInfo += "  [PAUSED]";
     drawText(moveInfo.c_str(), (int)r.x, (int)(r.y + 56 * theme.scale), theme.fontSizeTitle, theme.text);
 
     int ctrlY = (int)(r.y + 86 * theme.scale);

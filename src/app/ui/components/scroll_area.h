@@ -7,7 +7,7 @@ struct ScrollArea {
     Vector2 scroll{0, 0};
     int contentH{0};
 
-    Rectangle begin(Rectangle bounds);
+    Rectangle begin(Rectangle bounds, int contentHeight);
     void end();
 };
 

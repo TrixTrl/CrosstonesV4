@@ -8,7 +8,7 @@
 class DCTestApp : public App {
 protected:
     void onStart() override;
-    void onTick(float) override;
+    void onTick(float, const InputState&) override;
     void onDraw(Rectangle) override;
     void onDrawOverlay(Rectangle) override;
     void onStop() override;

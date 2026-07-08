@@ -17,14 +17,13 @@ void DCTestApp::onStart() {
     });
 }
 
-void DCTestApp::onTick(float dt) {
+void DCTestApp::onTick(float dt, const InputState& /*input*/) {
     if (IsKeyPressed(KEY_ESCAPE)) {
         running = false;
     }
 }
 
 void DCTestApp::onDraw(Rectangle rect) {
-    resolveLayout(rect);
     ui::Slot* boardSlot = layout.find("board");
     boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
 }
