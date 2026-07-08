@@ -1,6 +1,6 @@
 #include "AlphaBeta.h"
 
-#define PRINTPOSITIONSINSEARCH
+// #define PRINTPOSITIONSINSEARCH
 /*
 function alphabeta(node, depth, α, β, maximizingPlayer) is
     if depth == 0 or node is terminal then
@@ -36,7 +36,7 @@ std::pair<bool, float> alphaBeta_sockVersion(uint8_t (*pieces)[13][13], int dept
     }
     else if (depth != 0)
     {
-        throw;
+        // throw;
     }
     if (depth == 0)
     {

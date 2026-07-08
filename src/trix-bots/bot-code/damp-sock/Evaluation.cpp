@@ -2,6 +2,21 @@
 
 float Evaluator::basicEvaluation(const uint8_t (*pieces)[13][13])
 {
+    const int boardScores[13][13] = {
+        {1, 1, 1, 1, 4, 5, 5, 5, 4, 1, 1, 1, 1},
+        {1, 0, 1, 0, 4, 0, 5, 0, 4, 0, 1, 0, 1},
+        {1, 1, 1, 1, 4, 5, 5, 5, 4, 1, 1, 1, 1},
+        {1, 0, 1, 0, 4, 0, 5, 0, 4, 0, 1, 0, 1},
+        {1, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+        {4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 4},
+        {3, 0, 1, 0, 1, 0, 3, 0, 1, 0, 1, 0, 3},
+        {3, 3, 2, 2, 2, 3, 3, 3, 2, 2, 2, 3, 3},
+        {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+
     float blackScore = 0;
     float whiteScore = 0;
 
@@ -14,11 +29,11 @@ float Evaluator::basicEvaluation(const uint8_t (*pieces)[13][13])
             {
                 if (Piece::isWhite(piece))
                 {
-                    whiteScore += Piece::height(piece);
+                    whiteScore += log(Piece::height(piece) * boardScores[y][x] + 1);
                 }
                 else
                 {
-                    blackScore += Piece::height(piece);
+                    blackScore += log(Piece::height(piece) * boardScores[12 - y][x] + 1);
                 }
             }
         }

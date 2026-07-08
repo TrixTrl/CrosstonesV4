@@ -1561,6 +1561,7 @@ int Utils::millis()
 
 std::string Utils::getKey(uint8_t (*pieces)[13][13])
 {
+	return convertToPosString(pieces);
 	std::string key = "";
 	for (int i = 0; i < 13; i++)
 	{
