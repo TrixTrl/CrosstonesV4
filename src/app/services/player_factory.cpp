@@ -1,8 +1,9 @@
 #include "player_factory.h"
 #include "felix-bots/Deepchad.h"
-#include "trix-bots/TheFirst.h"
-#include "trix-bots/Hydra.h"
-#include "trix-bots/AlphaCruncher.h"
+#include "trix-bots/bot-code/TheFirst.h"
+#include "trix-bots/bot-code/Hydra.h"
+#include "trix-bots/bot-code/AlphaCruncher.h"
+#include "trix-bots/bot-code/damp-sock/DampSock.h"
 #include "game-suite/ManualPlayer.h"
 #include "data/GamePosition.h"
 
@@ -12,6 +13,7 @@ const std::vector<PlayerTypeInfo>& availablePlayerTypes() {
     static const std::vector<PlayerTypeInfo> types = {
         {"Deepchad", "Deepchad"},
         {"AlphaCruncher", "AlphaCruncher"},
+        {"DampSock", "DampSock"},
         {"Hydra", "Hydra"},
         {"TheFirst", "TheFirst"},
         {"ManualPlayer", "ManualPlayer"},
@@ -24,6 +26,7 @@ Player* createPlayer(const std::string& typeId, int param,
     *outManual = nullptr;
     if (typeId == "Deepchad") return new Deepchad(param);
     if (typeId == "AlphaCruncher") return new AlphaCruncher(param);
+    if (typeId == "DampSock") return new DampSock(param);
     if (typeId == "Hydra") return new Hydra(param, 14);
     if (typeId == "TheFirst") return new TheFirst(param);
     if (typeId == "ManualPlayer") {

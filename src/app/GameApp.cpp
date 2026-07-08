@@ -6,9 +6,9 @@
 #include "game-suite/GameMaster.h"
 #include "StackThread.h"
 #include "data/GamePosition.h"
+#include <string>
 #include <bitset>
 #include <cstring>
-#include <string>
 #include <algorithm>
 
 GameApp::GameApp() = default;

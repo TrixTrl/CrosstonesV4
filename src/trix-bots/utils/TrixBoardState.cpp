@@ -1,5 +1,7 @@
 #include "TrixBoardState.h"
 
+#include "Utils.h"
+
 #define BACKGROUND "\x1b[43m\x1b[38;5;52m"
 #define RESET "\x1b[m"
 #define BLACK "\x1b[38;5;0m"

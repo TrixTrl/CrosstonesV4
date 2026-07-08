@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Toggles.h"
-#include "TrixBoardState.h"
+#include "../utils/TrixBoardState.h"
 #include <vector>
 #include <map>
 #include <time.h>
 #include <string>
-#include "Utils.h"
+#include "../utils/Utils.h"
 #include <algorithm>
 #include "MCTS_Structs.h"
 #include <algorithm>
@@ -15,7 +15,6 @@
 #include <thread>
 #include <shared_mutex>
 
-// using namespace ::std;
 
 std::vector<BoardState_T::xMove> UCT_Search(BoardState_T boardState, int searchTime, bool isWhite, std::map<std::string, Node> *tree);
 void simulatorLoop(int endTime, BoardState_T boardState, bool isWhite, std::map<std::string, Node> *tree, std::shared_mutex *treeLock);

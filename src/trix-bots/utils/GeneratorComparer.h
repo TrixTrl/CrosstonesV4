@@ -3,7 +3,7 @@
 #include "TrixBoardState.h"
 #include "Utils.h"
 #include "FastMoveGenerator.h"
-#include "MCTS.h"
+#include "../mcts/MCTS.h"
 #include <chrono>
 #include <string>
 
