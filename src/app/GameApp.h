@@ -7,7 +7,7 @@
 #include "ui/components/dropdown.h"
 #include "ui/components/radio_group.h"
 #include "ui/components/button.h"
-#include "data/GameEntries.h"
+#include "app/persistence/GameEntries.h"
 #include "data/GamePosition.h"
 #include <memory>
 #include <stop_token>

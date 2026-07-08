@@ -6,6 +6,7 @@
 #include "game-suite/GameMaster.h"
 #include "StackThread.h"
 #include "data/GamePosition.h"
+#include "app/persistence/GameSetupConfig.h"
 #include <string>
 #include <bitset>
 #include <cstring>
@@ -58,10 +59,24 @@ void GameApp::onStart() {
 
     setup.playerTypes.clear();
     for (auto& t : services::availablePlayerTypes()) setup.playerTypes.push_back(t.id);
-    setup.p1Field.text = "3";
+
+    GameSetupConfig cfg = GameSetupConfig::load();
+    auto findType = [&](const std::string& type, int fallback) {
+        for (int i = 0; i < (int)setup.playerTypes.size(); i++)
+            if (setup.playerTypes[i] == type) return i;
+        return fallback;
+    };
+
+    setup.p1Stepper.selectedIdx = findType(cfg.player1Type, 0);
+    setup.p1Field.text = cfg.player1Param;
     setup.p1Field.commit();
-    setup.p2Field.text = "3";
+
+    setup.p2Stepper.selectedIdx = findType(cfg.player2Type, (std::min)(1, (int)setup.playerTypes.size() - 1));
+    setup.p2Field.text = cfg.player2Param;
     setup.p2Field.commit();
+
+    setup.lastGmIdx = cfg.gameModeBits;
+    setup.mainDropdown.selectedIdx = cfg.gameModeBits;
 }
 
 // ── layout helper (shared by onTickSetup and drawSetupForm — computed once
@@ -172,6 +187,14 @@ void GameApp::startGame() {
     p.player2Type = setup.playerTypes[setup.p2Stepper.selectedIdx];
     p.player2Param = setup.p2Field.text;
     p.gameModeBits = (setup.posSource == POS_START) ? setup.mainDropdown.selectedIdx : setup.lastGmIdx;
+
+    GameSetupConfig cfg;
+    cfg.player1Type = p.player1Type;
+    cfg.player1Param = p.player1Param;
+    cfg.player2Type = p.player2Type;
+    cfg.player2Param = p.player2Param;
+    cfg.gameModeBits = p.gameModeBits;
+    cfg.save();
 
     if (setup.posSource == POS_PRESET || setup.posSource == POS_SAVED) {
         auto& src = (setup.posSource == POS_PRESET) ? setup.gameEntries.presets : setup.gameEntries.saves;

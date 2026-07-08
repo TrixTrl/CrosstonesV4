@@ -2,7 +2,7 @@
 #include "App.h"
 #include "ui/components/board.h"
 #include "ui/components/dropdown.h"
-#include "data/GameEntries.h"
+#include "app/persistence/GameEntries.h"
 #include "game-suite/Board.h"
 #include <vector>
 

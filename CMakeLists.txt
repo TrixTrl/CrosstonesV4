@@ -59,18 +59,30 @@ set(MY_MODULES
 foreach(MOD ${MY_MODULES})
     message(STATUS "Configuring module: ${MOD}")
 
-    file(GLOB_RECURSE MOD_SOURCES CONFIGURE_DEPENDS 
+    file(GLOB_RECURSE MOD_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.hpp"
     )
+    file(GLOB_RECURSE MOD_CPP_SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${MOD}/*.cpp"
+    )
 
-    add_library(${MOD} STATIC ${MOD_SOURCES})
+    # Header-only modules (no .cpp) need an INTERFACE library — CMake can't
+    # pick a linker language for a STATIC library with nothing to compile.
+    if(MOD_CPP_SOURCES)
+        set(MOD_SCOPE PUBLIC)
+        add_library(${MOD} STATIC ${MOD_SOURCES})
+    else()
+        set(MOD_SCOPE INTERFACE)
+        add_library(${MOD} INTERFACE)
+        target_sources(${MOD} INTERFACE ${MOD_SOURCES})
+    endif()
 
-    target_include_directories(${MOD} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-    
-    target_link_libraries(${MOD} PUBLIC raylib)
-    target_compile_options(${MOD} PUBLIC /EHsc)
+    target_include_directories(${MOD} ${MOD_SCOPE} ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+    target_link_libraries(${MOD} ${MOD_SCOPE} raylib)
+    target_compile_options(${MOD} ${MOD_SCOPE} /EHsc)
 
     target_link_libraries(crosstones_executable PRIVATE ${MOD})
 endforeach()
