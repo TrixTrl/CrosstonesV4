@@ -262,7 +262,6 @@ static void captureGenerator(
 {
     uint8_t origin = state[originX][originY];
 
-    emitMove(gen, state);
 
     if (!turned && ((state[x][y] & hasTurnPiece) != 0)) {
         GamePosition boardCopy = state;

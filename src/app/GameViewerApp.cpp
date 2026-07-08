@@ -56,10 +56,6 @@ void GameViewerApp::onStart() {
     auto all = GameEntries::loadAll();
 
     entries.clear();
-    for (auto& p : all.presets) {
-        std::string pos = p.position.empty() ? all.rootPos : p.position;
-        entries.push_back({p.name, buildGameCode(pos, p.moves)});
-    }
     for (auto& s : all.saves) {
         std::string pos = s.position.empty() ? all.rootPos : s.position;
         entries.push_back({s.name, buildGameCode(pos, s.moves)});

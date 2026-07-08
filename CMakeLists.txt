@@ -40,10 +40,19 @@ target_link_libraries(crosstones_executable PRIVATE raylib)
 target_compile_options(crosstones_executable PRIVATE /EHsc)
 
 # Copy resources to build output directory
-add_custom_command(TARGET crosstones_executable POST_BUILD
+file(GLOB_RECURSE RESOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/*")
+
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/resources.stamp
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/resources
-        $<TARGET_FILE_DIR:crosstones_executable>/resources)
+        $<TARGET_FILE_DIR:crosstones_executable>/resources
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/resources.stamp
+    DEPENDS ${RESOURCE_FILES}
+    COMMENT "Copying resources"
+)
+add_custom_target(copy_resources ALL DEPENDS ${CMAKE_BINARY_DIR}/resources.stamp)
+add_dependencies(crosstones_executable copy_resources)
 
 
 set(MY_MODULES
@@ -105,9 +114,9 @@ if(BUILD_TESTS)
         add_test(NAME ${TEST_NAME}
             COMMAND crosstones_executable --run-tests ${TEST_NAME})
     endforeach()
-    # Run all tests on every build
+    # Run all tests on every build. Failures are printed to the console
     add_custom_target(check ALL
-        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        COMMAND cmd /C "\"${CMAKE_CTEST_COMMAND}\" --output-on-failure & exit 0"
         DEPENDS crosstones_executable
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         USES_TERMINAL

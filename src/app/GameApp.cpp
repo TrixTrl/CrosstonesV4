@@ -7,6 +7,7 @@
 #include "StackThread.h"
 #include "data/GamePosition.h"
 #include "app/persistence/GameSetupConfig.h"
+#include "app/persistence/PositionPresets.h"
 #include <string>
 #include <bitset>
 #include <cstring>
@@ -29,15 +30,16 @@ static const char* gameModeNames[] = {
     "Tortoise", "Orchid", "Crane", "Dragon"
 };
 
-static void buildDropdownForSource(GameApp::PosSource src, GameEntries& entries,
+static void buildDropdownForSource(GameApp::PosSource src, const std::vector<PositionPreset>& presets,
+                                   GameEntries& entries,
                                    std::vector<std::string_view>& names, int& count) {
     names.clear(); count = 0;
     if (src == GameApp::POS_START) {
         for (int p = 0; p < 8; p++) names.push_back(gameModeNames[p]);
         count = 8;
     } else if (src == GameApp::POS_PRESET) {
-        for (auto& e : entries.presets) names.push_back(e.name);
-        count = (int)entries.presets.size();
+        for (auto& e : presets) names.push_back(e.name);
+        count = (int)presets.size();
     } else {
         for (auto& e : entries.saves) names.push_back(e.name);
         count = (int)entries.saves.size();
@@ -77,11 +79,12 @@ void GameApp::onStart() {
 
     setup.lastGmIdx = cfg.gameModeBits;
     setup.mainDropdown.selectedIdx = cfg.gameModeBits;
+
+    setup.gamePresets = PositionPresets::loadAll();
 }
 
 // ── layout helper (shared by onTickSetup and drawSetupForm — computed once
-// per call site rather than duplicated, to avoid the desync risk of two
-// independently-maintained copies of the same rect math) ──
+// per call site rather than duplicated) ──
 
 GameApp::SetupRects GameApp::computeSetupRects() {
     float s = theme.scale;
@@ -125,7 +128,7 @@ void GameApp::onTickSetup(const InputState& input) {
 
     std::vector<std::string_view> dropdownNames;
     int dropdownCount = 0;
-    buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
+    buildDropdownForSource(setup.posSource, setup.gamePresets, setup.gameEntries, dropdownNames, dropdownCount);
 
     bool blocked = setup.mainDropdown.open || setup.p1Field.active || setup.p2Field.active;
     SetupRects r = computeSetupRects();
@@ -144,14 +147,14 @@ void GameApp::onTickSetup(const InputState& input) {
             setup.mainDropdown.open = false;
         } else if (radioSel == 1 && setup.posSource != POS_PRESET) {
             setup.posSource = POS_PRESET;
-            setup.gameEntries = GameEntries::loadAll();
-            buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
+            setup.gamePresets = PositionPresets::loadAll();
+            buildDropdownForSource(setup.posSource, setup.gamePresets, setup.gameEntries, dropdownNames, dropdownCount);
             setup.mainDropdown.selectedIdx = (std::min)(setup.presetIdx, (std::max)(0, dropdownCount - 1));
             setup.mainDropdown.open = false;
         } else if (radioSel == 2 && setup.posSource != POS_SAVED) {
             setup.posSource = POS_SAVED;
             setup.gameEntries = GameEntries::loadAll();
-            buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
+            buildDropdownForSource(setup.posSource, setup.gamePresets, setup.gameEntries, dropdownNames, dropdownCount);
             setup.mainDropdown.selectedIdx = (std::min)(setup.saveIdx, (std::max)(0, dropdownCount - 1));
             setup.mainDropdown.open = false;
         }
@@ -196,13 +199,19 @@ void GameApp::startGame() {
     cfg.gameModeBits = p.gameModeBits;
     cfg.save();
 
-    if (setup.posSource == POS_PRESET || setup.posSource == POS_SAVED) {
-        auto& src = (setup.posSource == POS_PRESET) ? setup.gameEntries.presets : setup.gameEntries.saves;
-        int idx = (setup.posSource == POS_PRESET) ? setup.presetIdx : setup.saveIdx;
-        if (idx >= 0 && idx < (int)src.size()) {
-            auto& entry = src[idx];
+    loadedPosition = LoadedPosition{};
+    if (setup.posSource == POS_PRESET) {
+        int idx = setup.presetIdx;
+        if (idx >= 0 && idx < (int)setup.gamePresets.size()) {
+            auto& preset = setup.gamePresets[idx];
+            loadedPosition.position = preset.position;
+            loadedPosition.displayName = preset.name;
+        }
+    } else if (setup.posSource == POS_SAVED) {
+        int idx = setup.saveIdx;
+        if (idx >= 0 && idx < (int)setup.gameEntries.saves.size()) {
+            auto& entry = setup.gameEntries.saves[idx];
             loadedPosition.position = entry.position.empty() ? setup.gameEntries.rootPos : entry.position;
-            loadedPosition.moveHistory = entry.moves;
             loadedPosition.displayName = entry.name;
         }
     }
@@ -224,6 +233,8 @@ void GameApp::startGame() {
 
     if (!loadedPosition.position.empty())
         play.gameMaster->loadPos(loadedPosition.position);
+
+    play.startPosition = play.gameMaster->getBoard().dumpPosition();
 
     play.prevBoard = boardView.position();
     std::memset(play.lastMoveHighlights, 0, sizeof(play.lastMoveHighlights));
@@ -273,6 +284,7 @@ void GameApp::onTickPlaying(const InputState& input) {
             entry.name = name;
             entry.player1 = params.player1Type;
             entry.player2 = params.player2Type;
+            entry.position = play.startPosition;
             entry.moves = moves;
             GameEntries::appendSave(entry);
             play.saveFlashTimer = 120;
@@ -300,7 +312,7 @@ void GameApp::drawSetupForm(Rectangle rect) {
 
     std::vector<std::string_view> dropdownNames;
     int dropdownCount = 0;
-    buildDropdownForSource(setup.posSource, setup.gameEntries, dropdownNames, dropdownCount);
+    buildDropdownForSource(setup.posSource, setup.gamePresets, setup.gameEntries, dropdownNames, dropdownCount);
 
     SetupRects r = computeSetupRects();
 

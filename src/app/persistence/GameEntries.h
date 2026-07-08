@@ -12,7 +12,6 @@ struct GameEntry {
 
 struct GameEntries {
     std::string rootPos;
-    std::vector<GameEntry> presets;
     std::vector<GameEntry> saves;
 
     static GameEntries loadAll();

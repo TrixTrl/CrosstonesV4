@@ -2,6 +2,7 @@
 #include "App.h"
 #include "ui/components/board.h"
 #include "ui/components/dropdown.h"
+#include "app/persistence/PositionPresets.h"
 #include "game-suite/Board.h"
 #include <bitset>
 #include <vector>
@@ -25,4 +26,5 @@ private:
     Board board;
     ui::Board boardView;
     ui::Dropdown dropdown;
+    std::vector<PositionPreset> presets;
 };

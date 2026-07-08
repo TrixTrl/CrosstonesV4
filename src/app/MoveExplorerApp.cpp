@@ -6,45 +6,18 @@
 #include <vector>
 #include <cstring>
 
-struct PositionPreset {
-    const char* name;
-    const char* position;
-};
-
-static const PositionPreset positionPresets[] = {
-    {"Standard Start",
-     "b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 "
-     "-B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 "
-     "11111111111111111111"},
-    {"Dragon Start",
-     "b-10000 b-10012 b-11200 b-11212 b-10606 r-10006 r-11206 -W30512 "
-     "-W30510 -B30502 -B30500 -W30712 -W30710 -B30702 -B30700 "
-     "11111111111111111111"},
-    {"Unsolved Endgame",
-     "-B30500 b-11200 bW20204 -W10304 -B30804 -B11204 -B20410 -W11210 "
-     "bW20212 r-10412 -W10512 -W20712 11110111110111111010"},
-    {"Seagull Gambit",
-     "b-10000 b-10012 b-11200 b-11212 rW20006 r-11206 -B10206 -B20204 "
-     "-B30500 -B30700 -W30512 -W30712 -W10605 -W10607 -W10808 -W20809 "
-     "-B21104 11110111111111111111"},
-    {"Win in 4 Ply",
-     "-B10700 -W10803 -W10602 00000000000000000000"},
-    {"Slaughterhouse",
-     "b-10000 r-10006 b-10012 -W30510 -B30502 b-10606 -B30702 -W30710 "
-     "b-11200 r-11206 b-11212 11111111111111111111"},
-};
-static const int numPresets = sizeof(positionPresets) / sizeof(positionPresets[0]);
-
 void MoveExplorerApp::onStart() {
     layout = { .dir = ui::Dir::Row, .children = {
         { .id = "board", .flex = 1, .minPx = 600 },
         { .id = "panel", .fixed = 300 },
     }};
 
+    presets = PositionPresets::loadAll();
+
     state = State{};
     if (!loadedPosition.position.empty()) {
-        for (int p = 0; p < numPresets; p++) {
-            if (loadedPosition.position == positionPresets[p].position) {
+        for (int p = 0; p < (int)presets.size(); p++) {
+            if (loadedPosition.position == presets[p].position) {
                 state.presetIdx = p;
                 break;
             }
@@ -53,7 +26,8 @@ void MoveExplorerApp::onStart() {
 
     std::bitset<3> set(5);
     board.rst(set);
-    board.loadPosition(positionPresets[state.presetIdx].position);
+    if (!presets.empty())
+        board.loadPosition(presets[state.presetIdx].position);
     board.copyPositionTo(boardView.position());
 }
 
@@ -86,11 +60,12 @@ void MoveExplorerApp::onTick(float dt, const InputState& input) {
         }
     }
 
+    int numPresets = (int)presets.size();
     bool presetChanged = false;
-    if (IsKeyPressed(KEY_LEFT_BRACKET)) {
+    if (numPresets > 0 && IsKeyPressed(KEY_LEFT_BRACKET)) {
         state.presetIdx = (state.presetIdx - 1 + numPresets) % numPresets;
         presetChanged = true;
-    } else if (IsKeyPressed(KEY_RIGHT_BRACKET) || IsKeyPressed(KEY_TAB)) {
+    } else if (numPresets > 0 && (IsKeyPressed(KEY_RIGHT_BRACKET) || IsKeyPressed(KEY_TAB))) {
         state.presetIdx = (state.presetIdx + 1) % numPresets;
         presetChanged = true;
     }
@@ -103,11 +78,11 @@ void MoveExplorerApp::onTick(float dt, const InputState& input) {
         presetChanged = true;
     }
 
-    if (presetChanged) {
+    if (presetChanged && numPresets > 0) {
         board = Board();
         std::bitset<3> set(5);
         board.rst(set);
-        board.loadPosition(positionPresets[state.presetIdx].position);
+        board.loadPosition(presets[state.presetIdx].position);
         board.copyPositionTo(boardView.position());
         moves = board.getMoves(isWhite);
         state.moveIdx = 0;
@@ -156,8 +131,8 @@ void MoveExplorerApp::onDrawOverlay(Rectangle rect) {
     ui::Panel::draw(r, "Position", theme);
 
     std::vector<std::string_view> presetNames;
-    for (int p = 0; p < numPresets; p++)
-        presetNames.push_back(positionPresets[p].name);
+    for (auto& p : presets)
+        presetNames.push_back(p.name);
     Rectangle dropdownRect = { r.x, r.y + 24 * theme.scale, r.width, (float)theme.itemH };
     dropdown.draw(dropdownRect, presetNames, theme);
 

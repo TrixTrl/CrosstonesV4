@@ -8,6 +8,7 @@
 #include "ui/components/radio_group.h"
 #include "ui/components/button.h"
 #include "app/persistence/GameEntries.h"
+#include "app/persistence/PositionPresets.h"
 #include "data/GamePosition.h"
 #include <memory>
 #include <stop_token>
@@ -56,6 +57,7 @@ private:
         ui::RadioGroup posRadio;
         ui::Button startButton;
         GameEntries gameEntries;
+        std::vector<PositionPreset> gamePresets;
         PosSource posSource = POS_START;
         int lastGmIdx = 2;
         int presetIdx = 0;
@@ -76,6 +78,7 @@ private:
         std::stop_source stopSource;
         int saveFlashTimer = 0;
         ui::Button saveButton;
+        std::string startPosition;
     };
     Parameters params;
     PlayState play;

@@ -53,7 +53,6 @@ static void parseFile(const std::string& path, std::string& outRootPos,
 
 GameEntries GameEntries::loadAll() {
     GameEntries result;
-    parseFile("resources/presets.txt", result.rootPos, result.presets);
     parseFile("saved_games.txt", result.rootPos, result.saves);
     return result;
 }
