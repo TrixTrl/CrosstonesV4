@@ -6,12 +6,14 @@
 #include <memory>
 #include "data/GamePosition.h"
 #include "data/XMove.h"
+#include "globals/GameMode.h"
 
 class Board
 {
 public:
 	Board();
 	void rst(std::bitset<3>& tps);
+	void rst(GameMode mode) { auto tps = gameModeToTps(mode); rst(tps); }
 	void wipe();
 
 	using xMove = XMoveTile;

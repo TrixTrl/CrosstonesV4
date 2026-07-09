@@ -18,4 +18,6 @@ private:
 
     bool testRoundTrip();
     bool testShortenUniqueness();
+    bool testFormatting();
+    bool testShortening();
 };

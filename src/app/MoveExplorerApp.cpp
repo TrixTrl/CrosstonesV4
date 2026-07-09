@@ -24,8 +24,7 @@ void MoveExplorerApp::onStart() {
         }
     }
 
-    std::bitset<3> set(5);
-    board.rst(set);
+    board.rst(GameMode::Orchid);
     if (!presets.empty())
         board.loadPosition(presets[state.presetIdx].position);
     board.copyPositionTo(boardView.position());
@@ -80,8 +79,7 @@ void MoveExplorerApp::onTick(float dt, const InputState& input) {
 
     if (presetChanged && numPresets > 0) {
         board = Board();
-        std::bitset<3> set(5);
-        board.rst(set);
+        board.rst(GameMode::Orchid);
         board.loadPosition(presets[state.presetIdx].position);
         board.copyPositionTo(boardView.position());
         moves = board.getMoves(isWhite);
@@ -123,7 +121,7 @@ void MoveExplorerApp::onTick(float dt, const InputState& input) {
 
 void MoveExplorerApp::onDraw(Rectangle rect) {
     ui::Slot* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale, theme.highlight);
 }
 
 void MoveExplorerApp::onDrawOverlay(Rectangle rect) {

@@ -1,13 +1,11 @@
 #include "StateTester.h"
 #include "globals/Piece.h"
 #include <iostream>
-#include <bitset>
 
 #define PIECEREDUCTIONERROR 0
 
 StateTester::StateTester() {
-    std::bitset<3> set(5);
-    BS.rst(set);
+    BS.rst(GameMode::Orchid);
     BS.copyPositionTo(&pieces);
 }
 

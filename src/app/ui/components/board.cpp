@@ -33,7 +33,7 @@ void Board::clearHistoryPreview() {
     hasHistoryPreview = false;
 }
 
-void Board::draw(Rectangle rect, float scale) {
+void Board::draw(Rectangle rect, float scale, Color highlightColor) {
     float borderRatio = 0.7f;
     float totalUnits = 13.0f + 2.0f * borderRatio;
     int cellSize = (std::min)((int)(rect.width / totalUnits), (int)(rect.height / totalUnits));
@@ -74,10 +74,10 @@ void Board::draw(Rectangle rect, float scale) {
 
     const GamePosition& gridState = hasHistoryPreview ? historyPreviewState : displayBoard;
     drawGrid(cellSize, ox, oy, gridState);
-    drawMovePath(cellSize, ox, oy);
+    drawMovePath(cellSize, ox, oy, highlightColor);
 
     if (hasHistoryPreview) {
-        drawHighlights(highlights, cellSize, ox, oy);
+        drawHighlights(highlights, cellSize, ox, oy, highlightColor);
         drawPieces(historyPreviewState, cellSize, ox, oy);
     } else {
         bool previewing = moveInfo && !moveInfo->xmove.empty();
@@ -94,7 +94,7 @@ void Board::draw(Rectangle rect, float scale) {
         }
 
         const bool (&finalHighlights)[13][13] = previewing ? diffHighlights : highlights;
-        drawHighlights(finalHighlights, cellSize, ox, oy);
+        drawHighlights(finalHighlights, cellSize, ox, oy, highlightColor);
 
         const GamePosition& drawState = previewing ? previewState : displayBoard;
         drawPieces(drawState, cellSize, ox, oy);
@@ -151,7 +151,7 @@ void Board::drawGrid(int cellSize, int ox, int oy, const GamePosition& state) {
     }
 }
 
-void Board::drawMovePath(int cellSize, int ox, int oy) {
+void Board::drawMovePath(int cellSize, int ox, int oy, Color color) {
     if (!moveInfo || moveInfo->path.empty()) return;
 
     struct Pt { int i, j; };
@@ -168,7 +168,7 @@ void Board::drawMovePath(int cellSize, int ox, int oy) {
                          (float)(oy + from.j * cellSize + cellSize / 2)};
         Vector2 end   = {(float)(ox + to.i   * cellSize + cellSize / 2),
                          (float)(oy + to.j   * cellSize + cellSize / 2)};
-        DrawLineEx(start, end, 3.0f, Color{255, 255, 100, 200});
+        DrawLineEx(start, end, 3.0f, color);
     }
 }
 
@@ -221,13 +221,13 @@ void Board::drawPieces(const GamePosition& state, int cellSize, int ox, int oy) 
     }
 }
 
-void Board::drawHighlights(const bool hl[13][13], int cellSize, int ox, int oy) {
+void Board::drawHighlights(const bool hl[13][13], int cellSize, int ox, int oy, Color color) {
     if (!hl) return;
 
     for (int i = 0; i < 13; i++) {
         for (int j = 0; j < 13; j++) {
             if (hl[i][j]) {
-                DrawRectangleLines(ox + i * cellSize, oy + j * cellSize, cellSize, cellSize, YELLOW);
+                DrawRectangleLines(ox + i * cellSize, oy + j * cellSize, cellSize, cellSize, color);
             }
         }
     }

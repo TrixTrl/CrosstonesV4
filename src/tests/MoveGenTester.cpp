@@ -22,8 +22,7 @@ namespace {
 
 void loadRaw(const std::string& posStr, uint8_t (&out)[13][13]) {
     Board b;
-    std::bitset<3> mode(0);
-    b.rst(mode);
+    b.rst(GameMode::Phoenix);
     b.loadPosition(posStr);
     b.copyPositionTo(&out);
 }
@@ -42,8 +41,7 @@ using GeneratorAdapter = std::function<std::vector<GamePosition>(const std::stri
 
 std::vector<GamePosition> genReferenceBoard(const std::string& posStr, bool isWhite) {
     Board b;
-    std::bitset<3> mode(0);
-    b.rst(mode);
+    b.rst(GameMode::Phoenix);
     b.loadPosition(posStr);
     auto moves = b.getMoves(isWhite);
     GamePosition start = b.positionCopy();

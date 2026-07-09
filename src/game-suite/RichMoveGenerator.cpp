@@ -77,11 +77,24 @@ static void basicGenerator(
     if (!turned && (piece & hasTurnPiece) != 0) {
         GamePosition copy = state;
         copy[x][y] ^= setTurnPiece;
-        if (!gen.currentPath.empty())
-            gen.currentPath.back().turned = true;
         Board::VisitedMap visitedCopy = visited;
+        // A turn taken with zero prior steps (turning in place at the
+        // start square) has no PathStep to mark yet — push one for the
+        // origin square so the resulting MoveInfo::path isn't empty
+        bool pushedOriginStep = gen.currentPath.empty();
+        if (pushedOriginStep) {
+            PathStep originStep;
+            originStep.i = x;
+            originStep.j = y;
+            originStep.turned = true;
+            gen.currentPath.push_back(originStep);
+        } else {
+            gen.currentPath.back().turned = true;
+        }
         basicGenerator(gen, copy, x, y, visitedCopy, remainingSteps, true, isWhite);
-        if (!gen.currentPath.empty())
+        if (pushedOriginStep)
+            gen.currentPath.pop_back();
+        else
             gen.currentPath.back().turned = false;
     }
 
@@ -159,7 +172,8 @@ static void basicGenerator(
                 PathStep step;
                 step.i = destX;
                 step.j = destY;
-                step.splitOnwards = 0;
+                step.splitOnwards = (splitOff == Piece::height(piece)) ? 0 : splitOff;
+                step.merged = true;
                 gen.currentPath.push_back(step);
 
                 Board::VisitedMap visitedCopy = visited;
@@ -223,7 +237,6 @@ static void basicGenerator(
                 PathStep step;
                 step.i = destX;
                 step.j = destY;
-                step.splitOnwards = Piece::height(piece);
                 step.pushed = true;
                 gen.currentPath.push_back(step);
 
@@ -323,7 +336,7 @@ static void captureGenerator(
                 PathStep splitStep;
                 splitStep.i = i;
                 splitStep.j = j;
-                splitStep.splitOnwards = 0;
+                splitStep.splitOnwards = (Piece::height(origin) <= 2) ? 0 : splitOff;
                 gen.currentPath.push_back(capStep);
                 gen.currentPath.push_back(splitStep);
 

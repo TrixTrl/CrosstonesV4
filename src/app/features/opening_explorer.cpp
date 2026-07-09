@@ -2,9 +2,7 @@
 #include "raylib.h"
 #include "app/FontManager.h"
 #include "app/ui/components/panel.h"
-#include <fstream>
-#include <sstream>
-#include <bitset>
+#include "globals/GameMode.h"
 #include <cstring>
 #include <algorithm>
 
@@ -16,64 +14,11 @@ static const char* defaultRootPos() {
            "11111111111111111111";
 }
 
-static const char* gameModeNameForBits(int bits) {
-    switch (bits) {
-        case 0: return "Phoenix";
-        case 1: return "Monkey";
-        case 2: return "Lotus";
-        case 3: return "Kylin";
-        case 4: return "Tortoise";
-        case 5: return "Orchid";
-        case 6: return "Crane";
-        case 7: return "Dragon";
-        default: return "Custom";
-    }
-}
-
 static int extractGameModeBits(const std::string& pos) {
     auto space = pos.rfind(' ');
     if (space == std::string::npos) return 2;
-    std::string last = pos.substr(space + 1);
-    if (last.length() >= 3) {
-        int b = 0;
-        for (int i = 0; i < 3 && i < (int)last.length(); i++)
-            if (last[i] == '1') b |= (1 << (2 - i));
-        return b;
-    }
-    return 2;
-}
-
-// ── loading (old-format compatible) ──────────────────────────────────
-
-static void parseOpeningsFile(const std::string& path,
-                              std::string& outRootPos,
-                              std::vector<std::pair<std::string, std::vector<int>>>& outOpenings) {
-    std::ifstream file(path);
-    if (!file.is_open()) return;
-
-    std::string line, currentName;
-    std::vector<int> currentMoves;
-
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') continue;
-
-        if (line.substr(0, 5) == "root=") {
-            outRootPos = line.substr(5);
-        } else if (line[0] == '[') {
-            if (!currentName.empty() && !currentMoves.empty())
-                outOpenings.push_back({currentName, currentMoves});
-            auto end = line.find(']');
-            currentName = line.substr(1, end == std::string::npos ? line.size() - 1 : end - 1);
-            currentMoves.clear();
-        } else if (line.substr(0, 6) == "moves=") {
-            std::string ms = line.substr(6);
-            std::stringstream ss(ms);
-            int idx;
-            while (ss >> idx) currentMoves.push_back(idx);
-        }
-    }
-    if (!currentName.empty() && !currentMoves.empty())
-        outOpenings.push_back({currentName, currentMoves});
+    std::string token = pos.substr(space + 1);
+    return static_cast<int>(gameModeFromTurningSquareToken(token));
 }
 
 // ── onStart ──────────────────────────────────────────────────────────
@@ -107,83 +52,111 @@ void OpeningExplorer::onStart() {
 
 void OpeningExplorer::initDefaultRoot() {
     rootPos = defaultRootPos();
-    gameModeName = gameModeNameForBits(extractGameModeBits(rootPos));
+    gameModeName = ::gameModeName(gameModeFromInt(extractGameModeBits(rootPos)));
 }
 
 void OpeningExplorer::loadAndBuildTree() {
     rootPos.clear();
-    std::vector<std::pair<std::string, std::vector<int>>> openings;
-
-    parseOpeningsFile("resources/openings.txt", rootPos, openings);
+    Openings openings = Openings::loadAll();
+    rootPos = openings.rootPos;
 
     if (rootPos.empty()) {
         initDefaultRoot();
     } else {
-        gameModeName = gameModeNameForBits(extractGameModeBits(rootPos));
+        gameModeName = ::gameModeName(gameModeFromInt(extractGameModeBits(rootPos)));
     }
 
-    buildTreeFromOpenings(openings);
+    buildTreeFromOpenings(openings.entries);
     currentNode = &root;
 }
 
-void OpeningExplorer::buildTreeFromOpenings(
-    const std::vector<std::pair<std::string, std::vector<int>>>& openings)
+static bool tryResolveEntryMoves(const OpeningEntry& entry, const std::string& rootPos, int mode,
+                                  std::vector<XMove>& outMoves) {
+    Board b;
+    b.rst(gameModeFromInt(mode));
+    std::string pos = rootPos;
+    size_t space = pos.rfind(' ');
+    if (space != std::string::npos)
+        pos = pos.substr(0, space + 1) + gameModeTurningSquareToken(gameModeFromInt(mode));
+    b.loadPosition(pos);
+
+    outMoves.clear();
+    for (size_t mi = 0; mi < entry.ksnMoves.size(); ++mi) {
+        bool isWhite = (mi % 2 == 0);
+        auto allInfos = RichMoveGenerator::generate(b.positionCopy(), isWhite);
+        auto allKsn = KsnFormatter::enrichAll(allInfos);
+        auto indices = KsnFormatter::match(entry.ksnMoves[mi], allKsn);
+
+        if (indices.empty()) return false;
+
+        XMove mv;
+        if (indices.size() == 1) {
+            mv = allKsn[indices[0]].info.xmove;
+        } else {
+            bool foundExact = false;
+            for (int idx : indices) {
+                if (allKsn[idx].longKsn == entry.ksnMoves[mi]) {
+                    mv = allKsn[idx].info.xmove;
+                    foundExact = true;
+                    break;
+                }
+            }
+            if (!foundExact) return false;
+        }
+
+        outMoves.push_back(mv);
+        b.unsafeMakeMove(mv);
+    }
+    return true;
+}
+
+void OpeningExplorer::buildTreeFromOpenings(const std::vector<OpeningEntry>& openings)
 {
     root = MoveNode{};
-    root.name = "Root";
 
-    for (const auto& [name, indices] : openings) {
-        Board b;
-        std::bitset<3> set(5);
-        b.rst(set);
-        b.loadPosition(rootPos);
+    for (const auto& entry : openings) {
+        std::vector<int> modesToTry = entry.modes.empty() ? std::vector<int>{5} : entry.modes;
+
+        std::vector<XMove> resolvedMoves;
+        bool resolved = false;
+        for (int mode : modesToTry) {
+            if (tryResolveEntryMoves(entry, rootPos, mode, resolvedMoves)) {
+                resolved = true;
+                break;
+            }
+        }
+        if (!resolved) continue;
 
         MoveNode* node = &root;
-        for (size_t mi = 0; mi < indices.size(); ++mi) {
-            bool isWhite = (mi % 2 == 0);
-            auto allMoves = b.getMoves(isWhite);
-            int idx = indices[mi];
+        for (auto& mv : resolvedMoves) {
+            auto* child = node->findChild(mv);
+            if (!child) child = node->addChild(mv);
 
-            if (idx < 0 || idx >= (int)allMoves.size()) break;
+            // Union all modes
+            for (int m : entry.modes)
+                if (std::find(child->modes.begin(), child->modes.end(), m) == child->modes.end())
+                    child->modes.push_back(m);
 
-            if (allMoves[idx].empty()) break;
-
-            auto* child = node->findChild(allMoves[idx]);
-            if (!child) child = node->addChild(allMoves[idx]);
-
-            b.unsafeMakeMove(allMoves[idx]);
             node = child;
         }
-        node->name = name;
+        node->labels.push_back({entry.name, entry.code, entry.modes});
     }
 }
 
-static std::string makeModeToken(int gameMode) {
-    int groups[] = {
-        0, 0, 0, 0, 2, 0, 0, 2, 1, 1,
-        1, 1, 2, 0, 0, 2, 0, 0, 0, 0,
-    };
-    bool bits[3] = {
-        ((gameMode >> 0) & 1) != 0,
-        ((gameMode >> 1) & 1) != 0,
-        ((gameMode >> 2) & 1) != 0,
-    };
-    std::string token(20, '0');
-    for (int n = 0; n < 20; n++)
-        token[n] = bits[groups[n]] ? '1' : '0';
-    return token;
+static bool nodeAppliesToMode(const MoveNode* node, int mode) {
+    if (!node || node->modes.empty()) return true; // unrestricted/malformed data fallback
+    return std::find(node->modes.begin(), node->modes.end(), mode) != node->modes.end();
 }
 
 void OpeningExplorer::initBoardAtRoot(int gameMode) {
     board = Board();
-    std::bitset<3> set(gameMode);
-    board.rst(set);
+    board.rst(gameModeFromInt(gameMode));
     std::string pos = rootPos;
     size_t space = pos.rfind(' ');
     if (space != std::string::npos)
-        pos = pos.substr(0, space + 1) + makeModeToken(gameMode);
+        pos = pos.substr(0, space + 1) + gameModeTurningSquareToken(gameModeFromInt(gameMode));
     board.loadPosition(pos);
-    gameModeName = gameModeNameForBits(gameMode);
+    gameModeName = ::gameModeName(gameModeFromInt(gameMode));
 }
 
 void OpeningExplorer::syncBoard() {
@@ -192,18 +165,13 @@ void OpeningExplorer::syncBoard() {
 
 // ── build UI data ───────────────────────────────────────────────────
 
-static const char* modeNames[] = {
-    "Phoenix", "Monkey", "Lotus", "Kylin",
-    "Tortoise", "Orchid", "Crane", "Dragon"
-};
-
 void OpeningExplorer::buildMoveList() {
     moveList.entries.clear();
 
     if (phase == ExplorerPhase::ChoosingMode) {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < kGameModeCount; i++) {
             ui::MoveEntry e;
-            e.label = modeNames[i];
+            e.label = ::gameModeName(gameModeFromInt(i));
             e.eval = 0.0f;
             e.isBook = true;
             moveList.entries.push_back(e);
@@ -223,7 +191,8 @@ void OpeningExplorer::buildMoveList() {
 
         if (currentNode && !cachedKsnMoves[i].info.xmove.empty()) {
             for (const auto& child : currentNode->children) {
-                if (child->moveData == cachedKsnMoves[i].info.xmove) {
+                if (child->moveData == cachedKsnMoves[i].info.xmove &&
+                    nodeAppliesToMode(child.get(), selectedGameMode)) {
                     e.isBook = true;
                     break;
                 }
@@ -237,8 +206,11 @@ void OpeningExplorer::buildMoveList() {
             auto* md = static_cast<XMove*>(e.userData);
             if (md->empty()) continue;
             for (const auto& child : currentNode->children) {
-                if (child->moveData == (*md) && !child->name.empty()) {
-                    e.subtitle = child->name;
+                if (child->moveData != (*md)) continue;
+                const OpeningLabel* label = child->labelForMode(selectedGameMode);
+                if (label) {
+                    e.subtitle = label->code.empty() ? label->name
+                                                      : ("[" + label->code + "] " + label->name);
                     break;
                 }
             }
@@ -321,7 +293,7 @@ void OpeningExplorer::playMove(int candidateIdx) {
         step.move = ksnMove.info.xmove;
         step.info = ksnMove.info;
         step.node = nextNode;
-        step.ksn = ksnMove.longKsn;
+        step.ksn = KsnFormatter::shorten(originalIdx, cachedKsnMoves);
         navPath.push_back(step);
     }
 
@@ -357,12 +329,11 @@ void OpeningExplorer::undoToMoveCount(int targetMoves) {
 
     Board b;
     int gm = (phase == ExplorerPhase::Exploring) ? selectedGameMode : 2;
-    std::bitset<3> set(gm);
-    b.rst(set);
+    b.rst(gameModeFromInt(gm));
     std::string pos = rootPos;
     size_t spc = pos.rfind(' ');
     if (spc != std::string::npos)
-        pos = pos.substr(0, spc + 1) + makeModeToken(gm);
+        pos = pos.substr(0, spc + 1) + gameModeTurningSquareToken(gameModeFromInt(gm));
     b.loadPosition(pos);
 
     MoveNode* node = &root;
@@ -382,9 +353,11 @@ void OpeningExplorer::undoToMoveCount(int targetMoves) {
 std::string OpeningExplorer::getOpeningName() const {
     if (phase == ExplorerPhase::ChoosingMode) return "Select game mode";
     std::string name;
-    for (auto& step : navPath)
-        if (step.node && !step.node->name.empty())
-            name = step.node->name;
+    for (auto& step : navPath) {
+        if (!step.node) continue;
+        const OpeningLabel* label = step.node->labelForMode(selectedGameMode);
+        if (label) name = label->code.empty() ? label->name : ("[" + label->code + "] " + label->name);
+    }
     return name.empty() ? "(unknown)" : name;
 }
 
@@ -523,13 +496,6 @@ void OpeningExplorer::onTick(float dt, const InputState& input) {
         }
     }
 
-    // Mouse wheel and scrollbar-drag scrolling are both handled internally
-    // by GuiScrollPanel (called from ScrollArea::begin in onDrawOverlay) —
-    // it owns scrollArea.scroll.y entirely. A second, independently
-    // computed wheel handler here used to fight it every frame (both would
-    // add their own delta to the same value on the same GetMouseWheelMove()
-    // reading, then GuiScrollPanel's clamp would win), which is why drag
-    // and wheel scrolling didn't work.
 
     // ── highlights / preview ──
     int mlHover = moveList.hoveredIdx;
@@ -558,12 +524,11 @@ void OpeningExplorer::onTick(float dt, const InputState& input) {
         if (previewKey >= -1) {
             auto replayToPly = [&](int target, int gm) -> GamePosition {
                 ::Board b;
-                std::bitset<3> set(gm);
-                b.rst(set);
+                b.rst(gameModeFromInt(gm));
                 std::string pos = rootPos;
                 size_t space = pos.rfind(' ');
                 if (space != std::string::npos)
-                    pos = pos.substr(0, space + 1) + makeModeToken(gm);
+                    pos = pos.substr(0, space + 1) + gameModeTurningSquareToken(gameModeFromInt(gm));
                 b.loadPosition(pos);
                 for (int p = 0; p <= target; p++)
                     b.unsafeMakeMove(navPath[p].move);
@@ -621,13 +586,10 @@ void OpeningExplorer::onTick(float dt, const InputState& input) {
 
 void OpeningExplorer::onDraw(Rectangle rect) {
     ui::Slot* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale, theme.highlight);
 }
 
 // ── computeHitRects ──────────────────────────────────────────────────
-// Shared by onTick (hit-testing) and onDrawOverlay (drawing) so the two
-// never drift out of sync the way they previously could (each recomputed
-// the same rects independently).
 
 OpeningExplorer::HitRects OpeningExplorer::computeHitRects() {
     float s = theme.scale;

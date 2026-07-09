@@ -15,6 +15,7 @@ struct Theme {
     Color textSection{130, 130, 160, 255};
     Color success{100, 200, 100, 255};
     Color successHover{140, 240, 140, 255};
+    Color highlight{74, 255, 44, 200};
 
     int fontSize{14};
     int fontSizeSmall{12};

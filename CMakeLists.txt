@@ -8,17 +8,17 @@ project(CROSSTONES_V4)
 find_package(raylib CONFIG REQUIRED)
 
 # Font download (once — subsequent builds use cached file)
-set(FONT_PATH "${CMAKE_SOURCE_DIR}/resources/FiraSans-Regular.ttf")
+set(FONT_PATH "${CMAKE_SOURCE_DIR}/resources/DejaVuSans.ttf")
 if(NOT EXISTS ${FONT_PATH})
-    message(STATUS "Downloading FiraSans font ...")
-    file(DOWNLOAD "https://raw.githubusercontent.com/mozilla/Fira/master/ttf/FiraSans-Regular.ttf"
+    message(STATUS "Downloading DejaVu Sans font ...")
+    file(DOWNLOAD "https://raw.githubusercontent.com/prawnpdf/prawn/master/data/fonts/DejaVuSans.ttf"
                   ${FONT_PATH} TLS_VERIFY OFF INACTIVITY_TIMEOUT 30)
 endif()
 # If CMake download failed, try PowerShell
 if(NOT EXISTS ${FONT_PATH})
     message(STATUS "Trying PowerShell download ...")
     execute_process(COMMAND powershell -Command
-        "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mozilla/Fira/master/ttf/FiraSans-Regular.ttf' -OutFile '${FONT_PATH}' -UseBasicParsing"
+        "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/prawnpdf/prawn/master/data/fonts/DejaVuSans.ttf' -OutFile '${FONT_PATH}' -UseBasicParsing"
         ERROR_QUIET OUTPUT_QUIET)
 endif()
 if(NOT EXISTS ${FONT_PATH})
@@ -109,14 +109,23 @@ if(BUILD_TESTS)
     file(GLOB TEST_CTEST_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*Tester.cpp"
     )
+    # Tests that are slow/verbose enough to be excluded by default
+    # To run, use:
+    # 'ctest -R <name>' or 'crosstones_executable --run-tests <name>'
+    set(MANUAL_TESTS
+        "OpeningsVerifyTester"
+    )
     foreach(TSF ${TEST_CTEST_SOURCES})
         get_filename_component(TEST_NAME ${TSF} NAME_WE)
         add_test(NAME ${TEST_NAME}
             COMMAND crosstones_executable --run-tests ${TEST_NAME})
+        if(TEST_NAME IN_LIST MANUAL_TESTS)
+            set_tests_properties(${TEST_NAME} PROPERTIES LABELS "manual")
+        endif()
     endforeach()
-    # Run all tests on every build. Failures are printed to the console
+    # Run all non-manual tests on every build. Failures are printed to the console
     add_custom_target(check ALL
-        COMMAND cmd /C "\"${CMAKE_CTEST_COMMAND}\" --output-on-failure & exit 0"
+        COMMAND cmd /C "\"${CMAKE_CTEST_COMMAND}\" --output-on-failure -LE manual & exit 0"
         DEPENDS crosstones_executable
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         USES_TERMINAL

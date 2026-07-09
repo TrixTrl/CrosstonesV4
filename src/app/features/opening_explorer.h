@@ -6,6 +6,7 @@
 #include "app/ui/components/move_history.h"
 #include "app/ui/components/scroll_area.h"
 #include "app/features/analysis_stub.h"
+#include "app/persistence/Openings.h"
 #include "game-suite/Board.h"
 #include "game-suite/RichMoveGenerator.h"
 #include "game-suite/KsnFormatter.h"
@@ -48,15 +49,13 @@ private:
 
     void initDefaultRoot();
     void loadAndBuildTree();
-    void buildTreeFromOpenings(const std::vector<std::pair<std::string, std::vector<int>>>& openings);
+    void buildTreeFromOpenings(const std::vector<OpeningEntry>& openings);
     void initBoardAtRoot(int gameMode);
     void syncBoard();
 
     void buildMoveList();
     void buildMoveHistory();
-    // The only place that calls buildMoveList()+buildMoveHistory() — every
-    // board/nav mutation calls this once at its exit point instead of
-    // copy-pasting the pair (previously duplicated at 7 call sites).
+
     void onBoardStateChanged();
     void playMove(int candidateIdx);
     void navigateBackTo(int historyRow);
@@ -64,9 +63,7 @@ private:
 
     std::string getOpeningName() const;
 
-    // Rect math shared by onTick (hit-testing) and onDrawOverlay (drawing) —
-    // computed once per frame from each call site instead of two
-    // independently maintained copies of the same formulas.
+    // Rect math shared by onTick and onDrawOverlay 
     struct HitRects {
         Rectangle right;
         int histX, histY, histW, colSplit, histEnd;

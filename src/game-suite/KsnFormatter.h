@@ -11,7 +11,6 @@ public:
     static std::vector<KsnMove> enrichAll(const std::vector<MoveInfo>& infos);
 
     static std::string formatLongKsn(const MoveInfo& info);
-    static std::string xMoveToLongKsn(const GamePosition& before, const XMove& move);
     static XMove fromLongKsn(const GamePosition& pos, const std::string& ksn, bool isWhite);
     static std::vector<int> match(const std::string& ksn, const std::vector<KsnMove>& moves);
     static std::string shorten(int moveIdx, const std::vector<KsnMove>& moves);

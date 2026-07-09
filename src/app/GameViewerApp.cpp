@@ -3,14 +3,12 @@
 #include "ui/components/panel.h"
 #include <string>
 #include <sstream>
-#include <bitset>
 #include <cstring>
 
 void GameViewerApp::parseAndLoadGame(const std::string& gameCode) {
     gameReplay.clear();
     board = Board();
-    std::bitset<3> set(5);
-    board.rst(set);
+    board.rst(GameMode::Orchid);
 
     auto pipePos = gameCode.find("|");
     if (pipePos == std::string::npos) {
@@ -139,7 +137,7 @@ void GameViewerApp::onTick(float dt, const InputState& input) {
 
 void GameViewerApp::onDraw(Rectangle rect) {
     ui::Slot* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale, theme.highlight);
 }
 
 void GameViewerApp::onDrawOverlay(Rectangle rect) {

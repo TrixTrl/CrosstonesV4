@@ -1,41 +1,990 @@
-# Crosstones Opening Book v1
-# Each [Section] is a named opening line as a sequence of move indices
-# from the root position. Move indices refer to the order returned by
-# board.getMoves(isWhite) at each step, alternating white (even depth)
-# and black (odd depth).
-#
-# Lines beginning with # are ignored.
+# Crosstones Opening Book v2
+# Each [Section] is a named opening line, transcribed from the reference
+# opening book PDF. Fields:
+#   code=<ECO-style code, e.g. "K5">  (empty for named footnote variants)
+#   modes=<space-separated game-mode bits, 0-7>
+#     Phoenix=0 Monkey=1 Lotus=2 Kylin=3 Tortoise=4 Orchid=5 Crane=6 Dragon=7
+#   moves=<space-separated KSN move tokens, full sequence from root,
+#          alternating White/Black, resolved via KsnFormatter::fromLongKsn>
 root=b-10000 r-10006 b-10012 -B30500 -B30502 -W30510 -W30512 b-10606 -B30700 -B30702 -W30710 -W30712 b-11200 r-11206 b-11212 11111111111111111111
 
-[DC Quick Development]
-moves=20 95 17 151 141 29
+[Spanish Opening]
+code=I1
+modes=2 3 6 7
+moves=e4
 
-[Hydra Center Push]
-moves=41 63 93 69 104 223
+[Bull's Opening]
+code=I2
+modes=2 3 6 7
+moves=e4②e5
 
-[Deepchad Kingside]
-moves=95 61 247 156 69 53
+[Suzhou Opening]
+code=I3
+modes=2 3
+moves=e3②d①c
 
-[Two Hydras Setup]
-moves=29 132 75 63 186 255
+[Pelican Defence]
+code=I4
+modes=2 3
+moves=e5 k11
 
-[Longmen Attack]
-moves=27 132 12 39 134 176
+[Petersen Defence]
+code=I5
+modes=2 3
+moves=e5 c11
 
-[DC Main Line]
-moves=20 95 17 151 141 29 37 125
+[Bradbury Defence]
+code=I6
+modes=2 6
+moves=e5 i10①i9
 
-[Hydra Gambit]
-moves=41 63 93 69
+[Alfonso Defence]
+code=I7
+modes=2 3 6 7
+moves=e5 e10②e9
 
-[Hydra Executed]
-moves=95 63 247 253 67 162
+[Collins Defence]
+code=I8
+modes=2 3 6 7
+moves=e5 i10②i9
 
-[Double Hydra Variation]
-moves=29 132 75 63
+[Papp Opening]
+code=I9
+modes=0 1
+moves=F3g3h3i3P
 
-[Deepchad Mirror]
-moves=27 132 12 134 24 112
+[Open Game]
+code=O0
+modes=2 3 6 7
+moves=e5 i9
 
-[Classical Center]
-moves=20 95 17 151
+[Yang Opening]
+code=O1
+modes=2 3 6 7
+moves=e5 i9 ②h5
+
+[Indian Opening]
+code=O2
+modes=6 7
+moves=e5 i9 b5
+
+[Russian Opening]
+code=O3
+modes=2 3 6 7
+moves=e5 i9 g5
+
+[Russian Opening, Orthodox Defence]
+code=O4
+modes=2 3 6 7
+moves=e5 i9 g5 e9 ②g7 l9 c5 ②c9①b
+
+[Russian Opening, Bakker Defence]
+code=O5
+modes=2 3 6 7
+moves=e5 i9 g5 ②l9 ②g7 g11T
+
+[Russian Opening, Pseudo-Lima]
+code=O6
+modes=2 3 6 7
+moves=e5 i9 g5 g9
+
+[Pseudo-Andean Gambit]
+code=O7
+modes=2 3 6 7
+moves=e5 i9 g5 g9 Hi5 ②g8①g7
+
+[Oaxaca Gambit]
+code=O8
+modes=3 7
+moves=e5 i9 c6
+
+[Deferred Peruvian Opening]
+code=O9
+modes=0 1 4 5
+moves=e5 i9 Hg5
+
+[Dutch Opening]
+code=H0
+modes=2 3 6 7
+moves=e5 i9 ②b5
+
+[Dutch Opening, Changxing System]
+code=H1
+modes=2 3 6 7
+moves=e5 i9 ②b5 e9
+
+[Dutch Opening, Bakker Defence]
+code=H2
+modes=2 3 6 7
+moves=e5 i9 ②b5 ②l9
+
+[Dutch Opening, Narang Defence]
+code=H3
+modes=2 3 6 7
+moves=e5 i9 ②b5 l9
+
+[Dutch Opening, Park Defence]
+code=H4
+modes=2 3 6 7
+moves=e5 i9 ②b5 e10①e9
+
+[Open Chapman Gambit]
+code=H5
+modes=2 3 6 7
+moves=e5 i9 ②b5 ②g9 Hi5 k9 Ig5 ①g7
+
+[Open Hartley Countergambit]
+code=H6
+modes=2 3 6 7
+moves=e5 i9 ②b5 ②g9 g7
+
+[Korean Opening]
+code=K0
+modes=2 3 6 7
+moves=e5 i9 i4①i5
+
+[Korean Opening, Narang Defence]
+code=K1
+modes=2 3 6 7
+moves=e5 i9 i4①i5 l9
+
+[Korean Opening, Changxing System]
+code=K2
+modes=2 3 6 7
+moves=e5 i9 i4①i5 Fe9
+
+[Korean Opening, Changxing, Alfama Variation]
+code=K3
+modes=2 3 6 7
+moves=e5 i9 i4①i5 Fe9 b5 ②c9①b
+
+[Liu Defence]
+code=K4
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ①l9
+
+[Korean Opening, Classical Variation]
+code=K5
+modes=2 3 6 7
+moves=e5 i9 i4①i5 e10①e9
+
+[Seoul Game]
+code=K6
+modes=2 3 6 7
+moves=e5 i9 i4①i5 e10①e9 b5
+
+[Busan Game]
+code=K7
+modes=2 3 6 7
+moves=e5 i9 i4①i5 e10①e9 k5
+
+[Korean Opening, Centre Variation]
+code=K8
+modes=3 7
+moves=e5 i9 i4①i5 e10①e9 Tg7
+
+[Korean Opening, Monk Variation]
+code=K9
+modes=2 3 6 7
+moves=e5 i9 i4①i5 e10①e9 ②b5
+
+[Korean Opening, Bakker Defence]
+code=B0
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9
+
+[Korean Opening, Kaneshiro Variation]
+code=B1
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9 ②b5
+
+[Neo-Bakker Defence]
+code=B2
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9 g7 Fe9
+
+[Neo-Bakker Defence, Main Line]
+code=B3
+modes=2 6
+moves=e5 i9 i4①i5 ②l9 g7 Fe9 ②b5
+
+[Liuxing Defence]
+code=B4
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9 g7 Fe9 b5 Eg9
+
+[Wilmersdorf Gambit]
+code=B5
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9 g7 Fe9 b5 Eg9 xh9
+
+[Korean Opening, Bakker Defence, Classical]
+code=B6
+modes=2 3 6 7
+moves=e5 i9 i4①i5 ②l9 g7 g11T
+
+[Symmetrical Game]
+code=S0
+modes=2 3 6 7
+moves=e5 e9
+
+[Kaneshiro Opening]
+code=S1
+modes=2 3 6 7
+moves=e5 e9 b5
+
+[Kaneshiro Opening, Changxing System]
+code=S2
+modes=2 3 6 7
+moves=e5 e9 b5 i9
+
+[Kaneshiro Opening, Main Line]
+code=S3
+modes=2 3 6 7
+moves=e5 e9 b5 ②c9①b
+
+[Neo-Russian Opening]
+code=S4
+modes=2 3 6 7
+moves=e5 e9 g5
+
+[Parisian Gambit Declined]
+code=S5
+modes=7
+moves=e5 e9 ②c6 i9
+
+[Parisian Gambit Accepted]
+code=S6
+modes=7
+moves=e5 e9 ②c6 ②h9 a7
+
+[Wren]
+modes=7
+moves=e5 e9 ②c6 ②g9①10
+
+[Old]
+modes=7
+moves=e5 e9 ②c6 ②g9①h
+
+[Sund]
+modes=7
+moves=e5 e9 ②c6 ②f9①h
+
+[Milwaukee Gambit]
+code=S7
+modes=7
+moves=e5 e9 ②c6 ②h9 Tg7
+
+[Chinese Opening]
+code=C0
+modes=2 3 6 7
+moves=e5 e9 i5
+
+[Chinese Opening, Bakker Defence]
+code=C1
+modes=2 3 6 7
+moves=e5 e9 i5 ②b9
+
+[Ouyang Gambit]
+code=C2
+modes=2 3 6 7
+moves=e5 e9 i5 ②b9 Eg5 g7
+
+[Ouyang Gate Gambit]
+code=C3
+modes=3 7
+moves=e5 e9 i5 ②b9 e7 g7
+
+[Woods Countergambit]
+code=C4
+modes=2 3 6 7
+moves=e5 e9 i5 ②b9 E②g5
+
+[Chinese Opening, Bakker Defence, Main Line]
+code=C5
+modes=2 3 6 7
+moves=e5 e9 i5 ②b9 ②c5①b a7
+
+[Chinese Opening, Park System]
+code=C6
+modes=2 3 6 7
+moves=e5 e9 i5 i10①i9
+
+[Chinese Opening, Narang Defence]
+code=C7
+modes=2 3 6 7
+moves=e5 e9 i5 b9
+
+[Chinese Opening, Classical Variation]
+code=G0
+modes=2 3 6 7
+moves=e5 e9 i5 i9
+
+[Watts System]
+code=G1
+modes=2 3 6 7
+moves=F3e5 F11e9 H3i5 H11i9 E5②dcb I9jkl E567TfgM E9②dc①b a7 Eg11T
+
+[Dongcheng System]
+code=G2
+modes=2 3 6 7
+moves=F3e5 F11e9 H3i5 H11i9 E5②dcb I9②jkl E567TfgM E9②dc①b a7 Eg11T
+
+[Chesterton System]
+code=G3
+modes=2 3 6 7
+moves=e5 e9 i5 i9 ②b5 ②l9 g7 ②g9
+
+[Classical Variation, Zijin'gang Variation]
+code=G4
+modes=2 3 6 7
+moves=e5 e9 i5 i9 b5
+
+[Zijin'gang - Watts System]
+code=G5
+modes=2 3 6 7
+moves=e5 e9 i5 i9 b5 l9
+
+[Zijin'gang - Dongcheng System]
+code=G6
+modes=2 3 6 7
+moves=e5 e9 i5 i9 b5 ②l9 ②k5①l m7 g7 ②c9①b a5②a7 Eg11T
+
+[Zijin'gang - Chesterton System]
+code=G7
+modes=2 3 6 7
+moves=e5 e9 i5 i9 b5 ②l9 ②k5①l m7 g7 ②g9
+
+[Shanghai Gambit]
+code=G8
+modes=2 3 6 7
+moves=e5 e9 i5 i9 b5 ②l9 g5 g7
+
+[Montgomery Tempo-chain]
+code=G9
+modes=2 6
+moves=e5 e9 i5 i9 b5 ②l9 ②k5①l m7 g7 i7T
+
+[Neo-Dutch Opening]
+code=N0
+modes=2 3 6 7
+moves=e5 e9 ②b5
+
+[Chapman Gambit]
+code=N1
+modes=2 3 6 7
+moves=e5 e9 ②b5 g9①h Hi5 l9 Ig5 ①g7
+
+[Hartley Countergambit]
+code=N2
+modes=2 3 6 7
+moves=e5 e9 ②b5 g9①h g7
+
+[Rotterdam Gambit]
+code=N3
+modes=2 3 6 7
+moves=e5 e9 ②b5 ②b9
+
+[Rotterdam Gambit Accepted]
+code=N4
+modes=2 3 6 7
+moves=e5 e9 ②b5 ②b9 a7 Hi9
+
+[Lisbon Defence]
+code=N5
+modes=2 3 6 7
+moves=e5 e9 ②b5 ②c9①b
+
+[Lisbon Defence, Main Line]
+code=N6
+modes=2 3 6 7
+moves=e5 e9 ②b5 ②c9①b a7 Hi9 g7 g11T
+
+[Lisbon Defence, Varela Variation]
+code=N7
+modes=3 7
+moves=e5 e9 ②b5 ②c9①b a7 Hi9 g7 a8
+
+[Anderson Defence]
+code=A0
+modes=2 3
+moves=e5 ②i11①9
+
+[Trinity]
+modes=2 3
+moves=e5 i11②10①9
+
+[Semi-Open Chinese System]
+code=A1
+modes=2 3
+moves=e5 ②i11①9 i5
+
+[Reginald Variation]
+code=A2
+modes=2 3
+moves=e5 ②i11①9 i3①i5
+
+[Trident Variation]
+code=A3
+modes=2 3
+moves=e5 ②i11①9 ②g5①h
+
+[Shen Variation]
+code=A4
+modes=2 3
+moves=e5 ②i11①9 ②g5
+
+[Monte-Carlo Gambit Accepted]
+code=A5
+modes=2 3
+moves=e5 ②i11①9 ②g5 g7 xg8
+
+[Monte-Carlo Gambit Declined]
+code=A6
+modes=2 3
+moves=e5 ②i11①9 ②g5 g7 j5
+
+[Japanese Opening]
+code=J0
+modes=2 3 6 7
+moves=e4①e5
+
+[Wesley Opening]
+modes=0 1 4 5
+moves=e4①e5
+
+[Hangzhou Defence]
+code=J1
+modes=2 3 6 7
+moves=e4①e5 e9
+
+[Hangzhou Defence, Yuquan Variation]
+code=J2
+modes=2 3 6 7
+moves=e4①e5 e9 c5
+
+[Seagull Gambit]
+code=J3
+modes=2 3 6 7
+moves=e4①e5 i9 c5
+
+[Seagull Gambit Accepted, Main Line]
+code=J4
+modes=2 3 6 7
+moves=e4①e5 i9 c5 ②l9 Eg5 g7
+
+[Seagull Gambit Accepted, Gate Variation]
+code=J5
+modes=3 7
+moves=e4①e5 i9 c5 ②l9 Ee7 Tg7
+
+[Seagull Gambit Declined]
+code=J6
+modes=2 3 6 7
+moves=e4①e5 i9 c5 e9
+
+[Seagull Gambit, Khan Variation]
+code=J7
+modes=2 3 6 7
+moves=e4①e5 i9 c5 e10①e9
+
+[Japanese Opening, Hypermodern Variation]
+code=J8
+modes=2 3 6 7
+moves=e4①e5 i9 Hi5
+
+[Japanese Opening, Anderson Defence]
+code=J9
+modes=2 3
+moves=e4①e5 ②i11①i9
+
+[Japanese Opening, Main Line]
+code=Z0
+modes=2 3 6 7
+moves=e4①e5 i9 g7
+
+[Japanese Opening, Bakker Defence]
+code=Z1
+modes=2 3 6 7
+moves=e4①e5 i9 g7 ②l9
+
+[Japanese Opening, Changxing System]
+code=Z2
+modes=2 3 6 7
+moves=e4①e5 i9 g7 e9
+
+[Japanese Opening, Changxing, Main Line]
+code=Z3
+modes=2 3 6 7
+moves=e4①e5 i9 g7 e9 e5①c ②l9
+
+[Griffin Variation]
+code=Z4
+modes=2 3 6 7
+moves=e4①e5 i9 g7 e9 e5①c l9
+
+[Stewart Variation]
+code=Z5
+modes=3 7
+moves=e4①e5 i9 g7 e9 e5①c k8
+
+[Japanese, Modern Defence]
+code=Z6
+modes=2 3
+moves=e4①e5 k11
+
+[Japanese O., Modern Defence, Deferred]
+code=Z7
+modes=2 3
+moves=e4①e5 k11 Hi5
+
+[Japanese O., Modern Defence, Main Line]
+code=Z8
+modes=2 3
+moves=e4①e5 k11 g7 e11①e9
+
+[Longmen Defence]
+code=L0
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3
+
+[Pseudo-Longmen Defence]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3
+
+[Pseudo-Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3 a4
+
+[Pseudo-Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Pseudo-Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Pseudo-Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Pseudo-Longmen Defence, Arusha Variation]
+modes=7
+moves=e4①e5 i9 g7 ②e11①9 e5①c5 c7T a7 c3 Hi5 ②l9 ②k5①l m7 m6
+
+[Collins]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9
+
+[Trinity (Longmen)]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9
+
+[Kara]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9
+
+[Accelerated Port Deadlock]
+code=L1
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3 a4
+
+[Fäller Intermezzo]
+code=L3
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Ikeda Attack]
+code=L4
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Longmen Defence, Classical Variation]
+code=L5
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Arusha Variation]
+code=L6
+modes=7
+moves=e4①e5 i9 Tg7 ②e11①9 e5①c5 c7T a7 c3 Hi5 ②l9 ②k5①l m7 m6
+
+[Japanese Opening, Park System]
+code=L7
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c c11
+
+[Japanese Opening, Kaneshiro Gambit]
+code=L8
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c c7T a7 c3T a4 a1
+
+
+[Collins Longmen Defence]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9 e5①c5 c7T a7 c3
+
+[Collins Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9 e5①c5 c7T a7 c3 a4
+
+[Collins Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Collins Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Collins Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 Tg7 ②e10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Trinity Longmen Defence]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9 e5①c5 c7T a7 c3
+
+[Trinity Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9 e5①c5 c7T a7 c3 a4
+
+[Trinity Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Trinity Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Trinity Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 Tg7 e11②10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Kara Longmen Defence]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3
+
+[Kara Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 a4
+
+[Kara Longmen Defence, Swan Variation]
+code=L2
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 Ac5 e9①c
+
+[Kara Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Kara Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Kara Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Kara Longmen Defence, Arusha Variation]
+modes=7
+moves=e4①e5 i9 Tg7 e10①9 e5①c5 c7T a7 c3 Hi5 ②l9 ②k5①l m7 m6
+
+[Collins Pseudo-Longmen Defence]
+modes=7
+moves=e4①e5 i9 g7 ②e10①9 e5①c5 c7T a7 c3
+
+[Collins Pseudo-Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 g7 ②e10①9 e5①c5 c7T a7 c3 a4
+
+[Collins Pseudo-Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 g7 ②e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Collins Pseudo-Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 g7 ②e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Collins Pseudo-Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 g7 ②e10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Trinity Pseudo-Longmen Defence]
+modes=7
+moves=e4①e5 i9 g7 e11②10①9 e5①c5 c7T a7 c3
+
+[Trinity Pseudo-Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 g7 e11②10①9 e5①c5 c7T a7 c3 a4
+
+[Trinity Pseudo-Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 g7 e11②10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Trinity Pseudo-Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 g7 e11②10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Trinity Pseudo-Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 g7 e11②10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Kara Pseudo-Longmen Defence]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3
+
+[Kara Pseudo-Longmen Defence, Accelerated Port Deadlock]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 a4
+
+[Kara Pseudo-Longmen Defence, Swan Variation]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 Ac5 e9①c
+
+[Kara Pseudo-Longmen Defence, Fäller Intermezzo]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 k3T
+
+[Kara Pseudo-Longmen Defence, Ikeda Attack]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 i4①i5 ②l9 Ac5 m7 Ce7T
+
+[Kara Pseudo-Longmen Defence, Classical Variation]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 Hi5 ②l9
+
+[Kara Pseudo-Longmen Defence, Arusha Variation]
+modes=7
+moves=e4①e5 i9 g7 e10①9 e5①c5 c7T a7 c3 Hi5 ②l9 ②k5①l m7 m6
+
+[Neo-Japanese Opening]
+code=X0
+modes=2 3
+moves=②e3①5
+
+[Trinity Opening]
+modes=2 3
+moves=e3②4①5
+
+[Neo-Japanese Opening, Main Line]
+code=X1
+modes=2 3
+moves=②e3①5 i9 g7
+
+[Neo-Japanese Opening, Bakker Defence]
+code=X2
+modes=2 3
+moves=②e3①5 i9 g7 ②l9
+
+[Neo-Japanese Opening, Chanxing System]
+code=X3
+modes=2 3
+moves=②e3①5 i9 g7 e9
+
+[Neo-Japanese Opening, Modern Defence]
+code=X4
+modes=2 3
+moves=②e3①5 k11
+
+[Neo-Japanese, Modern Defence, Deferred]
+code=X5
+modes=2 3
+moves=②e3①5 k11 Hi5
+
+[Neo-Japanese, Modern Defence, Main Line]
+code=X6
+modes=2 3
+moves=②e3①5 k11 g7 e11①e9
+
+[Neo-Japanese Opening, Anderson Defence]
+code=X7
+modes=2 3
+moves=②e3①5 ②i11①i9
+
+[Trinity (Neo-Japanese)]
+modes=2 3
+moves=②e3①5 i11②10①9
+
+[Neo-Japanese O., Hypermodern Variation]
+code=X8
+modes=2 3
+moves=②e3①5 i9 Hi5
+
+[Salamander Gambit]
+code=X9
+modes=2 3
+moves=②e3①5 i9 a3
+
+[Finnish Opening]
+code=F0
+modes=2 3
+moves=c3
+
+[Finnish Opening, Main Line]
+code=F1
+modes=2 3
+moves=c3 i9 i5
+
+[Finnish Opening, Modern Defence]
+code=F2
+modes=2 3
+moves=c3 i9 i3①5
+
+[Finnish, Anderson Defence]
+code=F3
+modes=2 3
+moves=c3 ②i11①i9
+
+[Trinity (Finnish)]
+modes=2 3
+moves=c3 i11②10①9
+
+[Finnish, Anderson Defence, Main Line]
+code=F4
+modes=2 3
+moves=c3 ②i11①i9 i5
+
+[Finnish, Anderson Defence, Grimm Variation]
+code=F5
+modes=2 3
+moves=c3 ②i11①i9 i3①5
+
+[Finnish Opening, Classical Variation]
+code=F6
+modes=2 3
+moves=c3 k11
+
+[Finnish Opening, Peruvian Defence]
+code=F7
+modes=0 1
+moves=c3 Hg9
+
+[Peruvian Opening]
+code=P0
+modes=0 1 4 5
+moves=Fg5
+
+[Crowbar Defence]
+code=P1
+modes=0 1 4 5
+moves=Fg5 i9
+
+[Crowbar Defence, Anti-Melbourne]
+code=P2
+modes=0 1 4 5
+moves=Fg5 i9 ②g7
+
+[Crowbar Defence, Pincer Variation]
+code=P3
+modes=0 1 4 5
+moves=Fg5 i9 ②g7 e9
+
+[Tongfang Crowbar Defence]
+code=P4
+modes=0 1 4 5
+moves=Fg5 e9
+
+[Humphrey Defence]
+code=P5
+modes=0 1
+moves=Fg5 k11
+
+[Reverse Peruvian Opening]
+code=P6
+modes=1 5
+moves=e5 Hg9
+
+[Reverse Peruvian Opening, Main Line]
+code=P7
+modes=1 5
+moves=e5 Hg9 i5
+
+[Ikeda-Carvajal System]
+code=P8
+modes=1 5
+moves=e5 Hg9 i4①i5
+
+[Tongfang Reverse Peruvian]
+code=P9
+modes=1 5
+moves=e5 Fg9
+
+[Melbourne Defence]
+code=M0
+modes=0 1 4 5
+moves=Fg5 Fg9
+
+[Melbourne Defence, Main Line]
+code=M1
+modes=1 5
+moves=Fg5 Fg9 Hi5
+
+[Melbourne Double Gambit]
+code=M2
+modes=1 5
+moves=Fg5 Fg9 Hi5 ②g8①7
+
+[Semi-Melbourne Defence]
+code=M3
+modes=1 5
+moves=Fg5 Fg9 ②d5
+
+[Semi-Melbourne Defence, Symmetrical]
+code=M4
+modes=1 5
+moves=Fg5 Fg9 ②d5 ②d9
+
+[Pseudo-Guatemalan Game]
+code=M5
+modes=1 5
+moves=Fg5 Fg9 ②d5 ②j9
+
+[Lima Deadlock]
+code=D0
+modes=0 1 4 5
+moves=Fg5 Hg9
+
+[Lima Deadlock Resolved]
+code=D1
+modes=0 4
+moves=Fg5 Hg9 g7
+
+[Lima Deadlock, Classical Main Line]
+code=D2
+modes=0 1 4 5
+moves=Fg5 Hg9 Hi5
+
+[Andean Gambit]
+code=D3
+modes=1 5
+moves=Fg5 Hg9 Hi5 ②g8①g7
+
+[Andean Gambit Accepted]
+code=D4
+modes=1 5
+moves=Fg5 Hg9 Hi5 ②g8①g7 x1h
+
+[Wild Bill Countergambit]
+code=D5
+modes=1 5
+moves=Fg5 Hg9 Hi5 ②g8①g7 x1f
+
+[Guatemalan Game]
+code=D6
+modes=1 5
+moves=Fg5 Hg9 ②d5 ②j9
+
+[Guatemalan Game, Exchange Variation]
+code=D7
+modes=1 5
+moves=Fg5 Hg9 ②d5 ②j9 k5 c9 a5 m9 m7 a7 xa8 xm6
+
+[Colombian Gambit]
+code=D8
+modes=1 5
+moves=Fg5 Hg9 ②d5 ②j9 k5 m9 m7 xm6 a5 g7
+
+[Accelerated Colombian Gambit]
+code=D9
+modes=1 5
+moves=Fg5 Hg9 ②d5 ②g7

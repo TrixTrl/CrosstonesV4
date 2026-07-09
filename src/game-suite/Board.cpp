@@ -67,35 +67,36 @@ void Board::rst(std::bitset<3> &tps)
 	uint8_t turnPieceMask = 0b10111111;
 	uint8_t resetMask = 0b11000000;
 
-	// gamePos[0][0] = turnPieceMask & gamePos[0][0] | (tps[0] * setTurnPiece);
-	gamePos[2][0] = turnPieceMask & gamePos[2][0] | (tps[0] * setTurnPiece);
-	gamePos[0][2] = turnPieceMask & gamePos[0][2] | (tps[0] * setTurnPiece);
-	gamePos[2][2] = turnPieceMask & gamePos[2][2] | (tps[0] * setTurnPiece);
+	// See globals/GameMode.h, for correct mapping
+	// gamePos[0][0] = turnPieceMask & gamePos[0][0] | (tps[2] * setTurnPiece);
+	gamePos[2][0] = turnPieceMask & gamePos[2][0] | (tps[2] * setTurnPiece);
+	gamePos[0][2] = turnPieceMask & gamePos[0][2] | (tps[2] * setTurnPiece);
+	gamePos[2][2] = turnPieceMask & gamePos[2][2] | (tps[2] * setTurnPiece);
 
-	gamePos[10][0] = turnPieceMask & gamePos[10][0] | (tps[0] * setTurnPiece);
-	// gamePos[12][0] = turnPieceMask & gamePos[12][0] | (tps[0] * setTurnPiece);
-	gamePos[10][2] = turnPieceMask & gamePos[10][2] | (tps[0] * setTurnPiece);
-	gamePos[12][2] = turnPieceMask & gamePos[12][2] | (tps[0] * setTurnPiece);
+	gamePos[10][0] = turnPieceMask & gamePos[10][0] | (tps[2] * setTurnPiece);
+	// gamePos[12][0] = turnPieceMask & gamePos[12][0] | (tps[2] * setTurnPiece);
+	gamePos[10][2] = turnPieceMask & gamePos[10][2] | (tps[2] * setTurnPiece);
+	gamePos[12][2] = turnPieceMask & gamePos[12][2] | (tps[2] * setTurnPiece);
 
-	// gamePos[0][12] = turnPieceMask & gamePos[0][12] | (tps[0] * setTurnPiece);
-	gamePos[2][12] = turnPieceMask & gamePos[2][12] | (tps[0] * setTurnPiece);
-	gamePos[0][10] = turnPieceMask & gamePos[0][10] | (tps[0] * setTurnPiece);
-	gamePos[2][10] = turnPieceMask & gamePos[2][10] | (tps[0] * setTurnPiece);
+	// gamePos[0][12] = turnPieceMask & gamePos[0][12] | (tps[2] * setTurnPiece);
+	gamePos[2][12] = turnPieceMask & gamePos[2][12] | (tps[2] * setTurnPiece);
+	gamePos[0][10] = turnPieceMask & gamePos[0][10] | (tps[2] * setTurnPiece);
+	gamePos[2][10] = turnPieceMask & gamePos[2][10] | (tps[2] * setTurnPiece);
 
-	gamePos[10][12] = turnPieceMask & gamePos[10][12] | (tps[0] * setTurnPiece);
-	// gamePos[12][12] = turnPieceMask & gamePos[12][12] | (tps[0] * setTurnPiece);
-	gamePos[10][10] = turnPieceMask & gamePos[10][10] | (tps[0] * setTurnPiece);
-	gamePos[12][10] = turnPieceMask & gamePos[12][10] | (tps[0] * setTurnPiece);
+	gamePos[10][12] = turnPieceMask & gamePos[10][12] | (tps[2] * setTurnPiece);
+	// gamePos[12][12] = turnPieceMask & gamePos[12][12] | (tps[2] * setTurnPiece);
+	gamePos[10][10] = turnPieceMask & gamePos[10][10] | (tps[2] * setTurnPiece);
+	gamePos[12][10] = turnPieceMask & gamePos[12][10] | (tps[2] * setTurnPiece);
 
 	gamePos[6][0] = turnPieceMask & gamePos[6][0] | (tps[1] * setTurnPiece);
 	gamePos[6][2] = turnPieceMask & gamePos[6][2] | (tps[1] * setTurnPiece);
 	gamePos[6][10] = turnPieceMask & gamePos[6][10] | (tps[1] * setTurnPiece);
 	gamePos[6][12] = turnPieceMask & gamePos[6][12] | (tps[1] * setTurnPiece);
 
-	gamePos[2][6] = turnPieceMask & gamePos[2][6] | (tps[2] * setTurnPiece);
-	gamePos[4][6] = turnPieceMask & gamePos[4][6] | (tps[2] * setTurnPiece);
-	gamePos[8][6] = turnPieceMask & gamePos[8][6] | (tps[2] * setTurnPiece);
-	gamePos[10][6] = turnPieceMask & gamePos[10][6] | (tps[2] * setTurnPiece);
+	gamePos[2][6] = turnPieceMask & gamePos[2][6] | (tps[0] * setTurnPiece);
+	gamePos[4][6] = turnPieceMask & gamePos[4][6] | (tps[0] * setTurnPiece);
+	gamePos[8][6] = turnPieceMask & gamePos[8][6] | (tps[0] * setTurnPiece);
+	gamePos[10][6] = turnPieceMask & gamePos[10][6] | (tps[0] * setTurnPiece);
 
 	for (int i = 0; i < 13; i++)
 	{

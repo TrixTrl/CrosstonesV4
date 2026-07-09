@@ -25,7 +25,7 @@ void DCTestApp::onTick(float dt, const InputState& /*input*/) {
 
 void DCTestApp::onDraw(Rectangle rect) {
     ui::Slot* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale, theme.highlight);
 }
 
 void DCTestApp::onDrawOverlay(Rectangle rect) {

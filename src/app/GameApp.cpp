@@ -8,6 +8,7 @@
 #include "data/GamePosition.h"
 #include "app/persistence/GameSetupConfig.h"
 #include "app/persistence/PositionPresets.h"
+#include "globals/GameMode.h"
 #include <string>
 #include <bitset>
 #include <cstring>
@@ -25,18 +26,13 @@ static const char* timestampStr() {
     return buf;
 }
 
-static const char* gameModeNames[] = {
-    "Phoenix", "Monkey", "Lotus", "Kylin",
-    "Tortoise", "Orchid", "Crane", "Dragon"
-};
-
 static void buildDropdownForSource(GameApp::PosSource src, const std::vector<PositionPreset>& presets,
                                    GameEntries& entries,
                                    std::vector<std::string_view>& names, int& count) {
     names.clear(); count = 0;
     if (src == GameApp::POS_START) {
-        for (int p = 0; p < 8; p++) names.push_back(gameModeNames[p]);
-        count = 8;
+        for (int p = 0; p < kGameModeCount; p++) names.push_back(gameModeName(gameModeFromInt(p)));
+        count = kGameModeCount;
     } else if (src == GameApp::POS_PRESET) {
         for (auto& e : presets) names.push_back(e.name);
         count = (int)presets.size();
@@ -221,7 +217,7 @@ void GameApp::startGame() {
         { .id = "board", .flex = 1 },
     }};
 
-    std::bitset<3> gamemode(p.gameModeBits);
+    std::bitset<3> gamemode = gameModeToTps(gameModeFromInt(p.gameModeBits));
     int p1p = p.player1Param.empty() ? 4 : std::stoi(p.player1Param);
     int p2p = p.player2Param.empty() ? 4 : std::stoi(p.player2Param);
     play.p1 = services::createPlayer(p.player1Type, p1p, &boardView.position(), &play.manualP1);
@@ -302,7 +298,7 @@ void GameApp::onDraw(Rectangle rect) {
         return;
     }
     auto* boardSlot = layout.find("board");
-    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale);
+    boardView.draw(boardSlot ? boardSlot->rect : rect, theme.scale, theme.highlight);
 }
 
 void GameApp::drawSetupForm(Rectangle rect) {

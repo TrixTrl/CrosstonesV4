@@ -1,10 +1,15 @@
 #pragma once
 #include "raylib.h"
+#include <vector>
 
 extern Font appFont;
 
 static inline void initAppFont() {
-    appFont = LoadFontEx("resources/FiraSans-Regular.ttf", 96, 0, 250);
+    std::vector<int> codepoints;
+    for (int c = 32; c <= 255; c++) codepoints.push_back(c);
+    for (int c = 0x2460; c <= 0x2473; c++) codepoints.push_back(c);
+
+    appFont = LoadFontEx("resources/DejaVuSans.ttf", 96, codepoints.data(), (int)codepoints.size());
     if (appFont.texture.id != 0) {
         SetTextureFilter(appFont.texture, TEXTURE_FILTER_BILINEAR);
     }

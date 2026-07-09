@@ -13,7 +13,7 @@ public:
     void clearHighlights();
     void setHistoryPreview(const GamePosition& state);
     void clearHistoryPreview();
-    void draw(Rectangle rect, float uiScale = 1.0f);
+    void draw(Rectangle rect, float uiScale = 1.0f, Color highlightColor = Color{74, 255, 44, 200});
 
     GamePosition& position() { return displayBoard; }
     const GamePosition& position() const { return displayBoard; }
@@ -27,9 +27,9 @@ private:
     GamePosition historyPreviewState{};
 
     void drawGrid(int cellSize, int ox, int oy, const GamePosition& state);
-    void drawMovePath(int cellSize, int ox, int oy);
+    void drawMovePath(int cellSize, int ox, int oy, Color color);
     void drawPieces(const GamePosition& state, int cellSize, int ox, int oy);
-    void drawHighlights(const bool hl[13][13], int cellSize, int ox, int oy);
+    void drawHighlights(const bool hl[13][13], int cellSize, int ox, int oy, Color color);
 };
 
 } // namespace ui
